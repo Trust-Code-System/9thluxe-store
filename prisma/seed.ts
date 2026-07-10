@@ -1,5 +1,7 @@
 // prisma/seed.ts
-import { PrismaClient, ProductCategory } from '@prisma/client'
+// DEVELOPMENT FIXTURES ONLY — these are not real production products or prices. They exist so the
+// app and tests run against a populated perfume catalogue. Do not treat as business data.
+import { PrismaClient, ProductCategory, PublishStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -13,6 +15,12 @@ async function main() {
       priceNGN: 95000,
       category: ProductCategory.PERFUMES,
       brand: 'Fàdè',
+      concentration: 'EDP',
+      fragranceFamily: 'ORIENTAL',
+      notesTop: 'bergamot',
+      notesHeart: 'oud',
+      notesBase: 'amber, vanilla',
+      publishStatus: PublishStatus.PUBLISHED,
       stock: 50,
     },
     {
@@ -23,6 +31,12 @@ async function main() {
       priceNGN: 75000,
       category: ProductCategory.PERFUMES,
       brand: 'Aurelius',
+      concentration: 'EDT',
+      fragranceFamily: 'WOODY',
+      notesTop: 'lemon, bergamot',
+      notesHeart: 'cedar',
+      notesBase: 'vetiver',
+      publishStatus: PublishStatus.PUBLISHED,
       stock: 30,
     },
     {
@@ -33,6 +47,12 @@ async function main() {
       priceNGN: 85000,
       category: ProductCategory.PERFUMES,
       brand: 'Vesper',
+      concentration: 'EDP',
+      fragranceFamily: 'FLORAL',
+      notesTop: 'pink pepper',
+      notesHeart: 'rose',
+      notesBase: 'patchouli',
+      publishStatus: PublishStatus.PUBLISHED,
       stock: 35,
     },
   ]

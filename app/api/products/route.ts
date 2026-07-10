@@ -68,10 +68,9 @@ export async function GET(request: NextRequest) {
         notesBase: true,
         longevity: true,
         occasion: true,
-        material: true,
-        lensType: true,
-        warranty: true,
-        waterResistance: true,
+        fragranceFamily: true,
+        concentration: true,
+        sillage: true,
       },
     })
 
