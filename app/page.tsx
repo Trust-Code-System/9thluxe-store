@@ -10,6 +10,8 @@ import { FragranceFamilies } from "@/components/home/fragrance-families"
 
 import { BrandStorySection } from "@/components/home/brand-story-section"
 
+import { ConciergeInvitation } from "@/components/home/concierge-invitation"
+
 import { NewsletterSection } from "@/components/home/newsletter-section"
 
 import { prisma } from "@/lib/prisma"
@@ -79,6 +81,8 @@ export default async function HomePage() {
       <FragranceFamilies />
 
       <BrandStorySection />
+
+      <ConciergeInvitation />
 
       <NewsletterSection />
 

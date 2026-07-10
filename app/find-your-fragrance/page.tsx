@@ -54,14 +54,24 @@ export default function FindYourFragrancePage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto max-w-2xl px-4 py-12">
-        <h1 className="mb-2 text-3xl font-semibold text-foreground">Find your fragrance</h1>
-        <p className="mb-8 text-muted-foreground">
-          Answer a few questions and we’ll point you to scents that match your taste.
-        </p>
+      <div className="container mx-auto max-w-2xl px-4 py-12 lg:py-16">
+        <div className="mb-8 text-center">
+          <span className="eyebrow">Find your scent</span>
+          <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+            A few questions
+          </h1>
+          <p className="mx-auto mt-3 max-w-md leading-relaxed text-muted-foreground">
+            Tell us how you like to wear fragrance and we’ll point you to matching scents.
+            Prefer to chat?{" "}
+            <a href="/concierge" className="font-medium text-accent underline underline-offset-4">
+              Ask the Scent Concierge
+            </a>
+            .
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit}>
-          <Card className="space-y-8 p-6">
+          <Card className="space-y-8 p-6 sm:p-8">
             <div>
               <label className="mb-3 block text-sm font-medium text-foreground">
                 Occasion
