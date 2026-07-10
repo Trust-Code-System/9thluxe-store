@@ -93,8 +93,9 @@ Anything marked `[blocked]` has an implemented adapter + `.env.example` entry + 
   flag-gated OFF). Full-bottle conversion + admin credit granting still to wire.
 - [~] Loyalty & referrals — pure points logic (earn 1pt/₦1,000, balance, redemption **refused unless
   `loyalty_rewards` flag on**), `GET /api/v1/loyalty` (tier/spend/points); referral code get-or-create
-  `GET /api/v1/referrals` with `referral_rewards` flag OFF. Earn-on-payment wiring + payout approval
-  still to add. Tested.
+  `GET /api/v1/referrals` with `referral_rewards` flag OFF. **Earn-on-payment wired** into the
+  Paystack webhook (LoyaltyLedger accrues points atomically on charge.success; tier via config).
+  Payout approval still to add. Tested.
 - [~] Notifications events + consent/quiet-hours/dedup
 - [~] Owner Copilot — **daily brief live** (`GET /api/v1/admin/daily-brief`, ADMIN-gated, read-only
   aggregation with every metric traceable via `brief.sources`, margin reports `no_cost_price_data`
@@ -119,7 +120,8 @@ Anything marked `[blocked]` has an implemented adapter + `.env.example` entry + 
 - [x] Migration + validation scripts w/ dry-run (`scripts/migrate/*`)
 - [x] Test runner (vitest) + config
 - [~] Unit tests (product validation, recommendation scoring, price calc, sample credit, loyalty ledger, margin, permissions, error mapping, AI structured output, payment-state transitions)
-- [~] Integration tests (Shopify adapter mock, Paystack mock, DB, webhooks, notifications, search, AI mock, contract, auth)
+- [~] Integration tests (Paystack mock ✓, AI mock ✓, contract ✓, **DB-backed verified-purchase path ✓**
+  self-cleaning + gated on DATABASE_URL). Shopify/webhook/notification/search suites still to add.
 - [ ] E2E backend tests (browse→cart, cart→checkout, verified/failed/duplicate/replay payment, oversell race, tracking, review verify, sample redemption, back-in-stock, AI unavailable-product, owner approval, account deletion)
 - [ ] Security tests (unauthorized access, role escalation, malformed/invalid-sig webhook, dup idempotency, oversized request, prompt-injection, sensitive-log, rate limits)
 - [ ] Migration tests (dry-run, rollback, dup SKU, missing attr, invalid currency, orphaned customer, unsupported category)

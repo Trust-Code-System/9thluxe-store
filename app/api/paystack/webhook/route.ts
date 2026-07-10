@@ -4,6 +4,8 @@ import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { sendReceipt } from '@/emails/sendReceipt'
 import { recordWebhookOnce } from '@/lib/webhooks/idempotency'
+import { resolveLoyaltyTier } from '@/lib/config/commerce'
+import { pointsForOrder } from '@/lib/loyalty/points'
 
 function verify(reqBody: string, signature?: string) {
   const secret = process.env.PAYSTACK_SECRET_KEY || ''
@@ -67,21 +69,30 @@ export async function POST(req: NextRequest) {
           })
         }
 
-        // Update user loyalty tier and lifetime spend
+        // Update user loyalty tier and lifetime spend (thresholds from commerce config)
         const updatedUser = await tx.user.update({
           where: { id: updated.userId },
           data: { totalLifetimeSpend: { increment: updated.totalNGN } },
           select: { totalLifetimeSpend: true },
         })
-        const newSpend = updatedUser.totalLifetimeSpend
-        const tier =
-          newSpend >= 5_000_000 ? 'PLATINUM' :
-          newSpend >= 1_000_000 ? 'GOLD' :
-          newSpend >= 200_000   ? 'OBSIDIAN' : 'STANDARD'
         await tx.user.update({
           where: { id: updated.userId },
-          data: { loyaltyTier: tier },
+          data: { loyaltyTier: resolveLoyaltyTier(updatedUser.totalLifetimeSpend) },
         })
+
+        // Accrue loyalty points (earning is always recorded; redemption stays flag-gated).
+        // Idempotent: the already-PAID + WebhookReceipt guards prevent double-earn.
+        const points = pointsForOrder(updated.totalNGN)
+        if (points > 0) {
+          const prior = await tx.loyaltyLedger.aggregate({
+            where: { userId: updated.userId },
+            _sum: { delta: true },
+          })
+          const balanceAfter = (prior._sum.delta ?? 0) + points
+          await tx.loyaltyLedger.create({
+            data: { userId: updated.userId, delta: points, reason: 'order_earn', balanceAfter, orderId: updated.id },
+          })
+        }
 
         return updated
       })
