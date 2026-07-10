@@ -38,11 +38,19 @@ interface CheckoutContentProps {
 
   items?: OrderItem[]
 
+  freeShippingThreshold?: number
+
+  flatShippingFee?: number
+
 }
 
 
 
-export function CheckoutContent({ items: propItems = [] }: CheckoutContentProps) {
+export function CheckoutContent({
+  items: propItems = [],
+  freeShippingThreshold = 500_000,
+  flatShippingFee = 15000,
+}: CheckoutContentProps) {
 
   const router = useRouter()
 
@@ -108,9 +116,8 @@ export function CheckoutContent({ items: propItems = [] }: CheckoutContentProps)
 
     const subtotalNGN = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
 
-    const FREE_SHIPPING_THRESHOLD = 500_000
-
-    const baseShippingNGN = subtotalNGN >= FREE_SHIPPING_THRESHOLD ? 0 : deliveryMethod === "express" ? 35000 : 15000
+    const baseShippingNGN =
+      subtotalNGN >= freeShippingThreshold ? 0 : deliveryMethod === "express" ? 35000 : flatShippingFee
 
     const giftWrappingNGN = formData.giftWrapping ? 2500 : 0
 
@@ -142,7 +149,7 @@ export function CheckoutContent({ items: propItems = [] }: CheckoutContentProps)
 
     }
 
-  }, [items, discount, deliveryMethod, couponId, formData.isGift, formData.giftMessage, formData.giftWrapping])
+  }, [items, discount, deliveryMethod, couponId, formData.isGift, formData.giftMessage, formData.giftWrapping, freeShippingThreshold, flatShippingFee])
 
 
 

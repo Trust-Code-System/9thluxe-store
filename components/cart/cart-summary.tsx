@@ -28,11 +28,21 @@ interface CartSummaryProps {
 
   itemCount: number
 
+  /** Commerce policy from backend config (lib/config/commerce). */
+  freeShippingThreshold?: number
+
+  flatShippingFee?: number
+
 }
 
 
 
-export function CartSummary({ subtotal, itemCount }: CartSummaryProps) {
+export function CartSummary({
+  subtotal,
+  itemCount,
+  freeShippingThreshold = 500000,
+  flatShippingFee = 15000,
+}: CartSummaryProps) {
 
   const couponCode = useCartStore((state) => state.couponCode)
 
@@ -66,7 +76,7 @@ export function CartSummary({ subtotal, itemCount }: CartSummaryProps) {
 
 
 
-  const shipping = subtotal > 500000 ? 0 : 15000
+  const shipping = subtotal >= freeShippingThreshold ? 0 : flatShippingFee
 
   const currentDiscount = discount
 
@@ -324,11 +334,11 @@ export function CartSummary({ subtotal, itemCount }: CartSummaryProps) {
 
                 ? "Complimentary delivery unlocked"
 
-                : `Add ${formatPrice(500000 - subtotal)} for free delivery`}
+                : `Add ${formatPrice(Math.max(0, freeShippingThreshold - subtotal))} for free delivery`}
 
             </span>
 
-            <span className="text-muted-foreground">{Math.min(100, Math.round((subtotal / 500000) * 100))}%</span>
+            <span className="text-muted-foreground">{Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100))}%</span>
 
           </div>
 
@@ -336,7 +346,7 @@ export function CartSummary({ subtotal, itemCount }: CartSummaryProps) {
 
             className="w-full h-1.5 rounded-full [&::-webkit-progress-bar]:bg-muted [&::-webkit-progress-bar]:rounded-full [&::-webkit-progress-value]:bg-accent [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:transition-all [&::-moz-progress-bar]:bg-accent"
 
-            value={Math.min(100, (subtotal / 500000) * 100)}
+            value={Math.min(100, (subtotal / freeShippingThreshold) * 100)}
 
             max={100}
 

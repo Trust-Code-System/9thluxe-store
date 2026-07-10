@@ -3,7 +3,7 @@ import Link from "next/link"
 import { MainLayout } from "@/components/layout/main-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { SprayCan, Truck, Award, Heart } from "lucide-react"
+import { SprayCan, Truck, Award, Heart, ShieldCheck, PackageCheck, MessageSquareWarning } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "About Fàdè",
@@ -18,11 +18,12 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-12 lg:mb-16">
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-4">
+            <span className="eyebrow">Our House</span>
+            <h1 className="mt-3 font-serif text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-4">
               About Fàdè
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Curating luxury fragrances for the discerning individual
+              A Lagos house for rare and coveted perfumes — curated with care, sold with confidence.
             </p>
           </div>
 
@@ -47,8 +48,8 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 md:grid-cols-1 max-w-md mx-auto gap-6">
                 <Card className="group hover:shadow-lg transition-shadow">
                   <CardContent className="pt-6 text-center">
-                    <div className="rounded-full bg-primary/10 p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <SprayCan className="h-8 w-8 text-primary" />
+                    <div className="rounded-full bg-accent/12 p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                      <SprayCan className="h-8 w-8 text-accent" />
                     </div>
                     <h3 className="font-semibold text-lg mb-2">Premium Perfumes</h3>
                     <p className="text-sm text-muted-foreground">
@@ -60,11 +61,11 @@ export default function AboutPage() {
             </div>
 
             {/* Delivery & Service */}
-            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <Card className="bg-secondary/50 border-border">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-primary/20 p-3 shrink-0">
-                    <Truck className="h-6 w-6 text-primary" />
+                  <div className="rounded-full bg-accent/15 p-3 shrink-0">
+                    <Truck className="h-6 w-6 text-accent" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Nationwide Delivery</h3>
@@ -84,8 +85,8 @@ export default function AboutPage() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="rounded-full bg-primary/10 p-3 shrink-0">
-                      <Award className="h-6 w-6 text-primary" />
+                    <div className="rounded-full bg-accent/12 p-3 shrink-0">
+                      <Award className="h-6 w-6 text-accent" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Quality First</h3>
@@ -100,8 +101,8 @@ export default function AboutPage() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="rounded-full bg-primary/10 p-3 shrink-0">
-                      <Heart className="h-6 w-6 text-primary" />
+                    <div className="rounded-full bg-accent/12 p-3 shrink-0">
+                      <Heart className="h-6 w-6 text-accent" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Customer Focused</h3>
@@ -112,6 +113,51 @@ export default function AboutPage() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Authenticity Centre */}
+            <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+              <div className="mb-6 text-center">
+                <span className="eyebrow">The Authenticity Promise</span>
+                <h2 className="mt-3 font-serif text-2xl font-semibold tracking-tight md:text-3xl">
+                  How we protect what you buy
+                </h2>
+              </div>
+              <div className="grid gap-6 sm:grid-cols-3">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                  <div>
+                    <h3 className="text-sm font-semibold">Sourced deliberately</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      We buy from suppliers we trust and record the provenance of every fragrance.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <PackageCheck className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                  <div>
+                    <h3 className="text-sm font-semibold">Inspected on arrival</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Each item is checked and sealed before dispatch — retailer inspection, not a
+                      manufacturer guarantee.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <MessageSquareWarning className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                  <div>
+                    <h3 className="text-sm font-semibold">Report a concern</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Doubt something you received? Contact our concierge and we’ll investigate.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 text-center">
+                <Button variant="outline" asChild className="bg-transparent">
+                  <Link href="/help/contact">Contact the Concierge</Link>
+                </Button>
+              </div>
             </div>
 
             {/* CTA */}

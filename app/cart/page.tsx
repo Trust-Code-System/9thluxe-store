@@ -8,6 +8,8 @@ import { CartContent } from "@/components/cart/cart-content"
 
 import { auth } from "@/lib/auth"
 
+import { getCommerceConfig } from "@/lib/config/commerce"
+
 export const metadata: Metadata = {
 
   title: "Shopping Cart | Fàdè",
@@ -24,6 +26,8 @@ export default async function CartPage() {
   // But we'll ensure the cart is user-scoped on the client side
   const session = await auth()
 
+  const { shipping } = getCommerceConfig()
+
   return (
 
     <MainLayout>
@@ -35,7 +39,10 @@ export default async function CartPage() {
           <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight md:text-4xl">Shopping Bag</h1>
         </div>
 
-        <CartContent />
+        <CartContent
+          freeShippingThreshold={shipping.freeShippingThreshold}
+          flatShippingFee={shipping.flatShippingFee}
+        />
 
       </div>
 

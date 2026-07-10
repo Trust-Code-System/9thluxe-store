@@ -20,7 +20,12 @@ import { useCartStore } from "@/lib/stores/cart-store"
 
 
 
-export function CartContent() {
+interface CartContentProps {
+  freeShippingThreshold?: number
+  flatShippingFee?: number
+}
+
+export function CartContent({ freeShippingThreshold, flatShippingFee }: CartContentProps = {}) {
 
   const cartItems = useCartStore((state) => state.items)
   const getTotalPrice = useCartStore((state) => state.getTotalPrice)
@@ -173,7 +178,12 @@ export function CartContent() {
 
       <div className="lg:col-span-1">
 
-        <CartSummary subtotal={subtotal} itemCount={itemCount} />
+        <CartSummary
+          subtotal={subtotal}
+          itemCount={itemCount}
+          freeShippingThreshold={freeShippingThreshold}
+          flatShippingFee={flatShippingFee}
+        />
 
       </div>
 

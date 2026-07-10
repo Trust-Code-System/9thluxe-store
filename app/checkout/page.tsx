@@ -4,6 +4,8 @@ import { MainLayout } from "@/components/layout/main-layout"
 
 import { CheckoutContent } from "@/components/checkout/checkout-content"
 
+import { getCommerceConfig } from "@/lib/config/commerce"
+
 
 
 export const metadata: Metadata = {
@@ -16,13 +18,23 @@ export const metadata: Metadata = {
 
 
 
+export const dynamic = "force-dynamic"
+
+
+
 export default function CheckoutPage() {
+
+  const { shipping } = getCommerceConfig()
 
   return (
 
     <MainLayout>
 
-      <CheckoutContent items={[]} />
+      <CheckoutContent
+        items={[]}
+        freeShippingThreshold={shipping.freeShippingThreshold}
+        flatShippingFee={shipping.flatShippingFee}
+      />
 
     </MainLayout>
 
