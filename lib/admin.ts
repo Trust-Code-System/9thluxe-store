@@ -13,6 +13,28 @@ function isBootstrapAdminEmail(email: string): boolean {
   return allowed.includes(email.toLowerCase())
 }
 
+/**
+ * API-route admin check (does NOT redirect). Returns the admin user or null. Auto-promotes a
+ * bootstrap admin email to ADMIN on first use, matching requireAdmin().
+ */
+export async function getAdminUser() {
+  const session = await auth()
+  const email = session?.user?.email
+  if (!email) return null
+  let user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, email: true, name: true, role: true },
+  })
+  if (user && user.role !== "ADMIN" && isBootstrapAdminEmail(email)) {
+    user = await prisma.user.update({
+      where: { email },
+      data: { role: "ADMIN" },
+      select: { id: true, email: true, name: true, role: true },
+    })
+  }
+  return user && user.role === "ADMIN" ? user : null
+}
+
 export async function requireAdmin() {
   const session = await auth()
   const email = session?.user?.email

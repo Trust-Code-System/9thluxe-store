@@ -87,7 +87,10 @@ Anything marked `[blocked]` has an implemented adapter + `.env.example` entry + 
 - [ ] Samples & discovery sets (credit ledger, redemption, expiry, conversion, abuse prevention)
 - [ ] Loyalty & referrals (configurable, disabled until approved)
 - [~] Notifications events + consent/quiet-hours/dedup
-- [ ] Owner Copilot (daily brief, inventory, marketing, insight, margin, Approval Centre)
+- [~] Owner Copilot — **daily brief live** (`GET /api/v1/admin/daily-brief`, ADMIN-gated, read-only
+  aggregation with every metric traceable via `brief.sources`, margin reports `no_cost_price_data`
+  rather than fabricating, + best-effort AI summary/actions that execute nothing). Inventory/
+  marketing/insight assistants + Approval Centre execution surfaces still to wire.
 - [ ] Admin/operational APIs (sync, moderation, reports, job/webhook reprocess, flags, audit search)
 
 ## Phase 5 — Security, privacy, reliability
