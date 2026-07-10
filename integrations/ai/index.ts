@@ -56,8 +56,8 @@ function recordSuccess(name: string) {
 export function scrubPrompt(text: string): string {
   return text
     .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '[email]')
+    .replace(/\b\d{16}\b/g, '[card]') // card before phone so 16-digit PANs aren't caught as phones
     .replace(/\+?\d[\d\s-]{8,}\d/g, '[phone]')
-    .replace(/\b\d{16}\b/g, '[card]')
     .slice(0, 6000) // hard input ceiling
 }
 
