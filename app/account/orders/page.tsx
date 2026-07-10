@@ -1,126 +1,94 @@
+import Image from "next/image"
 import Link from "next/link"
-import { OrderStatus } from "@prisma/client"
-
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Package } from "lucide-react"
+import { getOrdersByUserId } from "@/lib/queries/orders"
+import { formatPrice, formatDate } from "@/lib/format"
+import { getStatusColor } from "@/lib/mappers"
 import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { formatPrice } from "@/lib/format"
-
-export const dynamic = "force-dynamic"
-
-const STATUS_STYLES: Record<OrderStatus, string> = {
-  PENDING: "bg-amber-100 text-amber-700",
-  PAID: "bg-emerald-100 text-emerald-700",
-  SHIPPED: "bg-blue-100 text-blue-700",
-  DELIVERED: "bg-gray-200 text-gray-800",
-}
+import { redirect } from "next/navigation"
+import { mapProductToUI } from "@/lib/mappers"
 
 export default async function OrdersPage() {
   const session = await auth()
-  const email = session?.user?.email
+  if (!session?.user?.id) redirect("/auth/signin")
 
-  if (!email) {
-    return (
-      <div className="rounded-2xl border border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-        Please{" "}
-        <Link href="/auth/signin" className="font-medium text-foreground underline">
-          sign in
-        </Link>{" "}
-        to view your orders.
-      </div>
-    )
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: {
-      id: true,
-      orders: {
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          reference: true,
-          status: true,
-          totalNGN: true,
-          createdAt: true,
-          items: {
-            select: {
-              quantity: true,
-              product: { select: { name: true, slug: true } },
-            },
-          },
-        },
-      },
-    },
-  })
-
-  if (!user) {
-    return (
-      <div className="rounded-2xl border border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-        Account not found.{" "}
-        <Link href="/auth/signin" className="font-medium text-foreground underline">
-          Sign in
-        </Link>{" "}
-        again.
-      </div>
-    )
-  }
-
-  const orders = user.orders
+  const orders = await getOrdersByUserId(session.user.id)
 
   if (orders.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-        You have no orders yet.{" "}
-        <Link href="/" className="font-medium text-foreground underline">
-          Start shopping
-        </Link>{" "}
-        to add your first order.
-      </div>
+      <Card>
+        <CardContent className="py-16 text-center">
+          <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+          <h2 className="text-lg font-semibold mb-2">No orders yet</h2>
+          <p className="text-muted-foreground mb-4">When you make a purchase, your orders will appear here.</p>
+          <Button asChild>
+            <Link href="/">Start Shopping</Link>
+          </Button>
+        </CardContent>
+      </Card>
     )
   }
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold text-foreground">Orders</h1>
-
-      <ul className="space-y-4">
-        {orders.map((order) => {
-          const orderDate = new Date(order.createdAt).toLocaleDateString()
-          const orderRef = order.reference || `#${order.id.slice(-6)}`
-
-          return (
-            <li key={order.id} className="rounded-2xl border border-border bg-card p-6">
-              <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold">Order History</h2>
+      {orders.map((order) => (
+        <Card key={order.id}>
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <div>
                 <div className="flex items-center gap-3">
-                  <span className="font-medium text-foreground">{orderRef}</span>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[order.status]}`}>
-                    {order.status}
-                  </span>
+                  <span className="font-semibold">{order.id}</span>
+                  <Badge className={getStatusColor(order.status)}>{order.status.toLowerCase()}</Badge>
                 </div>
-                <div className="text-sm text-muted-foreground">{orderDate}</div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Placed on {formatDate(order.createdAt)}
+                </p>
               </div>
-
-              <div className="mt-2 text-sm text-muted-foreground">
-                Total <span className="font-semibold text-foreground">{formatPrice(order.totalNGN)}</span>
+              <div className="text-right">
+                <p className="font-semibold">{formatPrice(order.totalNGN)}</p>
+                <p className="text-sm text-muted-foreground">{order.items.length} item(s)</p>
               </div>
+            </div>
 
-              {order.items.length > 0 && (
-                <ul className="mt-4 space-y-1 rounded-2xl bg-muted/40 p-4 text-sm text-foreground">
-                  {order.items.map((item, index) => (
-                    <li key={`${order.id}-${index}`}>
-                      {item.quantity} ×{" "}
-                      <Link className="underline transition-colors hover:text-foreground" href={`/product/${item.product.slug}`}>
-                        {item.product.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+            <div className="flex flex-wrap gap-3">
+              {order.items.map((item) => {
+                const product = mapProductToUI(item.product)
+                const images = Array.isArray(item.product.images) 
+                  ? item.product.images as string[]
+                  : typeof item.product.images === 'string'
+                  ? [item.product.images]
+                  : []
+                return (
+                  <div key={item.id} className="relative w-16 h-16 rounded-lg overflow-hidden bg-muted">
+                    <Image
+                      src={images[0] || "/placeholder.svg"}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                    />
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="flex gap-2 mt-4">
+              <Button variant="outline" size="sm" className="bg-transparent">
+                View Details
+              </Button>
+              {order.status === "DELIVERED" && (
+                <Button variant="outline" size="sm" className="bg-transparent">
+                  Leave Review
+                </Button>
               )}
-            </li>
-          )
-        })}
-      </ul>
-    </section>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   )
 }
-

@@ -1,41 +1,50 @@
-import { prisma } from '@/lib/prisma'
+import { Mail, TrendingUp, Users, AlertTriangle } from 'lucide-react'
+
+import { NewsletterWorkflow } from '@/components/admin/newsletter-workflow'
 import { requireAdmin } from '@/lib/admin'
-import { Mail, Users, TrendingUp } from 'lucide-react'
-import { NewsletterForm } from '@/components/admin/newsletter-form'
+import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminNewsletterPage() {
   await requireAdmin()
 
-  // Count users with marketing emails enabled
-  const subscribers = await prisma.user.count({
-    where: { marketingEmails: true },
-  })
+  const [subscribers, totalUsers, campaignsRaw] = await Promise.all([
+    prisma.user.count({ where: { marketingEmails: true } }),
+    prisma.user.count(),
+    prisma.newsletterCampaign.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+    }),
+  ])
 
-  const totalUsers = await prisma.user.count()
+  const campaigns = campaignsRaw.map((campaign) => ({
+    ...campaign,
+    createdAt: campaign.createdAt.toISOString(),
+    sentAt: campaign.sentAt?.toISOString() ?? null,
+  }))
 
   const stats = [
     {
-      title: 'Newsletter Subscribers',
+      title: 'Newsletter subscribers',
       value: subscribers,
       icon: Users,
       color: 'bg-blue-100 text-blue-600',
-      description: 'Users subscribed to marketing emails',
+      description: 'Marketing opted-in customers',
     },
     {
-      title: 'Total Users',
+      title: 'Total users',
       value: totalUsers,
       icon: Users,
       color: 'bg-emerald-100 text-emerald-600',
-      description: 'All registered users',
+      description: 'Registered accounts',
     },
     {
-      title: 'Subscriber Rate',
+      title: 'Subscriber rate',
       value: totalUsers > 0 ? `${Math.round((subscribers / totalUsers) * 100)}%` : '0%',
       icon: TrendingUp,
       color: 'bg-purple-100 text-purple-600',
-      description: 'Percentage of users subscribed',
+      description: 'Share of users opted in',
     },
   ]
 
@@ -45,10 +54,8 @@ export default async function AdminNewsletterPage() {
         <h2 className="text-2xl font-semibold text-foreground">Newsletter</h2>
       </div>
 
-      {/* Newsletter Form */}
-      <NewsletterForm subscriberCount={subscribers} />
+      <NewsletterWorkflow campaigns={campaigns} subscriberCount={subscribers} />
 
-      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((stat) => (
           <div key={stat.title} className="rounded-3xl border border-border bg-card p-6">
@@ -66,60 +73,59 @@ export default async function AdminNewsletterPage() {
         ))}
       </div>
 
-      {/* Newsletter Info */}
       <div className="rounded-3xl border border-border bg-card p-6">
-        <div className="flex items-center gap-4 mb-6">
+        <div className="mb-6 flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Mail className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Email Marketing</h3>
-            <p className="text-sm text-muted-foreground">Manage your newsletter subscribers and campaigns</p>
+            <h3 className="text-lg font-semibold text-foreground">Email marketing</h3>
+            <p className="text-sm text-muted-foreground">Manage subscribers and send campaigns they will open.</p>
           </div>
         </div>
 
-        <div className="space-y-4 rounded-2xl border border-border bg-muted/30 p-6">
-          <p className="text-sm text-muted-foreground">
-            Users can subscribe to your newsletter through:
-          </p>
-          <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-            <li>Homepage newsletter signup form</li>
-            <li>Account settings page preferences</li>
-          </ul>
+        <div className="space-y-4 rounded-2xl border border-border bg-muted/30 p-6 text-sm text-muted-foreground">
+          <p>Subscribers can join through the homepage form and their account preferences.</p>
+          <p>Every opt-in is saved with their marketing consent so you can stay compliant.</p>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-4">
+        <div className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-5">
           <div className="flex items-start gap-3">
-            <div className="text-amber-600">ℹ️</div>
+            <AlertTriangle className="h-6 w-6 text-amber-600" />
             <div>
-              <h4 className="font-medium text-amber-800">Integration Required</h4>
-              <p className="mt-1 text-sm text-amber-700">
-                To send actual newsletters, integrate with an email service provider.
-                <strong className="block mt-2">Recommended: Resend (Easiest Setup)</strong>
+              <h4 className="font-medium text-amber-900">Connect a provider</h4>
+              <p className="mt-1 text-sm text-amber-800">
+                Sending real campaigns requires an ESP (email service provider). Resend is a great starting point.
               </p>
-              <div className="mt-4 space-y-3">
-                <div className="rounded-lg border border-amber-200 bg-white p-3">
-                  <h5 className="font-semibold text-amber-800 mb-2">📧 Resend Setup (5 minutes):</h5>
-                  <ol className="list-decimal list-inside text-sm text-amber-700 space-y-1">
-                    <li>Go to <a href="https://resend.com" target="_blank" className="underline font-medium">resend.com</a> and sign up</li>
-                    <li>Get your API key from the dashboard</li>
-                    <li>Add to your <code className="bg-amber-100 px-1 rounded">.env</code>: <code className="bg-amber-100 px-1 rounded">RESEND_API_KEY=your_key_here</code></li>
-                    <li>Install: <code className="bg-amber-100 px-1 rounded">npm install resend</code></li>
-                  </ol>
-                </div>
-                
-                <div className="rounded-lg border border-amber-200 bg-white p-3">
-                  <h5 className="font-semibold text-amber-800 mb-2">Other Options:</h5>
-                  <ul className="text-sm text-amber-700 space-y-1">
-                    <li>• <strong>SendGrid</strong> - Good for high volume, free tier (100 emails/day)</li>
-                    <li>• <strong>Mailchimp</strong> - Popular, great automation, free tier (500 contacts)</li>
-                    <li>• <strong>ConvertKit</strong> - Best for creators, email sequences</li>
-                  </ul>
-                </div>
+              <div className="mt-4 space-y-3 rounded-lg border border-amber-200 bg-white p-4 text-sm text-amber-800">
+                <p className="font-semibold">Resend setup (about 5 minutes)</p>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>
+                    Create an account at{' '}
+                    <a className="underline" href="https://resend.com" rel="noreferrer" target="_blank">
+                      resend.com
+                    </a>
+                  </li>
+                  <li>Generate an API key from the dashboard.</li>
+                  <li>
+                    Add it to <code className="rounded bg-amber-100 px-1">.env</code> as{' '}
+                    <code className="rounded bg-amber-100 px-1">RESEND_API_KEY=...</code>
+                  </li>
+                  <li>Install the SDK: `npm install resend` and call it from your newsletter API route.</li>
+                </ol>
               </div>
-              
-              <p className="mt-3 text-xs text-amber-600">
-                💡 <strong>Need help?</strong> Check the documentation or contact support once you choose a provider.
+
+              <div className="mt-4 rounded-lg border border-amber-200 bg-white p-4 text-sm text-amber-800">
+                <p className="font-semibold mb-2">Other options</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>SendGrid – reliable at scale, generous free tier.</li>
+                  <li>Mailchimp – easy automations and segmentation.</li>
+                  <li>ConvertKit – creator friendly drip campaigns.</li>
+                </ul>
+              </div>
+
+              <p className="mt-4 text-xs text-amber-700">
+                Need help? Check the `NEWSLETTER_INTEGRATION.md` playbook or drop us a note once you choose a provider.
               </p>
             </div>
           </div>

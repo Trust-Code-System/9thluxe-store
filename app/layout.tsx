@@ -25,7 +25,7 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: '9thLuxe | Luxury Watches, Perfumes & Eyeglasses',
+  title: 'Fàdè | Luxury Watches, Perfumes & Eyeglasses',
   description:
     'Modern luxury for every day. Discover curated watches, perfumes, and eyeglasses with delivery across Nigeria.',
 }
@@ -54,4 +54,3 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </html>
   )
 }
-

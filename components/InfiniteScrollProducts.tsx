@@ -1,24 +1,9 @@
 "use client"
 
+import type { Product } from '@prisma/client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { ProductCard } from './ProductCard'
 import { ProductGridSkeleton } from './ProductCardSkeleton'
-
-interface Product {
-  id: string
-  name: string
-  slug: string
-  description: string
-  priceNGN: number
-  images: unknown
-  brand: string | null
-  stock: number | null
-  ratingAvg: number | null
-  ratingCount: number | null
-  category: string
-  createdAt: Date
-  updatedAt: Date
-}
 
 interface InfiniteScrollProductsProps {
   initialProducts: Product[]

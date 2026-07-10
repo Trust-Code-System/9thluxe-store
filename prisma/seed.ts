@@ -22,7 +22,7 @@ async function main() {
       images: ['/placeholder.png'],
       priceNGN: 95000,
       category: Category.PERFUMES,
-      brand: '9thLuxe',
+      brand: 'Fàdè',
       stock: 50,
     },
     {

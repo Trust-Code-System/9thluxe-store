@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { prisma } from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
@@ -57,6 +60,16 @@ export async function GET(request: NextRequest) {
         category: true,
         createdAt: true,
         updatedAt: true,
+        productType: true,
+        notesTop: true,
+        notesHeart: true,
+        notesBase: true,
+        longevity: true,
+        occasion: true,
+        material: true,
+        lensType: true,
+        warranty: true,
+        waterResistance: true,
       },
     })
 

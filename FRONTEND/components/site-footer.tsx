@@ -76,23 +76,23 @@ export function SiteFooter() {
               </li>
               <li>
                 <a
-                  href="https://www.tiktok.com/@9th.luxe"
+                  href="https://www.tiktok.com/@Fàdè"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  TikTok: @9th.luxe
+                  TikTok: @Fàdè
                 </a>
               </li>
               <li>
                 <a
-                  href="https://instagram.com/9thluxee"
+                  href="https://instagram.com/Fàdè"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Instagram className="h-4 w-4" />
-                  <span>@9thluxee</span>
+                  <span>@Fàdè</span>
                 </a>
               </li>
             </ul>
@@ -101,7 +101,7 @@ export function SiteFooter() {
 
         {/* Copyright */}
         <div className="mt-12 border-t border-border pt-8 text-center text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} 9thLuxe. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Fàdè. All rights reserved.</p>
           <p className="mt-2">Nigeria-wide delivery. We ship to all 36 states and the FCT.</p>
         </div>
       </div>

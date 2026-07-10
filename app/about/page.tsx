@@ -2,9 +2,9 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'About 9thLuxe',
+  title: 'About Fàdè',
   description:
-    "9thluxe is a fashion and beauty brand specializing in perfumes, sunglasses, wristwatches and other stylish products. High-quality, trendy, and luxurious items for everyday elegance.",
+    "Fàdè is a fashion and beauty brand specializing in perfumes, sunglasses, wristwatches and other stylish products. High-quality, trendy, and luxurious items for everyday elegance.",
 }
 
 export default function AboutPage() {
@@ -13,9 +13,9 @@ export default function AboutPage() {
       <h1 className="text-3xl font-semibold">About</h1>
 
       <p className="text-lg leading-relaxed text-gray-800 dark:text-neutral-200">
-        <strong>9thluxe</strong> is a fashion and beauty brand that specializes in selling
+        <strong>Fàdè</strong> is a fashion and beauty brand that specializes in selling
         <strong> perfumes</strong>, <strong>sunglasses</strong>, <strong>wristwatches</strong> and other stylish products.
-        9thluxe focuses on providing customers with high-quality, trendy, and luxurious items that enhance personal style
+        Fàdè focuses on providing customers with high-quality, trendy, and luxurious items that enhance personal style
         and everyday elegance.
       </p>
 
@@ -32,4 +32,3 @@ export default function AboutPage() {
     </section>
   )
 }
-

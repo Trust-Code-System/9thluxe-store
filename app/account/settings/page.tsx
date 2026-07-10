@@ -1,143 +1,145 @@
-import Link from "next/link"
-import crypto from "node:crypto"
+"use client"
 
-import { prisma } from "@/lib/prisma"
-import { auth } from "@/lib/auth"
-import { redirect } from "next/navigation"
-import { TogglePreference } from "./toggle-preference"
 
-export const dynamic = "force-dynamic"
 
-export default async function SettingsPage() {
-  const session = await auth()
-  const email = session?.user?.email
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
-  if (!email) {
-    return (
-      <div className="space-y-3">
-        <h2 className="text-xl font-semibold text-foreground">Settings</h2>
-        <div className="rounded-2xl border border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-          Please{" "}
-          <Link href="/auth/signin" className="font-medium text-foreground underline">
-            sign in
-          </Link>{" "}
-          to manage your account preferences.
-        </div>
-      </div>
-    )
-  }
+import { Button } from "@/components/ui/button"
 
-  const user = await prisma.user.findUnique({ where: { email } })
-  if (!user) redirect("/auth/signin")
+import { Input } from "@/components/ui/input"
 
-  const marketingOptIn = (user as any).marketingEmails ?? true
-  const smsOptIn = (user as any).smsNotifications ?? false
+import { Label } from "@/components/ui/label"
 
-  async function deleteAccount() {
-    "use server"
-    const existing = await prisma.user.findUnique({ where: { id: user!.id } })
-    if (!existing) redirect("/auth/signin")
+import { Switch } from "@/components/ui/switch"
 
-    try {
-      await prisma.session.deleteMany({ where: { userId: existing.id } })
-      await prisma.account.deleteMany({ where: { userId: existing.id } })
-      await prisma.wishlist.deleteMany({ where: { userId: existing.id } })
-      await prisma.address.deleteMany({ where: { userId: existing.id } })
-    } catch {
-      // ignore cleanup errors
-    }
 
-    await prisma.user.update({
-      where: { id: existing.id },
-      data: {
-        name: null,
-        email: `deleted-${existing.id}@example.invalid`,
-        passwordHash: crypto.randomBytes(32).toString("hex"),
-        marketingEmails: false,
-      } as any,
-    })
 
-    redirect("/auth/signin")
-  }
+export default function SettingsPage() {
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-1">
-        <h2 className="text-xl font-semibold text-foreground">Settings</h2>
-        <p className="text-sm text-muted-foreground">
-          Choose how you hear from us and keep your account information up to date.
-        </p>
-      </div>
 
-      <section className="space-y-6">
-        <div className="rounded-2xl border border-border bg-card">
-          <div className="border-b border-border px-6 py-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Notifications</h3>
-          </div>
-          <div className="divide-y divide-border">
-            <TogglePreference
-              title="Email notifications"
-              description="Receive order updates via email."
-              enabled={marketingOptIn}
-              email={email}
-            />
-            <TogglePreference
-              title="SMS notifications"
-              description="Receive order updates via SMS."
-              enabled={smsOptIn}
-              email={email}
-              type="sms"
-            />
-            <TogglePreference
-              title="Promotional emails"
-              description="Receive special offers and product drops."
-              enabled={marketingOptIn}
-              email={email}
-            />
-          </div>
-        </div>
+    <div className="space-y-6">
 
-        <div className="rounded-2xl border border-border bg-card">
-          <div className="border-b border-border px-6 py-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Account details</h3>
-          </div>
-          <dl className="divide-y divide-border text-sm">
-            <DetailRow label="Email address" value={user.email} />
-            <DetailRow label="Name" value={user.name ?? "Not set"} />
-          </dl>
-        </div>
+      {/* Profile Settings */}
 
-        <div className="rounded-2xl border border-border bg-card">
-          <div className="border-b border-border px-6 py-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">Danger zone</h3>
+      <Card>
+
+        <CardHeader>
+
+          <CardTitle className="text-lg">Profile Information</CardTitle>
+
+          <CardDescription>Update your personal details</CardDescription>
+
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="space-y-2">
+
+              <Label htmlFor="firstName">First Name</Label>
+
+              <Input id="firstName" defaultValue="John" />
+
+            </div>
+
+            <div className="space-y-2">
+
+              <Label htmlFor="lastName">Last Name</Label>
+
+              <Input id="lastName" defaultValue="Doe" />
+
+            </div>
+
           </div>
-          <div className="space-y-3 px-6 py-5 text-sm text-muted-foreground">
-            <p>
-              Deleting your account removes your profile information and signs you out on all devices. Order history is
-              retained for bookkeeping.
-            </p>
-            <form action={deleteAccount}>
-              <button className="btn-outline w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground" type="submit">
-                Delete account
-              </button>
-            </form>
+
+          <div className="space-y-2">
+
+            <Label htmlFor="email">Email</Label>
+
+            <Input id="email" type="email" defaultValue="john@example.com" />
+
           </div>
-        </div>
-      </section>
+
+          <div className="space-y-2">
+
+            <Label htmlFor="phone">Phone</Label>
+
+            <Input id="phone" type="tel" defaultValue="+234 800 000 0000" />
+
+          </div>
+
+          <Button>Save Changes</Button>
+
+        </CardContent>
+
+      </Card>
+
+
+
+      {/* Notification Preferences */}
+
+      <Card>
+
+        <CardHeader>
+
+          <CardTitle className="text-lg">Notifications</CardTitle>
+
+          <CardDescription>Manage your notification preferences</CardDescription>
+
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="font-medium">Order Updates</p>
+
+              <p className="text-sm text-muted-foreground">Receive updates about your orders</p>
+
+            </div>
+
+            <Switch defaultChecked />
+
+          </div>
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="font-medium">Promotional Emails</p>
+
+              <p className="text-sm text-muted-foreground">Receive emails about new products and offers</p>
+
+            </div>
+
+            <Switch defaultChecked />
+
+          </div>
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="font-medium">Wishlist Alerts</p>
+
+              <p className="text-sm text-muted-foreground">Get notified when wishlist items go on sale</p>
+
+            </div>
+
+            <Switch />
+
+          </div>
+
+        </CardContent>
+
+      </Card>
+
     </div>
-  )
-}
 
-type DetailRowProps = {
-  label: string
-  value: string
-}
-
-function DetailRow({ label, value }: DetailRowProps) {
-  return (
-    <div className="flex items-center justify-between px-6 py-4">
-      <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium text-foreground">{value}</dd>
-    </div>
   )
+
 }

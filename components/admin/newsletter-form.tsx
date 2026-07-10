@@ -1,20 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Send, Loader2, AlertCircle } from 'lucide-react'
 
 interface NewsletterFormProps {
   subscriberCount: number
+  defaultValues?: { subject?: string; html?: string; text?: string }
 }
 
-export function NewsletterForm({ subscriberCount }: NewsletterFormProps) {
-  const [subject, setSubject] = useState('')
-  const [htmlContent, setHtmlContent] = useState('')
-  const [textContent, setTextContent] = useState('')
+export function NewsletterForm({ subscriberCount, defaultValues }: NewsletterFormProps) {
+  const [subject, setSubject] = useState(defaultValues?.subject || '')
+  const [htmlContent, setHtmlContent] = useState(defaultValues?.html || '')
+  const [textContent, setTextContent] = useState(defaultValues?.text || '')
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [result, setResult] = useState<{ sent: number; failed: number; total: number } | null>(null)
+
+  useEffect(() => {
+    if (defaultValues) {
+      setSubject(defaultValues.subject || '')
+      setHtmlContent(defaultValues.html || '')
+      setTextContent(defaultValues.text || '')
+    }
+  }, [defaultValues])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

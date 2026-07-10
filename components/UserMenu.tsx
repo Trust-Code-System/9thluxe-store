@@ -1,17 +1,26 @@
 import Link from 'next/link'
-import { auth, signOut } from '@/lib/auth'
+import { auth } from '@/lib/auth'
+import { User } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export async function UserMenu() {
   const session = await auth()
   if (!session) {
-    return <Link className="btn-outline" href="/auth/signin">Sign in</Link>
+    return (
+      <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+        <Link href="/auth/signin">
+          <User className="h-4 w-4" />
+          <span className="sr-only">Sign in</span>
+        </Link>
+      </Button>
+    )
   }
   return (
-    <form action={async () => { 'use server'; await signOut({ redirectTo: '/' }) }}>
-      <div className="flex items-center gap-2">
-        <Link className="btn-outline" href="/account">My account</Link>
-        <button className="btn-outline" type="submit">Sign out</button>
-      </div>
-    </form>
+    <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+      <Link href="/account">
+        <User className="h-4 w-4" />
+        <span className="sr-only">My account</span>
+      </Link>
+    </Button>
   )
 }

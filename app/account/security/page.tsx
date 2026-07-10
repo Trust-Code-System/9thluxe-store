@@ -1,64 +1,141 @@
-import bcrypt from "bcryptjs"
-import { redirect } from "next/navigation"
+"use client"
 
-import { prisma } from "@/lib/prisma"
-import { requireUser } from "@/lib/session"
 
-export const dynamic = "force-dynamic"
 
-export default async function SecurityPage() {
-  const user = await requireUser()
+import * as React from "react"
 
-  async function changePassword(formData: FormData) {
-    "use server"
-    const currentPassword = String(formData.get("currentPassword") || "")
-    const newPassword = String(formData.get("newPassword") || "")
+import { Eye, EyeOff } from "lucide-react"
 
-    if (!currentPassword || !newPassword) {
-      redirect("/account/security")
-    }
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
-    const record = await prisma.user.findUnique({ where: { id: user.id } })
-    if (!record?.passwordHash) {
-      redirect("/account/security")
-    }
+import { Button } from "@/components/ui/button"
 
-    const match = await bcrypt.compare(currentPassword, record.passwordHash)
-    if (!match) {
-      redirect("/account/security")
-    }
+import { Input } from "@/components/ui/input"
 
-    const nextHash = await bcrypt.hash(newPassword, 10)
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { passwordHash: nextHash },
-    })
+import { Label } from "@/components/ui/label"
 
-    redirect("/account/security")
-  }
+
+
+export default function SecurityPage() {
+
+  const [showPasswords, setShowPasswords] = React.useState(false)
+
+
 
   return (
-    <section className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold text-foreground">Security</h1>
-        <p className="text-sm text-muted-foreground">Update your password to keep your account secure.</p>
-      </header>
 
-      <form action={changePassword} className="max-w-md space-y-4 rounded-2xl border border-border bg-card p-6">
-        <div className="space-y-1">
-          <label htmlFor="currentPassword" className="text-sm font-medium text-foreground">
-            Current password
-          </label>
-          <input id="currentPassword" name="currentPassword" type="password" required className="input w-full" />
-        </div>
-        <div className="space-y-1">
-          <label htmlFor="newPassword" className="text-sm font-medium text-foreground">
-            New password
-          </label>
-          <input id="newPassword" name="newPassword" type="password" required className="input w-full" />
-        </div>
-        <button className="btn">Update password</button>
-      </form>
-    </section>
+    <div className="space-y-6">
+
+      {/* Change Password */}
+
+      <Card>
+
+        <CardHeader>
+
+          <CardTitle className="text-lg">Change Password</CardTitle>
+
+          <CardDescription>Update your password to keep your account secure</CardDescription>
+
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+
+          <div className="space-y-2">
+
+            <Label htmlFor="currentPassword">Current Password</Label>
+
+            <div className="relative">
+
+              <Input id="currentPassword" type={showPasswords ? "text" : "password"} />
+
+              <Button
+
+                type="button"
+
+                variant="ghost"
+
+                size="icon"
+
+                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+
+                onClick={() => setShowPasswords(!showPasswords)}
+
+              >
+
+                {showPasswords ? (
+
+                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+
+                ) : (
+
+                  <Eye className="h-4 w-4 text-muted-foreground" />
+
+                )}
+
+              </Button>
+
+            </div>
+
+          </div>
+
+          <div className="space-y-2">
+
+            <Label htmlFor="newPassword">New Password</Label>
+
+            <Input id="newPassword" type={showPasswords ? "text" : "password"} />
+
+          </div>
+
+          <div className="space-y-2">
+
+            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+
+            <Input id="confirmPassword" type={showPasswords ? "text" : "password"} />
+
+          </div>
+
+          <Button>Update Password</Button>
+
+        </CardContent>
+
+      </Card>
+
+
+
+      {/* Danger Zone */}
+
+      <Card className="border-destructive/50">
+
+        <CardHeader>
+
+          <CardTitle className="text-lg text-destructive">Danger Zone</CardTitle>
+
+          <CardDescription>Irreversible account actions</CardDescription>
+
+        </CardHeader>
+
+        <CardContent>
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="font-medium">Delete Account</p>
+
+              <p className="text-sm text-muted-foreground">Permanently delete your account and all associated data</p>
+
+            </div>
+
+            <Button variant="destructive">Delete Account</Button>
+
+          </div>
+
+        </CardContent>
+
+      </Card>
+
+    </div>
+
   )
+
 }

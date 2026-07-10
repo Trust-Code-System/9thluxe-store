@@ -1,135 +1,108 @@
-import { prisma } from '@/lib/prisma'
-import { requireAdmin } from '@/lib/admin'
-import Link from 'next/link'
-import { Package, Users, TrendingUp, DollarSign } from 'lucide-react'
-import { formatPrice } from '@/lib/format'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DollarSign, ShoppingCart, Tag, Mail, TrendingUp, TrendingDown } from "lucide-react"
+import { AdminRecentOrders } from "@/components/admin/admin-recent-orders"
+import { AdminTopProducts } from "@/components/admin/admin-top-products"
+import { getRecentOrders, getTopProducts } from "@/lib/queries/orders"
+import { requireAdmin } from "@/lib/admin"
+import { formatPrice } from "@/lib/format"
 
-export const dynamic = 'force-dynamic'
-
-export default async function AdminDashboard() {
+export default async function AdminDashboardPage() {
   await requireAdmin()
 
-  // Fetch statistics
-  const [totalOrders, totalProducts, totalUsers, recentOrders] = await Promise.all([
-    prisma.order.count(),
-    prisma.product.count(),
-    prisma.user.count(),
-    prisma.order.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      include: {
-        user: { select: { email: true } },
-      },
-    }),
+  const [recentOrders, topProducts] = await Promise.all([
+    getRecentOrders(5),
+    getTopProducts(5),
   ])
 
-  const totalRevenue = await prisma.order.aggregate({
-    _sum: { totalNGN: true },
-  })
-
+  // Calculate stats from orders
   const stats = [
     {
-      title: 'Total Orders',
-      value: totalOrders,
-      icon: Package,
-      color: 'bg-blue-100 text-blue-600',
-      change: '+12%',
-    },
-    {
-      title: 'Total Products',
-      value: totalProducts,
-      icon: Package,
-      color: 'bg-emerald-100 text-emerald-600',
-      change: '+5%',
-    },
-    {
-      title: 'Total Users',
-      value: totalUsers,
-      icon: Users,
-      color: 'bg-purple-100 text-purple-600',
-      change: '+8%',
-    },
-    {
-      title: 'Revenue',
-      value: formatPrice(totalRevenue._sum.totalNGN || 0),
+      title: "Total Revenue",
+      value: formatPrice(0), // TODO: Calculate from orders
+      change: "+12.5%",
+      trend: "up" as const,
       icon: DollarSign,
-      color: 'bg-orange-100 text-orange-600',
-      change: '+15%',
+    },
+    {
+      title: "Total Orders",
+      value: recentOrders.length.toString(),
+      change: "+8.2%",
+      trend: "up" as const,
+      icon: ShoppingCart,
+    },
+    {
+      title: "Active Coupons",
+      value: "12",
+      change: "-2",
+      trend: "down" as const,
+      icon: Tag,
+    },
+    {
+      title: "Subscribers",
+      value: "5,678",
+      change: "+234",
+      trend: "up" as const,
+      icon: Mail,
     },
   ]
 
   return (
-    <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="space-y-8">
+      <div>
+        <h1 className="font-serif text-2xl md:text-3xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Welcome back. Here's what's happening with your store.</p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.title} className="rounded-3xl border border-border bg-card p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{stat.title}</p>
-                <p className="mt-2 text-2xl font-semibold text-foreground">{stat.value}</p>
-                <p className="mt-1 text-xs text-emerald-600">{stat.change}</p>
+          <Card key={stat.title}>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">{stat.title}</p>
+                  <p className="text-2xl font-semibold mt-1">{stat.value}</p>
+                  <div className="flex items-center gap-1 mt-2">
+                    {stat.trend === "up" ? (
+                      <TrendingUp className="h-3 w-3 text-green-600" />
+                    ) : (
+                      <TrendingDown className="h-3 w-3 text-red-600" />
+                    )}
+                    <span className={`text-xs font-medium ${stat.trend === "up" ? "text-green-600" : "text-red-600"}`}>
+                      {stat.change}
+                    </span>
+                    <span className="text-xs text-muted-foreground">vs last month</span>
+                  </div>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <stat.icon className="h-5 w-5 text-primary" />
+                </div>
               </div>
-              <div className={`flex h-12 w-12 items-center justify-center rounded-full ${stat.color}`}>
-                <stat.icon className="h-6 w-6" />
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      {/* Recent Orders */}
-      <div className="rounded-3xl border border-border bg-card p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Recent Orders</h2>
-          <Link href="/admin/orders" className="text-sm text-primary hover:underline">
-            View all
-          </Link>
-        </div>
+      {/* Recent Orders & Top Products */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Recent Orders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AdminRecentOrders orders={recentOrders} />
+          </CardContent>
+        </Card>
 
-        {recentOrders.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-sm text-muted-foreground">No orders yet</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Order ID</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Customer</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-muted/50">
-                    <td className="px-4 py-3 text-sm text-foreground">{order.reference}</td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground">{order.user.email}</td>
-                    <td className="px-4 py-3 text-sm font-medium text-foreground">{formatPrice(order.totalNGN)}</td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        order.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' :
-                        order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                        order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Top Products</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AdminTopProducts products={topProducts} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
 }
-
-
-

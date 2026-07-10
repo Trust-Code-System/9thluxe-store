@@ -1,100 +1,116 @@
 import Link from 'next/link'
-import { Instagram, MessageCircle } from 'lucide-react'
+import { Instagram, Twitter, Facebook, Youtube } from 'lucide-react'
+import { NewsletterForm } from '@/components/newsletter/newsletter-form'
 
 const shopLinks = [
   { href: '/category/watches', label: 'Watches' },
   { href: '/category/perfumes', label: 'Perfumes' },
-  { href: '/category/glasses', label: 'Eye Glasses' },
+  { href: '/category/eyeglasses', label: 'Eyeglasses' },
+  { href: '/collections', label: 'Collections' },
 ]
 
 const helpLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/help', label: 'Help Center' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/about', label: 'About' },
+  { href: '/help/faq', label: 'FAQ' },
+  { href: '/help/contact', label: 'Contact Us' },
+  { href: '/help/returns', label: 'Returns & Exchanges' },
+  { href: '/help/shipping', label: 'Shipping Info' },
 ]
 
 export function SiteFooter() {
   const year = new Date().getFullYear()
   return (
     <footer className="border-t border-border bg-background">
-      <div className="container grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-4">
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Help</h3>
-          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-            {helpLinks.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="transition-colors hover:text-foreground">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Shop</h3>
-          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-            {shopLinks.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="transition-colors hover:text-foreground">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Business Hours</h3>
-          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-            <li>Mon-Sat: 8am - 9pm</li>
-            <li>Sun: 12pm - 9pm</li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Connect</h3>
-          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-            <li>
+      <div className="container mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand Column */}
+          <div>
+            <Link href="/" className="font-serif text-2xl font-semibold tracking-tight mb-4 inline-block">
+              Fàdè
+            </Link>
+            <p className="text-sm text-muted-foreground mb-4 max-w-xs">
+              Curated luxury in watches, perfumes & eyewear. We bring you the finest selection of premium accessories for the discerning individual.
+            </p>
+            <div className="flex items-center gap-4">
               <a
-                href="https://wa.me/2348160591348"
+                href="https://instagram.com/fade"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Instagram"
               >
-                <MessageCircle className="h-4 w-4" />
-                <span>+234 816 059 1348</span>
+                <Instagram className="h-5 w-5" />
               </a>
-            </li>
-            <li>
               <a
-                href="https://www.tiktok.com/@9th.luxe"
+                href="https://twitter.com/fade"
                 target="_blank"
                 rel="noreferrer"
-                className="transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Twitter"
               >
-                TikTok: @9th.luxe
+                <Twitter className="h-5 w-5" />
               </a>
-            </li>
-            <li>
               <a
-                href="https://instagram.com/9thluxee"
+                href="https://facebook.com/fade"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Facebook"
               >
-                <Instagram className="h-4 w-4" />
-                <span>@9thluxee</span>
+                <Facebook className="h-5 w-5" />
               </a>
-            </li>
-          </ul>
-        </div>
-      </div>
+              <a
+                href="https://youtube.com/fade"
+                target="_blank"
+                rel="noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="YouTube"
+              >
+                <Youtube className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
 
-      <div className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        <p>&copy; {year} 9thLuxe. All rights reserved.</p>
-        <p className="mt-2">Nationwide delivery across Nigeria's 36 states and the FCT.</p>
+          {/* SHOP Column */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">SHOP</h3>
+            <ul className="space-y-3">
+              {shopLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* HELP Column */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">HELP</h3>
+            <ul className="space-y-3">
+              {helpLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* NEWSLETTER Column */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">NEWSLETTER</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Subscribe for exclusive offers and new arrivals.
+            </p>
+            <NewsletterForm variant="inline" />
+          </div>
+        </div>
+
+        <div className="border-t border-border mt-12 pt-8 text-center text-sm text-muted-foreground">
+          <p>&copy; {year} Fàdè. All rights reserved.</p>
+        </div>
       </div>
     </footer>
   )

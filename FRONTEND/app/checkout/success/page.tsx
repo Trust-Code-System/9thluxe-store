@@ -37,8 +37,8 @@ export default function CheckoutSuccessPage() {
 
           <p className="mt-8 text-sm text-muted-foreground">
             Need help? Contact us at{" "}
-            <a href="mailto:9thluxe@gmail.com" className="underline hover:text-foreground">
-              9thluxe@gmail.com
+            <a href="mailto:Fàdè@gmail.com" className="underline hover:text-foreground">
+              Fàdè@gmail.com
             </a>{" "}
             or WhatsApp{" "}
             <a href="https://wa.me/2348160591348" className="underline hover:text-foreground">

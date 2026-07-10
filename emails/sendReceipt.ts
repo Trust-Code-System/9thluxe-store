@@ -14,7 +14,7 @@ export async function sendReceipt(order: OrderLike) {
   // For now, just log a “sent email” to the console.
   console.log('[EMAIL] Receipt =>', {
     to: order.user.email,
-    subject: `9thLuxe Order #${order.id.slice(-6)} receipt`,
+    subject: `Fàdè Order #${order.id.slice(-6)} receipt`,
     summary: {
       subtotal: order.subtotalNGN,
       discount: order.discountNGN,

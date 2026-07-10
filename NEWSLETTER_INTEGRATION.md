@@ -1,6 +1,6 @@
 # Newsletter Integration Guide
 
-This guide will help you integrate email newsletters into your 9thLuxe store.
+This guide will help you integrate email newsletters into your Fàdè store.
 
 ## Quick Start: Resend (Recommended - Easiest Setup)
 
@@ -55,7 +55,7 @@ This guide will help you integrate email newsletters into your 9thLuxe store.
        const results = await Promise.all(
          subscribers.map(user =>
            resend.emails.send({
-             from: '9thLuxe <newsletter@yourdomain.com>',
+             from: 'Fàdè <newsletter@yourdomain.com>',
              to: user.email,
              subject,
              html,
@@ -137,7 +137,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 export async function GET() {
   try {
     const { data, error } = await resend.emails.send({
-      from: '9thLuxe <newsletter@yourdomain.com>',
+      from: 'Fàdè <newsletter@yourdomain.com>',
       to: 'your-email@example.com',
       subject: 'Test Newsletter',
       html: '<h1>Test Email</h1><p>Newsletter integration is working!</p>'

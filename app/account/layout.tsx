@@ -1,61 +1,45 @@
-import type { ReactNode } from 'react'
-import Link from 'next/link'
-import { requireUser } from '@/lib/session'
-import {
-  Settings2,
-  Heart,
-  MapPin,
-  Package,
-  ShieldCheck,
-  User2,
-  LayoutDashboard,
-} from 'lucide-react'
+import type React from "react"
 
-import { AccountSidebar } from '@/components/account/AccountSidebar'
+import type { Metadata } from "next"
 
-export const dynamic = "force-dynamic"
+import { MainLayout } from "@/components/layout/main-layout"
 
-type AccountLayoutProps = {
-  children: ReactNode
+import { AccountSidebar } from "@/components/account/account-sidebar"
+
+
+
+export const metadata: Metadata = {
+
+  title: "My Account | Fàdè",
+
+  description: "Manage your Fàdè account.",
+
 }
 
-export default async function AccountLayout({ children }: AccountLayoutProps) {
-  const user = await requireUser()
 
-  const navItems = [
-    { href: '/account', label: 'Overview', icon: <LayoutDashboard className="h-4 w-4" /> },
-    { href: '/account/orders', label: 'Orders', icon: <Package className="h-4 w-4" /> },
-    { href: '/account/wishlist', label: 'Wishlist', icon: <Heart className="h-4 w-4" /> },
-    { href: '/account/addresses', label: 'Addresses', icon: <MapPin className="h-4 w-4" /> },
-    { href: '/account/profile', label: 'Profile', icon: <User2 className="h-4 w-4" /> },
-    { href: '/account/security', label: 'Security', icon: <ShieldCheck className="h-4 w-4" /> },
-    { href: '/account/settings', label: 'Settings', icon: <Settings2 className="h-4 w-4" /> },
-  ]
+
+export default function AccountLayout({ children }: { children: React.ReactNode }) {
 
   return (
-    <div className="space-y-8 px-4 lg:px-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold text-foreground">My Account</h1>
-        <p className="text-sm text-muted-foreground">
-          Manage your profile, orders, and communication preferences in one place.
-        </p>
-      </header>
 
-      <section className="grid gap-8 lg:grid-cols-[260px,1fr]">
-        <AccountSidebar name={user.name} email={user.email} navItems={navItems} />
+    <MainLayout cartItemCount={3}>
 
-        <div className="space-y-8">
-          <div className="rounded-3xl border border-border bg-card p-6 lg:p-8">{children}</div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
 
-          <footer className="text-xs text-muted-foreground">
-            Need assistance?{' '}
-            <Link href="/help" className="font-medium text-foreground hover:underline">
-              Visit the help center
-            </Link>
-            .
-          </footer>
+        <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-8">My Account</h1>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+
+          <AccountSidebar />
+
+          <div className="flex-1">{children}</div>
+
         </div>
-      </section>
-    </div>
+
+      </div>
+
+    </MainLayout>
+
   )
+
 }

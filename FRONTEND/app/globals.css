@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* 9thLuxe Color System - Light Mode Only */
+  /* Fàdè Color System - Light Mode Only */
   --background: oklch(1 0 0); /* #FFFFFF */
   --foreground: oklch(0.145 0 0);
 

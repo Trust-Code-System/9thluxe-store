@@ -11,7 +11,7 @@ interface SocialShareProps {
 export function SocialShare({ productName, productUrl }: SocialShareProps) {
   const [copied, setCopied] = useState(false)
 
-  const shareText = `Check out ${productName} on 9thLuxe!`
+  const shareText = `Check out ${productName} on Fàdè!`
   const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${productUrl}` : productUrl
 
   const shareToTwitter = () => {

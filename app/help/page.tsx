@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Help Center | 9thLuxe',
+  title: 'Help Center | Fàdè',
 }
 
 export default function HelpPage() {
@@ -21,7 +21,7 @@ export default function HelpPage() {
       <div className="rounded-xl border border-border bg-card p-5 leading-7 text-foreground">
         <p className="text-foreground">Delivery across Nigeria within 1-5 business days, depending on your state.</p>
         <p className="text-foreground">
-          Chat / Email: <a href="mailto:9thluxe@gmail.com" className="underline text-foreground hover:text-muted-foreground">9thluxe@gmail.com</a>
+          Chat / Email: <a href="mailto:Fàdè@gmail.com" className="underline text-foreground hover:text-muted-foreground">Fàdè@gmail.com</a>
         </p>
         <p className="text-foreground">
           Phone / WhatsApp: <a href="tel:+2348160591348" className="underline text-foreground hover:text-muted-foreground">+234 816 059 1348</a>
@@ -50,4 +50,3 @@ export default function HelpPage() {
     </section>
   )
 }
-

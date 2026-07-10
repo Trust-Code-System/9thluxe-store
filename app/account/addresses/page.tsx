@@ -1,96 +1,63 @@
-import Link from "next/link"
-
-import { prisma } from "@/lib/prisma"
-import { requireUser } from "@/lib/session"
-
-export const dynamic = "force-dynamic"
+import { Plus, MapPin, Pencil, Trash2 } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { getAddressesByUserId } from "@/lib/queries/addresses"
+import { auth } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
 export default async function AddressesPage() {
-  const user = await requireUser()
+  const session = await auth()
+  if (!session?.user?.id) redirect("/auth/signin")
 
-  const addresses = await prisma.address.findMany({
-    where: { userId: user.id },
-    orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
-  })
-
-  if (addresses.length === 0) {
-    return (
-      <div className="rounded-2xl border border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-        You have not saved any addresses yet.{" "}
-        <Link href="/account/addresses/new" className="font-medium text-foreground underline">
-          Add your first address
-        </Link>
-        .
-      </div>
-    )
-  }
+  const addresses = await getAddressesByUserId(session.user.id)
 
   return (
-    <section className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-foreground">Addresses</h1>
-        <Link href="/account/addresses/new" className="btn">
-          Add new
-        </Link>
+        <h2 className="text-lg font-semibold">Saved Addresses</h2>
+        <Button size="sm">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Address
+        </Button>
       </div>
 
-      <ul className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {addresses.map((address) => (
-          <li key={address.id} className="rounded-2xl border border-border bg-card p-6">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="space-y-1 text-sm">
-                <div className="font-medium text-foreground">{address.line1}</div>
-                <div className="text-muted-foreground">
-                  {address.city}, {address.state}
+          <Card key={address.id}>
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">{session.user.name || "User"}</span>
                 </div>
-                <div className="text-muted-foreground">{address.phone}</div>
-                {address.isDefault && (
-                  <span className="mt-2 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                    Default address
-                  </span>
+                {address.isDefault && <Badge variant="secondary">Default</Badge>}
+              </div>
+
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>{address.line1}</p>
+                <p>
+                  {address.city}, {address.state}
+                </p>
+                <p>{address.phone}</p>
+              </div>
+
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" size="sm" className="bg-transparent">
+                  <Pencil className="h-3 w-3 mr-1" />
+                  Edit
+                </Button>
+                {!address.isDefault && (
+                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    Delete
+                  </Button>
                 )}
               </div>
-              <div className="flex gap-2">
-                <form action={setDefaultAction.bind(null, address.id)}>
-                  <button className="btn-outline px-3 py-2 text-sm" type="submit" disabled={address.isDefault}>
-                    Make default
-                  </button>
-                </form>
-                <form action={deleteAction.bind(null, address.id)}>
-                  <button className="btn-outline px-3 py-2 text-sm" type="submit">
-                    Delete
-                  </button>
-                </form>
-              </div>
-            </div>
-          </li>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
-    </section>
+      </div>
+    </div>
   )
 }
-
-async function setDefaultAction(addressId: string) {
-  "use server"
-  const user = await requireUser()
-
-  await prisma.$transaction([
-    prisma.address.updateMany({
-      where: { userId: user.id, isDefault: true },
-      data: { isDefault: false },
-    }),
-    prisma.address.update({
-      where: { id: addressId, userId: user.id },
-      data: { isDefault: true },
-    }),
-  ])
-}
-
-async function deleteAction(addressId: string) {
-  "use server"
-  const user = await requireUser()
-  await prisma.address.delete({
-    where: { id: addressId, userId: user.id },
-  })
-}
-

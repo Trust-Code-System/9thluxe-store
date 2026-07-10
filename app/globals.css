@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* 9thLuxe Color System - Light Mode (Beige background, black text) */
+  /* Fàdè Color System - Light Mode (Beige background, black text) */
   --background: oklch(0.97 0.02 85); /* Beige background */
   --foreground: oklch(0.145 0 0); /* Black text */
 
@@ -51,6 +51,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --font-body: var(--font-poppins);
+  --font-heading: var(--font-playfair);
 }
 
 .dark {
@@ -118,7 +120,7 @@
   
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-poppins), sans-serif;
+    font-family: var(--font-body), sans-serif;
     letter-spacing: -0.01em;
     line-height: 1.6;
     position: relative;
@@ -201,13 +203,35 @@
     opacity: 0.05;
   }
 
+  .page-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.35);
+  }
+
+  .container-max {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    font-family: var(--font-playfair), serif;
+    font-family: var(--font-heading), serif;
     font-weight: 600;
     letter-spacing: -0.02em;
   }
@@ -230,6 +254,17 @@
   small {
     @apply text-xs;
   }
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 30px 60px rgba(2, 6, 23, 0.35);
+  backdrop-filter: blur(32px);
+}
+.glass-panel-soft {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 @layer components {

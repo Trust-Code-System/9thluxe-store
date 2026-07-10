@@ -17,10 +17,10 @@ export async function GET() {
     const { data, error } = await resend.emails.send({
       from: 'onboarding@resend.dev', // Use Resend's test domain
       to: 'jesselingard990@gmail.com', // Your Resend account email
-      subject: 'Test Newsletter - 9thLuxe',
+      subject: 'Test Newsletter - Fàdè',
       html: `
         <h1>🎉 Newsletter Integration Working!</h1>
-        <p>This is a test email from your 9thLuxe store.</p>
+        <p>This is a test email from your Fàdè store.</p>
         <p>Your Resend integration is set up correctly.</p>
         <hr>
         <p><small>If you received this, you're all set to send newsletters!</small></p>

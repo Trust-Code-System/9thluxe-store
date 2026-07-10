@@ -46,6 +46,10 @@ const config = {
           foreground: 'var(--card-foreground)',
         },
       },
+      fontFamily: {
+        body: 'var(--font-body)',
+        heading: 'var(--font-heading)',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
