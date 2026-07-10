@@ -53,7 +53,7 @@ async function expandQueryWithAnthropic(query: string): Promise<string[] | null>
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-3-5-haiku-20241022",
+        model: process.env.ANTHROPIC_MODEL || "claude-haiku-4-5-20251001",
         max_tokens: 100,
         messages: [{ role: "user", content: SEARCH_PROMPT(query) }],
       }),
@@ -80,7 +80,7 @@ async function expandQueryWithXAI(query: string): Promise<string[] | null> {
         Authorization: `Bearer ${key}`,
       },
       body: JSON.stringify({
-        model: process.env.XAI_SEARCH_MODEL || "grok-2",
+        model: process.env.XAI_SEARCH_MODEL || process.env.XAI_MODEL || "grok-4.5",
         max_tokens: 100,
         messages: [
           { role: "system", content: "Reply only with a JSON array. No other text." },

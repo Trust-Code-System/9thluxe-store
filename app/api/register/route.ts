@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { toSafeAuthErrorMessage } from '@/lib/prisma-error'
-
-function generateReferralCode(): string {
-  return Math.random().toString(36).substring(2, 10).toUpperCase()
-}
+import { generateReferralCode } from '@/lib/referrals/code'
+import { attributeReferral } from '@/lib/referrals/service'
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,14 +13,7 @@ export async function POST(req: NextRequest) {
     if (exists) return NextResponse.json({ error: 'Email already registered' }, { status: 400 })
     const hash = await bcrypt.hash(password, 10)
 
-    // Validate referral code if provided
-    let referrerId: string | undefined
-    if (referredBy) {
-      const referrer = await prisma.user.findUnique({ where: { referralCode: String(referredBy).toUpperCase() } })
-      if (referrer) referrerId = referrer.id
-    }
-
-    // Generate unique referral code
+    // Generate unique referral code for the new user
     let referralCode = generateReferralCode()
     let attempts = 0
     while (attempts < 5) {
@@ -32,7 +23,12 @@ export async function POST(req: NextRequest) {
       attempts++
     }
 
-    await prisma.user.create({ data: { email, name, passwordHash: hash, referralCode, referredBy: referrerId } })
+    const user = await prisma.user.create({ data: { email, name, passwordHash: hash, referralCode } })
+
+    // Attribute the referral (creates a Referral row + fraud guards). Best-effort: never blocks signup.
+    if (referredBy) {
+      await attributeReferral(user.id, String(referredBy)).catch(() => null)
+    }
     return NextResponse.json({ ok: true })
   } catch (error) {
     console.error('Register API error:', error)

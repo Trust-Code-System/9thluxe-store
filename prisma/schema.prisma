@@ -21,32 +21,42 @@ enum OrderStatus {
 }
 
 model User {
-  id              String     @id @default(cuid())
-  name            String?
-  email           String     @unique
-  passwordHash    String
-  role            Role       @default(USER)
-  marketingEmails Boolean    @default(true)
+  id               String    @id @default(cuid())
+  name             String?
+  email            String    @unique
+  passwordHash     String
+  role             Role      @default(USER)
+  marketingEmails  Boolean   @default(true)
   smsNotifications Boolean   @default(false)
-  orderUpdates    Boolean    @default(true)
-  wishlistAlerts  Boolean    @default(false)
-  resetToken      String?
+  orderUpdates     Boolean   @default(true)
+  wishlistAlerts   Boolean   @default(false)
+  resetToken       String?
   resetTokenExpiry DateTime?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   // Loyalty & referral
-  loyaltyTier        String   @default("STANDARD") // STANDARD | OBSIDIAN | GOLD | PLATINUM
-  totalLifetimeSpend Int      @default(0)
-  referralCode       String?  @unique
-  referredBy         String?  // userId of referrer
+  loyaltyTier        String  @default("STANDARD") // STANDARD | OBSIDIAN | GOLD | PLATINUM
+  totalLifetimeSpend Int     @default(0)
+  referralCode       String? @unique
+  referredBy         String? // userId of referrer
 
-  accounts     Account[]
-  sessions     Session[]
-  orders       Order[]
-  wishlists    Wishlist[]
-  reviews      Review[]
-  addresses    Address[]
+  accounts  Account[]
+  sessions  Session[]
+  orders    Order[]
+  wishlists Wishlist[]
+  reviews   Review[]
+  addresses Address[]
+
+  scentProfile    ScentProfile?
+  quizSessions    ScentQuizSession[]
+  consents        ConsentRecord[]
+  loyaltyEntries  LoyaltyLedger[]
+  referralsMade   Referral[]                @relation("referrer")
+  sampleCredits   SampleCredit[]
+  discoverySets   DiscoverySet[]
+  supportThreads  SupportConversation[]
+  backInStockSubs BackInStockSubscription[]
 }
 
 model Category {
@@ -60,87 +70,151 @@ model Category {
 }
 
 model Product {
-  id           String      @id @default(cuid())
-  name         String
-  slug         String      @unique
-  description  String
-  images       Json        // store image array as JSON
-  priceNGN     Int
-  oldPriceNGN  Int?
-  currency     String      @default("NGN")
-  category     ProductCategory
-  brand        String?
-  productType  String?     // perfume
-  notesTop     String?
-  notesHeart   String?
-  notesBase    String?
-  longevity    String?
-  occasion     String?
-  material     String?
-  lensType     String?
-  warranty     String?
-  waterResistance String?
-  stock          Int         @default(10)
-  isFeatured     Boolean     @default(false)
-  isBestseller   Boolean     @default(false)
-  isNew          Boolean     @default(false)
-  isLimited      Boolean     @default(false)
-  fragranceFamily String?    // CITRUS | WOODY | FLORAL | ORIENTAL | FRESH | SPICY | GOURMAND
-  dropDate       DateTime?   // scheduled release date for limited drops
-  notifyCount    Int         @default(0) // users who requested drop notification
-  deletedAt      DateTime?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  id          String          @id @default(cuid())
+  name        String
+  slug        String          @unique
+  description String
+  images      Json // store image array as JSON
+  priceNGN    Int
+  oldPriceNGN Int?
+  currency    String          @default("NGN")
+  category    ProductCategory
+  brand       String?
+  productType String? // perfume
+  notesTop    String?
+  notesHeart  String?
+  notesBase   String?
+  longevity   String?
+  occasion    String?
+
+  // --- Perfume identity ---
+  shopifyId       String?       @unique
+  sku             String?       @unique
+  barcode         String?
+  launchYear      Int?
+  perfumer        String?
+  countryOfOrigin String?
+  publishStatus   PublishStatus @default(DRAFT)
+
+  // --- Fragrance structure ---
+  concentration    String? // EDP | EDT | Parfum | EDC
+  mainAccords      String? // comma-separated accords
+  olfactoryDesc    String?
+  searchSynonyms   String? // comma-separated synonyms/alternate names
+  moodTags         String? // comma-separated
+  // --- Performance (editorial / aggregated opinion, NOT scientific fact) ---
+  sillage          String?
+  intensity        String?
+  sprayGuidance    String?
+  climate          String?
+  season           String?
+  timeOfDay        String?
+  beginnerFriendly Boolean? @default(false)
+
+  // --- Commerce (public) ---
+  returnEligible Boolean @default(true)
+  isPreorder     Boolean @default(false)
+  isWaitlist     Boolean @default(false)
+  weightGrams    Int?
+  shippingClass  String?
+
+  // --- Commerce (PRIVATE — never exposed via public API; see lib DTO mappers) ---
+  costPriceNGN Int?
+  supplierId   String?
+  supplier     Supplier? @relation(fields: [supplierId], references: [id])
+  reorderPoint Int?      @default(0)
+
+  // --- Trust ---
+  authenticityStatus AuthenticityStatus @default(RETAILER_INSPECTED)
+  batchInfo          String?
+  internalAuthNotes  String? // PRIVATE
+  lastVerifiedAt     DateTime?
+
+  stock           Int       @default(10)
+  isFeatured      Boolean   @default(false)
+  isBestseller    Boolean   @default(false)
+  isNew           Boolean   @default(false)
+  isLimited       Boolean   @default(false)
+  fragranceFamily String? // CITRUS | WOODY | FLORAL | ORIENTAL | FRESH | SPICY | GOURMAND
+  dropDate        DateTime? // scheduled release date for limited drops
+  notifyCount     Int       @default(0) // users who requested drop notification
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Social proof cache
-  ratingAvg    Float       @default(0)
-  ratingCount  Int         @default(0)
+  ratingAvg   Float @default(0)
+  ratingCount Int   @default(0)
 
   // relations
-  collectionId String?
-  collection   Collection? @relation(fields: [collectionId], references: [id])
-  orderItems   OrderItem[]
-  wishlists    Wishlist[]
-  reviews      Review[]
+  collectionId    String?
+  collection      Collection?               @relation(fields: [collectionId], references: [id])
+  orderItems      OrderItem[]
+  wishlists       Wishlist[]
+  reviews         Review[]
+  variants        ProductVariant[]
+  media           ProductMedia[]
+  backInStockSubs BackInStockSubscription[]
 
   @@index([name])
   @@index([category])
   @@index([ratingAvg])
+  @@index([publishStatus])
+  @@index([brand])
 }
 
 model Review {
-  id        String   @id @default(cuid())
-  userId    String
-  productId String
-  rating    Int                 // 1–5 (enforce in app)
-  comment   String?
-  approved  Boolean  @default(true)
+  id          String  @id @default(cuid())
+  userId      String
+  productId   String
+  rating      Int // 1–5 (enforce in app)
+  comment     String?
+  approved    Boolean @default(true)
   displayName String?
-  tag        String?
-  createdAt DateTime @default(now())
+  tag         String?
 
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
+  // Verified-purchase + structured ratings
+  orderId          String? // matching PAID order => verified purchase
+  verifiedPurchase Boolean @default(false)
+  longevityRating  Int?
+  sillageRating    Int?
+  valueRating      Int?
+  climate          String?
+  occasion         String?
+  application      String? // skin | clothing
+
+  // Moderation
+  moderationStatus ModerationStatus @default(PENDING)
+  moderatedAt      DateTime?
+  moderatedBy      String?
+  reportedCount    Int              @default(0)
+
+  createdAt DateTime  @default(now())
+  editedAt  DateTime?
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 
   @@index([productId, createdAt])
   @@index([userId])
+  @@index([moderationStatus])
 }
 
 model Coupon {
-  id           String   @id @default(cuid())
-  code         String   @unique
-  type         String   // "PERCENT" or "FIXED"
-  value        Int      // percent (1–100) or NGN amount
-  startsAt     DateTime
-  endsAt       DateTime
-  maxUses      Int?
-  usedCount    Int      @default(0)
-  minSubtotal  Int?
-  active       Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(cuid())
+  code        String   @unique
+  type        String // "PERCENT" or "FIXED"
+  value       Int // percent (1–100) or NGN amount
+  startsAt    DateTime
+  endsAt      DateTime
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  minSubtotal Int?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  orders       Order[]
+  orders Order[]
 }
 
 enum NewsletterStatus {
@@ -160,22 +234,22 @@ model NewsletterCampaign {
 }
 
 model NewsletterSubscriber {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  subscribedAt DateTime @default(now())
+  id             String    @id @default(cuid())
+  email          String    @unique
+  subscribedAt   DateTime  @default(now())
   unsubscribedAt DateTime?
 
   @@index([email])
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  type      String   // "ORDER_PAID", "ORDER_SHIPPED", etc.
+  id        String    @id @default(cuid())
+  type      String // "ORDER_PAID", "ORDER_SHIPPED", etc.
   title     String
   message   String
   orderId   String?
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  read      Boolean   @default(false)
+  createdAt DateTime  @default(now())
   readAt    DateTime?
 
   @@index([read, createdAt])
@@ -200,27 +274,27 @@ model Address {
 }
 
 model Order {
-  id           String       @id @default(cuid())
-  userId       String
-  user         User         @relation(fields: [userId], references: [id])
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  status       OrderStatus  @default(PENDING)
+  status OrderStatus @default(PENDING)
 
   // Pricing breakdown
-  subtotalNGN  Int          @default(0)
-  discountNGN  Int          @default(0)
-  shippingNGN  Int          @default(0)
-  totalNGN     Int
+  subtotalNGN Int @default(0)
+  discountNGN Int @default(0)
+  shippingNGN Int @default(0)
+  totalNGN    Int
 
   // Optional coupon applied
-  couponId     String?
-  coupon       Coupon?      @relation(fields: [couponId], references: [id])
+  couponId String?
+  coupon   Coupon? @relation(fields: [couponId], references: [id])
 
   // Payment method
-  paymentMethod String       @default("CARD") // CARD | BANK_TRANSFER
+  paymentMethod String @default("CARD") // CARD | BANK_TRANSFER
 
-  reference    String?      @unique
-  items        OrderItem[]
+  reference String?     @unique
+  items     OrderItem[]
 
   // Shipping/contact snapshot
   addressLine1 String
@@ -229,11 +303,11 @@ model Order {
   phone        String
 
   // Gift options
-  isGift       Boolean      @default(false)
+  isGift       Boolean @default(false)
   giftMessage  String?
-  giftWrapping Boolean      @default(false)
+  giftWrapping Boolean @default(false)
 
-  createdAt    DateTime     @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
@@ -253,14 +327,14 @@ model OrderItem {
 }
 
 model Collection {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
-  slug        String    @unique
+  slug        String   @unique
   description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  products    Product[]
+  products Product[]
 }
 
 model Wishlist {
@@ -314,4 +388,350 @@ model VerificationToken {
 enum Role {
   USER
   ADMIN
+}
+
+// ------------------------------------------------------------------
+// Backend upgrade: perfume commerce + intelligence domains
+// ------------------------------------------------------------------
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AuthenticityStatus {
+  RETAILER_INSPECTED
+  MANUFACTURER_VERIFIED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXECUTED
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model ProductVariant {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size         String? // e.g. 100ml, 50ml, 2ml sample
+  sku          String?  @unique
+  barcode      String?
+  priceNGN     Int
+  compareAtNGN Int?
+  costPriceNGN Int? // PRIVATE
+  isSample     Boolean  @default(false)
+  stock        Int      @default(0)
+  weightGrams  Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model ProductMedia {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  kind      String  @default("image") // image | video
+  alt       String?
+  position  Int     @default(0)
+
+  @@index([productId, position])
+}
+
+model Supplier {
+  id           String   @id @default(cuid())
+  name         String
+  contactEmail String?
+  leadTimeDays Int?
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  products Product[]
+}
+
+model BackInStockSubscription {
+  id         String    @id @default(cuid())
+  productId  String
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id])
+  email      String
+  notified   Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  notifiedAt DateTime?
+
+  @@unique([productId, email])
+  @@index([productId, notified])
+}
+
+model ScentProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  archetype         String?
+  preferredFamilies String? // comma-separated
+  preferredNotes    String?
+  dislikedNotes     String?
+  intensity         String?
+  longevity         String?
+  budgetMaxNGN      Int?
+  occasion          String?
+  climate           String?
+  updatedAt         DateTime @updatedAt
+  createdAt         DateTime @default(now())
+}
+
+model ScentQuizSession {
+  id             String   @id @default(cuid())
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id])
+  quizVersion    String
+  answers        Json
+  derivedProfile Json?
+  consentGiven   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ConsentRecord {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose   String // marketing_email | marketing_whatsapp | marketing_sms | analytics
+  channel   String?
+  granted   Boolean
+  source    String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, purpose])
+}
+
+model LoyaltyLedger {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  delta        Int // points earned (+) or redeemed (-)
+  reason       String
+  balanceAfter Int
+  orderId      String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model Referral {
+  id             String   @id @default(cuid())
+  referrerId     String
+  referrer       User     @relation("referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referredUserId String?
+  code           String   @unique
+  status         String   @default("PENDING") // PENDING | QUALIFIED | REWARDED | REVERSED
+  rewardApproved Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  @@index([referrerId])
+}
+
+model SampleCredit {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amountNGN    Int
+  remainingNGN Int
+  reason       String
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  redemptions CreditRedemption[]
+
+  @@index([userId])
+}
+
+model CreditRedemption {
+  id        String       @id @default(cuid())
+  creditId  String
+  credit    SampleCredit @relation(fields: [creditId], references: [id], onDelete: Cascade)
+  orderId   String?
+  amountNGN Int
+  createdAt DateTime     @default(now())
+
+  @@unique([creditId, orderId])
+  @@index([creditId])
+}
+
+model DiscoverySet {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  name      String
+  status    String   @default("DRAFT") // DRAFT | ORDERED
+  createdAt DateTime @default(now())
+
+  items DiscoverySetItem[]
+
+  @@index([userId])
+}
+
+model DiscoverySetItem {
+  id        String       @id @default(cuid())
+  setId     String
+  set       DiscoverySet @relation(fields: [setId], references: [id], onDelete: Cascade)
+  productId String
+  variantId String?
+  quantity  Int          @default(1)
+
+  @@index([setId])
+}
+
+model SupportConversation {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  subject   String?
+  status    String   @default("OPEN") // OPEN | ESCALATED | CLOSED
+  escalated Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model NotificationLog {
+  id         String   @id @default(cuid())
+  event      String
+  channel    String
+  kind       String // transactional | promotional
+  dedupeKey  String   @unique
+  recipient  String?
+  status     String // sent | skipped | failed
+  skipReason String?
+  providerId String?
+  createdAt  DateTime @default(now())
+
+  @@index([event, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorRole  String?
+  action     String
+  targetType String
+  targetId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([actorId, createdAt])
+}
+
+model ApprovalRequest {
+  id               String         @id @default(cuid())
+  action           String // refund | discount | price_change | publish | reorder | compensation | campaign | stock_adjust | ai_content
+  reason           String
+  dataSource       String?
+  riskLevel        String         @default("MEDIUM") // LOW | MEDIUM | HIGH
+  createdBy        String?
+  requiredApprover String?
+  status           ApprovalStatus @default(PENDING)
+  decidedBy        String?
+  decidedAt        DateTime?
+  executed         Boolean        @default(false)
+  payload          Json?
+  createdAt        DateTime       @default(now())
+
+  @@index([status, createdAt])
+}
+
+model RecommendationRequest {
+  id               String   @id @default(cuid())
+  userId           String?
+  query            String
+  constraints      Json?
+  resultProductIds String // comma-separated product ids returned
+  explanation      String?
+  merchandising    Json? // internal note of any merchandising weights applied
+  feedback         String? // optional customer feedback
+  createdAt        DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model IntegrationEvent {
+  id          String    @id @default(cuid())
+  provider    String // shopify | paystack
+  topic       String
+  externalId  String?
+  payload     Json?
+  processed   Boolean   @default(false)
+  error       String?
+  createdAt   DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([provider, externalId])
+  @@index([processed, createdAt])
+}
+
+model WebhookReceipt {
+  id          String    @id @default(cuid())
+  provider    String
+  eventId     String
+  topic       String?
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+
+  @@unique([provider, eventId])
+}
+
+model IdempotencyKey {
+  id        String    @id @default(cuid())
+  key       String    @unique
+  scope     String
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  @@index([scope])
+}
+
+model JobRun {
+  id          String    @id @default(cuid())
+  name        String
+  status      JobStatus @default(PENDING)
+  attempts    Int       @default(0)
+  lastError   String?
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([name, status])
+  @@index([status, createdAt])
+}
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  enabled     Boolean  @default(false)
+  description String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
 }

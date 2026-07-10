@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { sendReceipt } from '@/emails/sendReceipt'
+import { recordWebhookOnce } from '@/lib/webhooks/idempotency'
+import { resolveLoyaltyTier } from '@/lib/config/commerce'
+import { pointsForOrder } from '@/lib/loyalty/points'
+import { reversePointsForOrder } from '@/lib/loyalty/service'
+import { qualifyReferral } from '@/lib/referrals/service'
 
 function verify(reqBody: string, signature?: string) {
   const secret = process.env.PAYSTACK_SECRET_KEY || ''
@@ -20,6 +25,14 @@ export async function POST(req: NextRequest) {
   if (evt?.event === 'charge.success') {
     const ref = evt?.data?.reference as string | undefined
     const orderId = evt?.data?.metadata?.orderId as string | undefined
+
+    // Durable replay protection: process each event id at most once.
+    const eventId = String(evt?.id ?? evt?.data?.id ?? ref ?? orderId ?? '')
+    if (eventId) {
+      const first = await recordWebhookOnce('paystack', eventId, evt.event)
+      if (!first) return NextResponse.json({ ok: true })
+    }
+
     if (orderId) {
       // Fetch order items first so we can decrement stock
       const existingOrder = await prisma.order.findUnique({
@@ -58,27 +71,39 @@ export async function POST(req: NextRequest) {
           })
         }
 
-        // Update user loyalty tier and lifetime spend
+        // Update user loyalty tier and lifetime spend (thresholds from commerce config)
         const updatedUser = await tx.user.update({
           where: { id: updated.userId },
           data: { totalLifetimeSpend: { increment: updated.totalNGN } },
           select: { totalLifetimeSpend: true },
         })
-        const newSpend = updatedUser.totalLifetimeSpend
-        const tier =
-          newSpend >= 5_000_000 ? 'PLATINUM' :
-          newSpend >= 1_000_000 ? 'GOLD' :
-          newSpend >= 200_000   ? 'OBSIDIAN' : 'STANDARD'
         await tx.user.update({
           where: { id: updated.userId },
-          data: { loyaltyTier: tier },
+          data: { loyaltyTier: resolveLoyaltyTier(updatedUser.totalLifetimeSpend) },
         })
+
+        // Accrue loyalty points (earning is always recorded; redemption stays flag-gated).
+        // Idempotent: the already-PAID + WebhookReceipt guards prevent double-earn.
+        const points = pointsForOrder(updated.totalNGN)
+        if (points > 0) {
+          const prior = await tx.loyaltyLedger.aggregate({
+            where: { userId: updated.userId },
+            _sum: { delta: true },
+          })
+          const balanceAfter = (prior._sum.delta ?? 0) + points
+          await tx.loyaltyLedger.create({
+            data: { userId: updated.userId, delta: points, reason: 'order_earn', balanceAfter, orderId: updated.id },
+          })
+        }
 
         return updated
       })
 
       // send receipt (best-effort)
       await sendReceipt(order).catch(() => {})
+
+      // Qualify any pending referral for this customer's first paid order (best-effort, idempotent).
+      await qualifyReferral(order.userId, order.id).catch(() => {})
 
       // Create notification for admin
       await prisma.notification.create({
@@ -89,6 +114,20 @@ export async function POST(req: NextRequest) {
           orderId: order.id,
         }
       }).catch(() => {}) // Don't fail if notification creation fails
+    }
+  } else if (evt?.event === 'refund.processed' || evt?.event === 'charge.refunded') {
+    // Reverse loyalty points earned for the refunded order. Idempotent + replay-guarded.
+    const ref = (evt?.data?.transaction?.reference ?? evt?.data?.reference) as string | undefined
+    const eventId = String(evt?.id ?? evt?.data?.id ?? ref ?? '')
+    if (eventId) {
+      const first = await recordWebhookOnce('paystack', eventId, evt.event)
+      if (!first) return NextResponse.json({ ok: true })
+    }
+    if (ref) {
+      const order = await prisma.order.findUnique({ where: { reference: ref }, select: { id: true, userId: true } })
+      if (order) {
+        await reversePointsForOrder(order.userId, order.id).catch(() => {})
+      }
     }
   }
 

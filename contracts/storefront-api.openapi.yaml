@@ -1,0 +1,318 @@
+openapi: 3.1.0
+info:
+  title: Fàdè Essence Storefront API
+  version: 1.0.0
+  description: >
+    Versioned storefront API (/api/v1) for the Fàdè Essence perfume store. All responses use a
+    single envelope { data, error, meta, requestId }. Errors use stable codes from
+    contracts/error-catalogue.md. This document is the frontend contract; contract tests guard it.
+servers:
+  - url: /api/v1
+components:
+  schemas:
+    Envelope:
+      type: object
+      required: [data, error, meta, requestId]
+      properties:
+        data: { nullable: true }
+        error:
+          nullable: true
+          $ref: '#/components/schemas/Error'
+        meta: { type: object, additionalProperties: true }
+        requestId: { type: string }
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, description: Stable machine-readable code }
+        message: { type: string, description: Safe customer-facing message }
+        fieldErrors:
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              message: { type: string }
+    Money:
+      type: integer
+      description: Whole Nigerian Naira (no decimals).
+    ProductVariant:
+      type: object
+      properties:
+        id: { type: string }
+        size: { type: string, example: '100ml' }
+        priceNGN: { $ref: '#/components/schemas/Money' }
+        sampleSize: { type: boolean }
+        inStock: { type: boolean }
+    Product:
+      type: object
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        brand: { type: string }
+        description: { type: string }
+        priceNGN: { $ref: '#/components/schemas/Money' }
+        oldPriceNGN: { $ref: '#/components/schemas/Money', nullable: true }
+        currency: { type: string, default: NGN }
+        images: { type: array, items: { type: string } }
+        fragranceFamily: { type: string, nullable: true }
+        notesTop: { type: string, nullable: true }
+        notesHeart: { type: string, nullable: true }
+        notesBase: { type: string, nullable: true }
+        concentration: { type: string, nullable: true }
+        longevity: { type: string, nullable: true }
+        sillage: { type: string, nullable: true }
+        ratingAvg: { type: number }
+        ratingCount: { type: integer }
+        inStock: { type: boolean }
+        variants:
+          type: array
+          items: { $ref: '#/components/schemas/ProductVariant' }
+    CartLine:
+      type: object
+      properties:
+        productId: { type: string }
+        variantId: { type: string, nullable: true }
+        quantity: { type: integer, minimum: 1 }
+    Cart:
+      type: object
+      properties:
+        id: { type: string }
+        lines:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CartLine'
+              - type: object
+                properties:
+                  priceNGN: { $ref: '#/components/schemas/Money' }
+                  name: { type: string }
+        subtotalNGN: { $ref: '#/components/schemas/Money' }
+        shippingNGN: { $ref: '#/components/schemas/Money' }
+        discountNGN: { $ref: '#/components/schemas/Money' }
+        totalNGN: { $ref: '#/components/schemas/Money' }
+        currency: { type: string }
+        checkoutUrl: { type: string, nullable: true }
+paths:
+  /products:
+    get:
+      summary: List published products
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: brand, in: query, schema: { type: string } }
+        - { name: family, in: query, schema: { type: string } }
+        - { name: note, in: query, schema: { type: string } }
+        - { name: occasion, in: query, schema: { type: string } }
+        - { name: inStock, in: query, schema: { type: boolean } }
+        - { name: minPriceNGN, in: query, schema: { type: integer } }
+        - { name: maxPriceNGN, in: query, schema: { type: integer } }
+        - { name: cursor, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, maximum: 60, default: 24 } }
+      responses:
+        '200':
+          description: Product page
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          products: { type: array, items: { $ref: '#/components/schemas/Product' } }
+                          nextCursor: { type: string, nullable: true }
+  /products/{slug}:
+    get:
+      summary: Get a product by slug
+      parameters:
+        - { name: slug, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Product
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - properties: { data: { $ref: '#/components/schemas/Product' } }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /search:
+    get:
+      summary: Faceted product search (hard filters applied before any AI ranking)
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, maximum: 60, default: 24 } }
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /cart:
+    get:
+      summary: Get the current cart
+      responses:
+        '200':
+          description: Cart
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - properties: { data: { $ref: '#/components/schemas/Cart' } }
+    post:
+      summary: Add / update / remove a cart line (stock + price revalidated server-side)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, line]
+              properties:
+                action: { type: string, enum: [add, update, remove] }
+                line: { $ref: '#/components/schemas/CartLine' }
+      responses:
+        '200':
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - properties: { data: { $ref: '#/components/schemas/Cart' } }
+        '409':
+          description: Stock/price conflict
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /recommendations:
+    get:
+      summary: Catalogue-grounded recommendations (never returns unavailable products as available)
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: notes, in: query, schema: { type: string } }
+        - { name: excludeNotes, in: query, schema: { type: string } }
+        - { name: budgetMaxNGN, in: query, schema: { type: integer } }
+        - { name: family, in: query, schema: { type: string } }
+        - { name: sampleFirst, in: query, schema: { type: boolean } }
+        - { name: limit, in: query, schema: { type: integer, maximum: 20, default: 6 } }
+      responses:
+        '200':
+          description: Recommendations
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /concierge:
+    post:
+      summary: AI Scent Concierge — grounded, typed recommendations; refuses out-of-catalogue intent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string, maxLength: 1000 }
+                budgetMaxNGN: { type: integer }
+                excludeNotes: { type: array, items: { type: string } }
+                sampleFirst: { type: boolean }
+                limit: { type: integer, minimum: 1, maximum: 12 }
+      responses:
+        '200':
+          description: Concierge response (items + message + explanation + disclaimer)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '403':
+          description: Feature disabled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /reviews:
+    get:
+      summary: Approved reviews for a product
+      parameters:
+        - { name: productId, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Reviews
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+    post:
+      summary: Submit a review (verified purchasers only, one per product)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, rating]
+              properties:
+                productId: { type: string }
+                rating: { type: integer, minimum: 1, maximum: 5 }
+                comment: { type: string, maxLength: 2000 }
+                displayName: { type: string }
+                longevityRating: { type: integer, minimum: 1, maximum: 5 }
+                sillageRating: { type: integer, minimum: 1, maximum: 5 }
+                valueRating: { type: integer, minimum: 1, maximum: 5 }
+                application: { type: string, enum: [skin, clothing] }
+      responses:
+        '201':
+          description: Review created (moderation PENDING)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '401':
+          description: Not signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '403':
+          description: Not a verified purchaser (REVIEW_NOT_VERIFIED)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '409':
+          description: Already reviewed (REVIEW_DUPLICATE)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /reviews/summary:
+    get:
+      summary: AI summary of real reviews (states count, flagged isAiSummary)
+      parameters:
+        - { name: productId, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Summary (summary may be null when too few reviews)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /back-in-stock:
+    post:
+      summary: Subscribe to a product's back-in-stock notification (idempotent per product+email)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId]
+              properties:
+                productId: { type: string }
+                email: { type: string, format: email }
+      responses:
+        '201':
+          description: Subscribed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }

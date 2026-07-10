@@ -11,7 +11,7 @@ const userPrompt = process.argv.slice(2).join(" ") || "Say hello";
 const systemPrompt = "You are a helpful coding assistant, reply concisely.";
 
 const body = {
-  model: "gpt-4o-mini",
+  model: process.env.OPENAI_MODEL || "gpt-5.6-terra",
   messages: [
     { role: "system", content: systemPrompt },
     { role: "user", content: userPrompt }
