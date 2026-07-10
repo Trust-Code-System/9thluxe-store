@@ -77,7 +77,9 @@ Anything marked `[blocked]` has an implemented adapter + `.env.example` entry + 
 - [ ] Fragrance DNA quiz (versioned, anon+auth, derived profile)
 - [ ] Gift Concierge (delivery feasibility validated separately)
 - [ ] Layering Lab (editorial rules + AI explanation, non-guaranteed)
-- [~] Reviews (verified-purchase, moderation audit, AI summary with count + regeneration)
+- [x] Reviews (`POST/GET /api/v1/reviews`: verified-purchase enforced, one-per-user, moderation
+  PENDING flag; `GET /api/v1/reviews/summary`: AI summary of real reviews with count + isAiSummary)
+- [x] Back-in-stock subscribe (`POST /api/v1/back-in-stock`, idempotent per product+email)
 - [ ] Samples & discovery sets (credit ledger, redemption, expiry, conversion, abuse prevention)
 - [ ] Loyalty & referrals (configurable, disabled until approved)
 - [~] Notifications events + consent/quiet-hours/dedup

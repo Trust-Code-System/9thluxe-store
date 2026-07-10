@@ -196,11 +196,123 @@ paths:
     get:
       summary: Catalogue-grounded recommendations (never returns unavailable products as available)
       parameters:
+        - { name: q, in: query, schema: { type: string } }
         - { name: notes, in: query, schema: { type: string } }
+        - { name: excludeNotes, in: query, schema: { type: string } }
+        - { name: budgetMaxNGN, in: query, schema: { type: integer } }
+        - { name: family, in: query, schema: { type: string } }
+        - { name: sampleFirst, in: query, schema: { type: boolean } }
         - { name: limit, in: query, schema: { type: integer, maximum: 20, default: 6 } }
       responses:
         '200':
           description: Recommendations
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /concierge:
+    post:
+      summary: AI Scent Concierge — grounded, typed recommendations; refuses out-of-catalogue intent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string, maxLength: 1000 }
+                budgetMaxNGN: { type: integer }
+                excludeNotes: { type: array, items: { type: string } }
+                sampleFirst: { type: boolean }
+                limit: { type: integer, minimum: 1, maximum: 12 }
+      responses:
+        '200':
+          description: Concierge response (items + message + explanation + disclaimer)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '403':
+          description: Feature disabled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /reviews:
+    get:
+      summary: Approved reviews for a product
+      parameters:
+        - { name: productId, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Reviews
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+    post:
+      summary: Submit a review (verified purchasers only, one per product)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, rating]
+              properties:
+                productId: { type: string }
+                rating: { type: integer, minimum: 1, maximum: 5 }
+                comment: { type: string, maxLength: 2000 }
+                displayName: { type: string }
+                longevityRating: { type: integer, minimum: 1, maximum: 5 }
+                sillageRating: { type: integer, minimum: 1, maximum: 5 }
+                valueRating: { type: integer, minimum: 1, maximum: 5 }
+                application: { type: string, enum: [skin, clothing] }
+      responses:
+        '201':
+          description: Review created (moderation PENDING)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '401':
+          description: Not signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '403':
+          description: Not a verified purchaser (REVIEW_NOT_VERIFIED)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '409':
+          description: Already reviewed (REVIEW_DUPLICATE)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /reviews/summary:
+    get:
+      summary: AI summary of real reviews (states count, flagged isAiSummary)
+      parameters:
+        - { name: productId, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Summary (summary may be null when too few reviews)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+  /back-in-stock:
+    post:
+      summary: Subscribe to a product's back-in-stock notification (idempotent per product+email)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId]
+              properties:
+                productId: { type: string }
+                email: { type: string, format: email }
+      responses:
+        '201':
+          description: Subscribed
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Envelope' }
