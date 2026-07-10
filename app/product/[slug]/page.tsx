@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { notFound } from "next/navigation"
 import { MainLayout } from "@/components/layout/main-layout"
 import { ProductGallery } from "@/components/product/product-gallery"
@@ -115,6 +116,24 @@ export default async function ProductPage({ params }: ProductPageProps) {
         reviewCount={productDetails.reviewCount}
       />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-24 lg:pb-12">
+        <nav aria-label="Breadcrumb" className="mb-8 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <Link href="/" className="transition-colors hover:text-foreground">Home</Link>
+          <span aria-hidden className="text-border">/</span>
+          <Link href="/shop" className="transition-colors hover:text-foreground">Perfumes</Link>
+          {productDetails.brand ? (
+            <>
+              <span aria-hidden className="text-border">/</span>
+              <Link
+                href={`/shop?brand=${encodeURIComponent(productDetails.brand)}`}
+                className="transition-colors hover:text-foreground"
+              >
+                {productDetails.brand}
+              </Link>
+            </>
+          ) : null}
+          <span aria-hidden className="text-border">/</span>
+          <span className="truncate text-foreground/70">{productDetails.name}</span>
+        </nav>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           <ProductGallery images={productDetails.images} productName={productDetails.name} />
           <ProductInfo product={productDetails} />

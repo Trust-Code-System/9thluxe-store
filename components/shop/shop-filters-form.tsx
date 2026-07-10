@@ -75,7 +75,7 @@ export function ShopFiltersForm({ params, brands }: ShopFiltersFormProps) {
 
   return (
     <form
-      className="grid gap-6 rounded-[32px] border border-border bg-background/80 p-6 shadow-[0_30px_60px_rgba(2,6,23,0.1)] md:grid-cols-[0.9fr,1.1fr]"
+      className="grid gap-6 rounded-2xl border border-border bg-card p-6 shadow-[0_20px_50px_-30px_rgba(33,24,19,0.4)] md:grid-cols-[0.9fr,1.1fr]"
       method="get"
     >
       {params.q && <input type="hidden" name="q" value={params.q} />}

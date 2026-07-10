@@ -155,7 +155,7 @@ export function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-12 pb-8 border-b border-border">
           {trustStrip.map(({ icon: Icon, label, detail }) => (
             <div key={label} className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent">
                 <Icon className="h-5 w-5" />
               </div>
               <div>
@@ -298,7 +298,7 @@ export function Footer() {
 
                     <span className="hidden sm:inline">Subscribe</span>
 
-                    <span className="sm:hidden">Sub</span>
+                    <span className="sm:hidden">Join</span>
 
                   </>
 

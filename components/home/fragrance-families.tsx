@@ -4,95 +4,75 @@ const FAMILIES = [
   {
     key: "CITRUS",
     name: "Citrus",
-    mood: "Fresh & Energizing",
+    mood: "Fresh & energising",
     description: "Bergamot, lemon, mandarin",
-    gradient: "from-yellow-100 to-amber-50 dark:from-yellow-950/40 dark:to-amber-950/20",
-    accent: "text-amber-700 dark:text-amber-400",
-    emoji: "🍋",
   },
   {
     key: "WOODY",
     name: "Woody",
-    mood: "Warm & Grounded",
-    description: "Sandalwood, cedarwood, vetiver",
-    gradient: "from-stone-100 to-amber-50 dark:from-stone-950/40 dark:to-amber-950/20",
-    accent: "text-stone-700 dark:text-stone-400",
-    emoji: "🪵",
+    mood: "Warm & grounded",
+    description: "Sandalwood, cedar, vetiver",
   },
   {
     key: "FLORAL",
     name: "Floral",
-    mood: "Soft & Romantic",
+    mood: "Soft & romantic",
     description: "Rose, jasmine, tuberose",
-    gradient: "from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/20",
-    accent: "text-rose-600 dark:text-rose-400",
-    emoji: "🌹",
   },
   {
     key: "ORIENTAL",
     name: "Oriental",
-    mood: "Exotic & Sensual",
-    description: "Amber, oud, spices, incense",
-    gradient: "from-orange-50 to-amber-100 dark:from-orange-950/30 dark:to-amber-950/30",
-    accent: "text-orange-700 dark:text-orange-400",
-    emoji: "✨",
+    mood: "Exotic & sensual",
+    description: "Amber, oud, spice, incense",
   },
   {
     key: "FRESH",
     name: "Fresh",
-    mood: "Clean & Airy",
+    mood: "Clean & airy",
     description: "Oceanic, aquatic, green",
-    gradient: "from-sky-50 to-blue-50 dark:from-sky-950/30 dark:to-blue-950/20",
-    accent: "text-sky-600 dark:text-sky-400",
-    emoji: "💧",
   },
   {
     key: "SPICY",
     name: "Spicy",
-    mood: "Bold & Confident",
+    mood: "Bold & confident",
     description: "Pepper, cardamom, cinnamon",
-    gradient: "from-red-50 to-orange-50 dark:from-red-950/30 dark:to-orange-950/20",
-    accent: "text-red-600 dark:text-red-400",
-    emoji: "🌶️",
   },
 ]
 
 export function FragranceFamilies() {
   return (
-    <section className="py-16 bg-muted/30">
-      <div className="container mx-auto max-w-[1200px] px-6 space-y-10">
-        <header className="text-center space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">
-            Explore by mood
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-semibold">Shop by Fragrance Family</h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Every great fragrance belongs to a family. Discover yours.
+    <section className="paper-texture bg-secondary/40 py-16 lg:py-24">
+      <div className="container mx-auto max-w-[1200px] space-y-10 px-4 sm:px-6 lg:px-8">
+        <header className="space-y-3 text-center">
+          <span className="eyebrow">Explore by character</span>
+          <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+            Shop by Fragrance Family
+          </h2>
+          <p className="mx-auto max-w-lg text-muted-foreground">
+            Every scent belongs to a family. Find the character that feels like you.
           </p>
         </header>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
           {FAMILIES.map((family) => (
             <Link
               key={family.key}
               href={`/shop?family=${family.key}`}
-              className={`group relative rounded-2xl p-6 bg-gradient-to-br ${family.gradient} border border-transparent hover:border-border transition-all duration-300 hover:shadow-md`}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-[0_18px_40px_-26px_rgba(33,24,19,0.5)]"
             >
-              <div className="space-y-2">
-                <span className="text-3xl" aria-hidden="true">
-                  {family.emoji}
-                </span>
-                <div>
-                  <p className={`text-lg font-semibold ${family.accent}`}>{family.name}</p>
-                  <p className="text-sm font-medium text-foreground/80">{family.mood}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{family.description}</p>
-                </div>
+              <div className="space-y-1.5">
+                <p className="font-serif text-xl font-medium text-foreground">{family.name}</p>
+                <p className="text-sm font-medium text-accent">{family.mood}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{family.description}</p>
               </div>
-              <div className="absolute bottom-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <span className={`text-xs font-semibold uppercase tracking-wider ${family.accent}`}>
-                  Explore →
-                </span>
-              </div>
+              <span
+                className="mt-5 inline-block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors group-hover:text-accent"
+                aria-hidden
+              >
+                Explore →
+              </span>
+              {/* Warm amber wash on hover */}
+              <span className="amber-glow pointer-events-none absolute -bottom-8 -right-8 h-28 w-28 rounded-full opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
             </Link>
           ))}
         </div>

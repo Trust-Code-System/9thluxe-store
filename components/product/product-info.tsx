@@ -6,7 +6,7 @@ import * as React from "react"
 
 import Link from "next/link"
 
-import { Heart, Share2, Check, AlertCircle } from "lucide-react"
+import { Heart, Share2, Check, AlertCircle, ShieldCheck, Truck, RotateCcw } from "lucide-react"
 
 import { toast } from "sonner"
 
@@ -186,7 +186,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
           href={`/shop?brand=${encodeURIComponent(product.brand)}`}
 
-          className="text-sm font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
+          className="text-xs font-semibold uppercase tracking-[0.2em] text-accent transition-colors hover:text-accent/80"
 
         >
 
@@ -200,7 +200,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Title */}
 
-      <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight -mt-4">{product.name}</h1>
+      <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight -mt-3">{product.name}</h1>
 
 
 
@@ -365,6 +365,31 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </div>
 
       )}
+
+      {/* Trust row */}
+      <div className="mt-2 grid grid-cols-1 gap-3 rounded-xl border border-border bg-secondary/50 p-4 sm:grid-cols-3">
+        <div className="flex items-start gap-2.5">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div className="text-xs leading-snug">
+            <p className="font-medium text-foreground">Inspected on arrival</p>
+            <p className="text-muted-foreground">Sealed &amp; authenticity-checked</p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2.5">
+          <Truck className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div className="text-xs leading-snug">
+            <p className="font-medium text-foreground">Nationwide delivery</p>
+            <p className="text-muted-foreground">Tracked dispatch</p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2.5">
+          <RotateCcw className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div className="text-xs leading-snug">
+            <p className="font-medium text-foreground">Easy returns</p>
+            <p className="text-muted-foreground">On eligible items</p>
+          </div>
+        </div>
+      </div>
 
     </div>
 
