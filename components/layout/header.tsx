@@ -83,7 +83,7 @@ export function Header(_props: HeaderProps) {
 
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-0.5" aria-label="Main">
+          <nav className="hidden lg:flex items-center gap-7" aria-label="Main">
             {navigation.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
               return (
@@ -91,10 +91,11 @@ export function Header(_props: HeaderProps) {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "px-4 py-2.5 text-[15px] font-semibold tracking-tight transition-colors rounded-md",
+                    "relative py-1 text-[13px] font-medium uppercase tracking-[0.14em] transition-colors",
+                    "after:absolute after:-bottom-0.5 after:left-0 after:h-px after:bg-accent after:transition-all after:duration-300",
                     isActive
-                      ? "text-foreground bg-muted/80"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                      ? "text-foreground after:w-full"
+                      : "text-muted-foreground hover:text-foreground after:w-0 hover:after:w-full",
                   )}
                 >
                   {item.name}

@@ -44,31 +44,37 @@ export function BrandStorySection() {
 
           <div className="max-w-lg">
 
-            <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-6">The Fàdè Story</h2>
+            <span className="eyebrow">Our House</span>
 
-            <div className="space-y-4 text-muted-foreground leading-relaxed">
+            <h2 className="mb-6 mt-3 font-serif text-3xl font-semibold tracking-tight md:text-4xl">The Fàdè Story</h2>
+
+            <div className="space-y-4 leading-relaxed text-muted-foreground">
 
               <p>
 
-                Founded on the principle that true luxury lies in the details, Fàdè curates an exceptional collection of
+                Fàdè is a Lagos house built on a simple belief — that a fragrance should feel
 
-                perfumes from the world's most prestigious houses.
+                composed, not chosen at random. We curate rare and coveted perfumes from houses
+
+                we trust, and present them with the care they deserve.
 
               </p>
 
               <p>
 
-                Our name, meaning "to bring" in Yoruba, reflects our mission: to bring the finest in craftsmanship,
+                Our name draws from Yoruba, a nod to bringing something worthwhile to those who
 
-                heritage, and design to those who appreciate the extraordinary.
+                appreciate it: craftsmanship, provenance, and the quiet confidence of a scent that
+
+                lasts.
 
               </p>
 
               <p>
 
-                Every piece in our collection tells a story of artistry and dedication, carefully selected to meet our
+                Every fragrance we carry is sourced deliberately and inspected on arrival, so what
 
-                uncompromising standards of excellence.
+                reaches you is exactly what you expect.
 
               </p>
 

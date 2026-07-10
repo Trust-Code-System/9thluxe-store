@@ -5,16 +5,23 @@ import Link from "next/link"
 export function AnnouncementBar() {
   return (
     <div
-      className="w-full border-b border-border bg-muted/50 text-center text-xs font-medium text-muted-foreground"
+      className="w-full bg-espresso text-[13px] text-[color:var(--primary-foreground)]"
       role="complementary"
       aria-label="Promotion"
     >
-      <div className="container mx-auto px-4 py-2">
+      <div className="container mx-auto flex items-center justify-center gap-2 px-4 py-2.5">
+        <span className="hidden sm:inline text-[color:var(--amber)]" aria-hidden>
+          ✦
+        </span>
         <Link
           href="/shop"
-          className="hover:text-foreground transition-colors underline underline-offset-2"
+          className="font-sans tracking-wide text-center transition-opacity hover:opacity-80"
         >
-          Free shipping on orders over ₦500,000
+          Complimentary delivery on qualifying orders
+          <span className="mx-2 text-[color:var(--amber)]" aria-hidden>·</span>
+          <span className="underline underline-offset-4 decoration-[color:var(--amber)]/60">
+            Discover the collection
+          </span>
         </Link>
       </div>
     </div>

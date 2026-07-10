@@ -74,11 +74,11 @@ const tagLabels: Record<string, string> = {
 
 const tagColors: Record<string, string> = {
 
-  new: "bg-emerald-600 text-white",
+  new: "bg-moss text-white",
 
-  bestseller: "bg-amber-600 text-white",
+  bestseller: "bg-accent text-accent-foreground",
 
-  limited: "bg-red-600 text-white",
+  limited: "bg-espresso text-[color:var(--primary-foreground)]",
 
 }
 
@@ -122,9 +122,9 @@ export function ProductCard({ product, onAddToWishlist, onQuickView, className }
 
       className={cn(
 
-        "group relative flex flex-col rounded-xl bg-card border border-border overflow-hidden transition-all duration-300",
+        "group relative flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card transition-all duration-300",
 
-        isHovered && "shadow-lg -translate-y-1",
+        isHovered && "-translate-y-1 border-accent/30 shadow-[0_18px_40px_-24px_rgba(33,24,19,0.55)]",
 
         className,
 
@@ -138,7 +138,7 @@ export function ProductCard({ product, onAddToWishlist, onQuickView, className }
 
       {/* Image Container */}
 
-      <div className="relative aspect-square overflow-hidden bg-muted">
+      <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
 
         <Link href={`/product/${product.slug}`}>
 
@@ -256,7 +256,7 @@ export function ProductCard({ product, onAddToWishlist, onQuickView, className }
 
         {/* Brand */}
 
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{product.brand}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">{product.brand}</span>
 
 
 
@@ -264,7 +264,7 @@ export function ProductCard({ product, onAddToWishlist, onQuickView, className }
 
         <Link href={`/product/${product.slug}`}>
 
-          <h3 className="font-medium text-sm leading-tight line-clamp-2 hover:text-accent transition-colors">
+          <h3 className="font-serif text-[15px] font-medium leading-snug line-clamp-2 transition-colors hover:text-accent">
 
             {product.name}
 
