@@ -70,9 +70,10 @@ Anything marked `[blocked]` has an implemented adapter + `.env.example` entry + 
 ## Phase 4 — Services & feature backends
 - [~] Catalogue & inventory services (sync, publish rules, low/out-of-stock, back-in-stock, preorder/waitlist, reconciliation, dup-SKU, source-of-truth doc)
 - [~] Cart & order services (anon/auth cart, merge, revalidation, gift, sample credit, shipping threshold from config, tracking, reconciliation)
-- [x] Search architecture (hard filters before AI, availability/price/sample facets)
-- [~] Recommendation engine (intent → constraints → retrieve → score → safeguards → explain → revalidate → typed results → feedback)
-- [~] AI Scent Concierge backend (catalogue-grounded, refusal/clarification, no medical claims)
+- [x] Search architecture (hard filters before AI, availability/price/sample facets) + `GET /api/v1/search`
+- [x] Recommendation engine (`lib/recommendations/engine.ts`: intent → constraints → retrieve → score → safeguards → revalidate → typed results) + `GET /api/v1/recommendations`; grounding invariant tested (never returns unavailable-as-available)
+- [x] AI Scent Concierge backend (`POST /api/v1/concierge`: catalogue-grounded, refusal/clarification for out-of-catalogue intent, no medical claims, feature-flag gated)
+- [x] v1 storefront routes on the envelope: `GET /api/v1/products`, `/products/[slug]`, `/search`, `/recommendations`, `POST /concierge`
 - [ ] Fragrance DNA quiz (versioned, anon+auth, derived profile)
 - [ ] Gift Concierge (delivery feasibility validated separately)
 - [ ] Layering Lab (editorial rules + AI explanation, non-guaranteed)

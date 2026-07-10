@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { sendReceipt } from '@/emails/sendReceipt'
+import { recordWebhookOnce } from '@/lib/webhooks/idempotency'
 
 function verify(reqBody: string, signature?: string) {
   const secret = process.env.PAYSTACK_SECRET_KEY || ''
@@ -20,6 +21,14 @@ export async function POST(req: NextRequest) {
   if (evt?.event === 'charge.success') {
     const ref = evt?.data?.reference as string | undefined
     const orderId = evt?.data?.metadata?.orderId as string | undefined
+
+    // Durable replay protection: process each event id at most once.
+    const eventId = String(evt?.id ?? evt?.data?.id ?? ref ?? orderId ?? '')
+    if (eventId) {
+      const first = await recordWebhookOnce('paystack', eventId, evt.event)
+      if (!first) return NextResponse.json({ ok: true })
+    }
+
     if (orderId) {
       // Fetch order items first so we can decrement stock
       const existingOrder = await prisma.order.findUnique({
