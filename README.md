@@ -1,10 +1,10 @@
-# Fàdè Essence - Luxury E-Commerce Platform
+# Fádé Essence - Luxury E-Commerce Platform
 
-A modern, full-featured e-commerce platform built with Next.js 16, TypeScript, and Prisma. Fàdè Essence specializes in luxury perfumes, offering a premium shopping experience with comprehensive admin management capabilities.
+A modern, full-featured e-commerce platform built with Next.js 16, TypeScript, and Prisma. Fádé Essence specializes in luxury perfumes, offering a premium shopping experience with comprehensive admin management capabilities.
 
 ## 🎯 Project Overview
 
-Fàdè Essence is a complete e-commerce solution featuring:
+Fádé Essence is a complete e-commerce solution featuring:
 - **Customer-facing storefront** with product browsing, cart management, and checkout
 - **Admin dashboard** for product, order, and inventory management
 - **User authentication** with NextAuth.js v5
@@ -524,6 +524,6 @@ For support, contact:
 
 ---
 
-**Built with ❤️ for Fàdè Essence**
+**Built with ❤️ for Fádé Essence**
 
 

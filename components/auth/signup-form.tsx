@@ -74,7 +74,7 @@ export function SignUpForm() {
 
       toast.success("Account created successfully", {
 
-        description: "Welcome to Fàdè!",
+        description: "Welcome to Fádé!",
 
       })
 

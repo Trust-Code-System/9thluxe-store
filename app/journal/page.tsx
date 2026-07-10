@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowRight } from "lucide-react"
 
 export const metadata = {
-  title: "The Journal | Fàdè",
+  title: "The Journal | Fádé",
   description: "Fragrance guides, editorial content, and olfactory education for the discerning nose.",
 }
 

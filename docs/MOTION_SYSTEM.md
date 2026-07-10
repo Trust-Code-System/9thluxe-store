@@ -1,4 +1,4 @@
-# Fàdè Motion System
+# Fádé Motion System
 
 Motion is calm and editorial — it supports the content, never blocks it. All
 animation uses `opacity` and `transform` only (no layout-animating properties).

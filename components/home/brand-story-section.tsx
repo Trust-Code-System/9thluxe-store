@@ -26,7 +26,7 @@ export function BrandStorySection() {
 
               src="/fade-brand-story-atelier.jpg"
 
-              alt="The Fàdè story"
+              alt="The Fádé story"
 
               fill
 
@@ -46,13 +46,13 @@ export function BrandStorySection() {
 
             <span className="eyebrow">Our House</span>
 
-            <h2 className="mb-6 mt-3 font-serif text-3xl font-semibold tracking-tight md:text-4xl">The Fàdè Story</h2>
+            <h2 className="mb-6 mt-3 font-serif text-3xl font-semibold tracking-tight md:text-4xl">The Fádé Story</h2>
 
             <div className="space-y-4 leading-relaxed text-muted-foreground">
 
               <p>
 
-                Fàdè is a Lagos house built on a simple belief — that a fragrance should feel
+                Fádé is a Lagos house built on a simple belief — that a fragrance should feel
 
                 composed, not chosen at random. We curate rare and coveted perfumes from houses
 

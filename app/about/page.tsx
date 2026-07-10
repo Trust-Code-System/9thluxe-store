@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button"
 import { SprayCan, Truck, Award, Heart, ShieldCheck, PackageCheck, MessageSquareWarning } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "About Fàdè",
+  title: "About Fádé",
   description:
-    "Fàdè is a fashion and beauty brand specializing in luxury perfumes. High-quality, trendy, and luxurious fragrances for everyday elegance.",
+    "Fádé is a fashion and beauty brand specializing in luxury perfumes. High-quality, trendy, and luxurious fragrances for everyday elegance.",
 }
 
 export default function AboutPage() {
@@ -20,7 +20,7 @@ export default function AboutPage() {
           <div className="text-center mb-12 lg:mb-16">
             <span className="eyebrow">Our House</span>
             <h1 className="mt-3 font-serif text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-4">
-              About Fàdè
+              About Fádé
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               A Lagos house for rare and coveted perfumes — curated with care, sold with confidence.
@@ -33,7 +33,7 @@ export default function AboutPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="text-lg leading-relaxed text-foreground mb-6">
-                  <strong className="font-semibold">Fàdè</strong> is a fashion and beauty brand that specializes in{" "}
+                  <strong className="font-semibold">Fádé</strong> is a fashion and beauty brand that specializes in{" "}
                   <strong className="font-semibold">luxury perfumes</strong>. We focus on providing
                   customers with high-quality, trendy, and luxurious fragrances that enhance personal style and everyday elegance.
                 </p>

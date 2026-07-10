@@ -11,7 +11,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Fàdè — Luxury Perfumes",
+  title: "Fádé — Luxury Perfumes",
   description:
     "Modern luxury meets everyday elegance. Shop premium perfumes with Nigeria-wide delivery.",
   generator: "v0.app",

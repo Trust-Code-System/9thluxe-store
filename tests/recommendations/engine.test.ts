@@ -9,7 +9,7 @@ function product(over: Partial<CommerceProduct> & { id: string }): CommerceProdu
     shopifyId: null,
     slug: over.slug ?? over.id,
     name: over.name ?? over.id,
-    brand: over.brand ?? 'Fàdè',
+    brand: over.brand ?? 'Fádé',
     description: '',
     price: over.price ?? { amountNGN: 80_000, currency: 'NGN' },
     compareAtPrice: null,

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Truck, Clock, Package, MapPin } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Shipping Information | Fàdè",
+  title: "Shipping Information | Fádé",
   description: "Learn about our shipping options and delivery times.",
 }
 

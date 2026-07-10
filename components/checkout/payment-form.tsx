@@ -30,7 +30,7 @@ interface PaymentFormProps {
 }
 
 const BANK_DETAILS = {
-  accountName: "Fàdè Essence Limited",
+  accountName: "Fádé Essence Limited",
   bank: "Guaranty Trust Bank (GTBank)",
   accountNumber: "0123456789",
 }

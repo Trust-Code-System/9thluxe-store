@@ -4,7 +4,7 @@ import { ProductGrid } from "@/components/ui/product-grid"
 import { prisma } from "@/lib/prisma"
 
 export const metadata: Metadata = {
-  title: "Featured Collections | Fàdè",
+  title: "Featured Collections | Fádé",
   description: "Explore our featured collections of luxury perfumes. Discover timeless elegance and premium craftsmanship.",
 }
 

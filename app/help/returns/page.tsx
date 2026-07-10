@@ -6,7 +6,7 @@ import { Package, Clock, CheckCircle, XCircle } from "lucide-react"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Returns & Exchanges | Fàdè",
+  title: "Returns & Exchanges | Fádé",
   description: "Learn about our return and exchange policy.",
 }
 

@@ -45,7 +45,7 @@ export default async function AdminDashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="font-serif text-2xl md:text-3xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Overview of your Fàdè storefront performance.</p>
+        <p className="text-muted-foreground mt-1">Overview of your Fádé storefront performance.</p>
       </div>
 
       {/* KPI Cards */}

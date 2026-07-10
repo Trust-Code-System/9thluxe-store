@@ -1,4 +1,4 @@
-# Fàdè Design System — "The Olfactory Atelier"
+# Fádé Design System — "The Olfactory Atelier"
 
 Warm, editorial, tactile. The system is token-driven (Tailwind v4 `@theme` in
 `app/globals.css`) so a palette change restyles the whole site.

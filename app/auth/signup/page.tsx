@@ -3,8 +3,8 @@ import Link from "next/link"
 import { SignUpForm } from "@/components/auth/signup-form"
 
 export const metadata: Metadata = {
-  title: "Create Account | Fàdè",
-  description: "Create your Fàdè account to start shopping.",
+  title: "Create Account | Fádé",
+  description: "Create your Fádé account to start shopping.",
 }
 
 export default function SignUpPage() {
@@ -14,10 +14,10 @@ export default function SignUpPage() {
         {/* Brand */}
         <div className="text-center mb-8">
           <Link href="/" className="font-serif text-3xl font-semibold">
-            Fàdè
+            Fádé
           </Link>
           <h1 className="mt-6 font-serif text-2xl font-semibold">Create an account</h1>
-          <p className="mt-2 text-muted-foreground">Join Fàdè for exclusive access to luxury</p>
+          <p className="mt-2 text-muted-foreground">Join Fádé for exclusive access to luxury</p>
         </div>
 
         {/* Form */}

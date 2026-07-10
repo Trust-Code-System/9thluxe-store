@@ -14,7 +14,7 @@ async function main() {
       images: ['/placeholder.png'],
       priceNGN: 95000,
       category: ProductCategory.PERFUMES,
-      brand: 'Fàdè',
+      brand: 'Fádé',
       concentration: 'EDP',
       fragranceFamily: 'ORIENTAL',
       notesTop: 'bergamot',

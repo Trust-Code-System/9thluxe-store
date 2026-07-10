@@ -6,6 +6,7 @@ import Image from "next/image"
 import { Sparkles, ArrowUp, RotateCcw, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { LogoMark } from "@/components/logo"
 
 /** Product shape returned by the recommendation engine (subset the UI needs). */
 interface ConciergeProduct {
@@ -161,7 +162,7 @@ export function ConciergeClient() {
       </div>
       <p className="mt-2.5 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
         <Sparkles className="h-3 w-3 text-accent" />
-        AI concierge · grounded in the Fàdè catalogue. Not medical or allergy advice.
+        AI concierge · grounded in the Fádé catalogue. Not medical or allergy advice.
       </p>
     </form>
   )
@@ -186,7 +187,7 @@ export function ConciergeClient() {
     return (
       <div className="mx-auto flex min-h-[calc(100dvh-7rem)] w-full max-w-2xl flex-col items-center justify-center px-4 py-10">
         <span className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-accent/12 text-accent">
-          <Sparkles className="h-6 w-6" />
+          <LogoMark className="h-6 w-[18px]" />
         </span>
         <h1 className="text-center font-serif text-3xl font-semibold tracking-tight md:text-4xl">
           How can I help you find a scent?
@@ -216,7 +217,7 @@ export function ConciergeClient() {
             <div key={i} className="space-y-4">
               <div className="flex items-start gap-3">
                 <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent">
-                  <Sparkles className="h-4 w-4" />
+                  <LogoMark className="h-4 w-3" />
                 </span>
                 <p className="max-w-[85%] rounded-2xl rounded-tl-md bg-card px-4 py-2.5 text-sm leading-relaxed text-foreground">
                   {turn.text}
@@ -241,7 +242,7 @@ export function ConciergeClient() {
         {status === "loading" && (
           <div className="flex items-center gap-3">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/12 text-accent">
-              <Sparkles className="h-4 w-4 animate-pulse" />
+              <LogoMark className="h-4 w-3 animate-pulse" />
             </span>
             <div className="flex items-center gap-1 rounded-2xl bg-card px-4 py-3">
               <Dot /> <Dot delay="0.15s" /> <Dot delay="0.3s" />

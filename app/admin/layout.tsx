@@ -8,8 +8,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { requireAdmin } from "@/lib/admin"
 
 export const metadata: Metadata = {
-  title: "Fàdè Admin Dashboard",
-  description: "Manage your Fàdè storefront.",
+  title: "Fádé Admin Dashboard",
+  description: "Manage your Fádé storefront.",
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -1,4 +1,4 @@
-# Top 11 High Priority Updates for Fàdè E-commerce
+# Top 11 High Priority Updates for Fádé E-commerce
 
 ## 1. **Regenerate Prisma Client & Test Database**
 **Priority: CRITICAL**

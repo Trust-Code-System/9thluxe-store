@@ -156,7 +156,7 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
 
   const templates = {
     header: `<div style="text-align: center; padding: 20px; background: #f8f9fa;">
-  <h1 style="color: #2f3e33; font-family: serif;">Fàdè Essence</h1>
+  <h1 style="color: #2f3e33; font-family: serif;">Fádé Essence</h1>
 </div>`,
     product: `<div style="border: 1px solid #e5e7eb; padding: 20px; margin: 20px 0; border-radius: 8px;">
   <h3 style="color: #2f3e33;">Product Name</h3>
@@ -164,7 +164,7 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
   <a href="${siteUrl}/shop" style="display: inline-block; padding: 10px 20px; background: #2f3e33; color: white; text-decoration: none; border-radius: 4px;">Shop Now</a>
 </div>`,
     footer: `<div style="text-align: center; padding: 20px; background: #f8f9fa; margin-top: 40px;">
-  <p style="color: #6b7280; font-size: 12px;">© ${new Date().getFullYear()} Fàdè Essence. All rights reserved.</p>
+  <p style="color: #6b7280; font-size: 12px;">© ${new Date().getFullYear()} Fádé Essence. All rights reserved.</p>
   <p style="color: #6b7280; font-size: 12px;">
     <a href="{{unsubscribe}}" style="color: #6b7280;">Unsubscribe</a>
   </p>

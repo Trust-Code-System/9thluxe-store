@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const defaultFrom = 'Fàdè Essence <onboarding@resend.dev>'
+    const defaultFrom = 'Fádé Essence <onboarding@resend.dev>'
     const fromAddress = process.env.NEWSLETTER_FROM_EMAIL?.trim() || defaultFrom
     const usingDefaultSender = fromAddress === defaultFrom || fromAddress.includes('onboarding@resend.dev')
     const plaintextFallback = text?.trim() || stripHtml(html)

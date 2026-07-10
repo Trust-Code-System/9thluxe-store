@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM || 'onboarding@resend.dev',
       to,
-      subject: 'Test Newsletter - Fàdè',
+      subject: 'Test Newsletter - Fádé',
       html: `
         <h1>🎉 Newsletter Integration Working!</h1>
-        <p>This is a test email from your Fàdè store.</p>
+        <p>This is a test email from your Fádé store.</p>
         <p>Your Resend integration is set up correctly.</p>
         <hr>
         <p><small>If you received this, you're all set to send newsletters!</small></p>

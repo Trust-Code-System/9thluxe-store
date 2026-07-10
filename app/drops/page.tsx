@@ -6,7 +6,7 @@ import { NotifyButton } from "@/components/drops/notify-button"
 import { Badge } from "@/components/ui/badge"
 
 export const metadata = {
-  title: "Limited Drops | Fàdè",
+  title: "Limited Drops | Fádé",
   description: "Exclusive limited-edition fragrances. Get notified before they sell out.",
 }
 
@@ -45,7 +45,7 @@ export default async function DropsPage() {
       <div className="container mx-auto max-w-[1200px] px-6 space-y-16">
         {/* Header */}
         <header className="text-center space-y-4 max-w-2xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Fàdè Exclusive</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground">Fádé Exclusive</p>
           <h1 className="text-4xl sm:text-5xl font-semibold">Limited Drops</h1>
           <p className="text-muted-foreground text-lg leading-relaxed">
             Rare and exclusive fragrances, available for a limited time only. Once they&apos;re gone, they&apos;re gone.

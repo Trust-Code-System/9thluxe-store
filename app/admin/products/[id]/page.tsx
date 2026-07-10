@@ -98,7 +98,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-serif text-2xl font-semibold tracking-tight">Edit product</h1>
-          <p className="text-muted-foreground">Update product details for the Fàdè storefront.</p>
+          <p className="text-muted-foreground">Update product details for the Fádé storefront.</p>
         </div>
       </div>
 

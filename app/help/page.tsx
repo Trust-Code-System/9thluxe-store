@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Mail, Phone, Clock, Truck, MessageCircle, HelpCircle, ArrowLeft } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Help Center | Fàdè",
+  title: "Help Center | Fádé",
   description: "Get help with your orders, shipping, and returns.",
 }
 

@@ -19,7 +19,7 @@ export async function sendReceipt(order: OrderLike) {
   if (!process.env.RESEND_API_KEY) {
     console.log('[EMAIL] Receipt (no API key):', {
       to: order.user.email,
-      subject: `Fàdè Order #${order.reference || order.id.slice(-6)} receipt`,
+      subject: `Fádé Order #${order.reference || order.id.slice(-6)} receipt`,
       summary: {
         subtotal: order.subtotalNGN,
         discount: order.discountNGN,
@@ -52,7 +52,7 @@ export async function sendReceipt(order: OrderLike) {
       </head>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: #2f3e33; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1 style="margin: 0; font-family: serif;">Fàdè Essence</h1>
+          <h1 style="margin: 0; font-family: serif;">Fádé Essence</h1>
         </div>
         <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
           <h2 style="color: #2f3e33; margin-top: 0;">Order Confirmation</h2>
@@ -97,7 +97,7 @@ export async function sendReceipt(order: OrderLike) {
           <p>You can track your order status in your account dashboard.</p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
-            <p>Thank you for shopping with Fàdè Essence</p>
+            <p>Thank you for shopping with Fádé Essence</p>
             <p>If you have any questions, contact us at fadeessencee@gmail.com or +234 8160591348</p>
           </div>
         </div>
@@ -107,7 +107,7 @@ export async function sendReceipt(order: OrderLike) {
 
   try {
     await resend.emails.send({
-      from: process.env.NEWSLETTER_FROM_EMAIL || "Fàdè Essence <onboarding@resend.dev>",
+      from: process.env.NEWSLETTER_FROM_EMAIL || "Fádé Essence <onboarding@resend.dev>",
       to: order.user.email,
       subject: `Order Confirmation - Order #${orderRef}`,
       html,

@@ -54,7 +54,7 @@ export const brands = [
   "Creed",
   "Dior",
   "Chanel",
-  "Fàdè",
+  "Fádé",
   "Aurelius",
   "Vesper",
   "Prada",

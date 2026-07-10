@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Fàdè Essence — Luxury Perfumes",
-    short_name: "Fàdè",
+    name: "Fádé Essence — Luxury Perfumes",
+    short_name: "Fádé",
     description: "Curated luxury perfumes for the discerning individual.",
     start_url: "/",
     display: "standalone",

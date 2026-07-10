@@ -10,7 +10,7 @@ import { getCommerceConfig } from "@/lib/config/commerce"
 
 export const metadata: Metadata = {
 
-  title: "Checkout | Fàdè",
+  title: "Checkout | Fádé",
 
   description: "Complete your order securely.",
 

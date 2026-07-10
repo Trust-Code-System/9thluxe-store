@@ -3,8 +3,8 @@ import Link from "next/link"
 import { SignInForm } from "@/components/auth/signin-form"
 
 export const metadata: Metadata = {
-  title: "Sign In | Fàdè",
-  description: "Sign in to your Fàdè account.",
+  title: "Sign In | Fádé",
+  description: "Sign in to your Fádé account.",
 }
 
 export default function SignInPage() {
@@ -14,7 +14,7 @@ export default function SignInPage() {
         {/* Brand */}
         <div className="text-center mb-8">
           <Link href="/" className="font-serif text-3xl font-semibold">
-            Fàdè
+            Fádé
           </Link>
           <h1 className="mt-6 font-serif text-2xl font-semibold">Welcome back</h1>
           <p className="mt-2 text-muted-foreground">Sign in to your account to continue</p>

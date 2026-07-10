@@ -8,7 +8,7 @@ export function SocialProof() {
           <p className="text-xs font-semibold uppercase tracking-[0.5em] text-muted-foreground">Boutique confidence</p>
           <h2 className="text-3xl font-semibold text-foreground font-serif">What our clientele says</h2>
           <p className="text-sm text-muted-foreground">
-            Curated collections, quiet luxuries, and thoughtful service keep Fàdè Essence feel intimate and timeless.
+            Curated collections, quiet luxuries, and thoughtful service keep Fádé Essence feel intimate and timeless.
           </p>
         </div>
         <TrustBadges />

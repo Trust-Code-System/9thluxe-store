@@ -16,7 +16,7 @@ export function SiteHeader() {
       <div className="container mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-8 px-6">
         {/* Brand */}
         <Link href="/" className="text-xl font-bold tracking-tight">
-          Fàdè
+          Fádé
         </Link>
 
         {/* Center: Search Bar */}

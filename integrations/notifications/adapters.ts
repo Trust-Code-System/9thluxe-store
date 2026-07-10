@@ -21,9 +21,9 @@ export const emailAdapter: ChannelAdapter = {
       const { Resend } = await import('resend')
       const resend = new Resend(env.RESEND_API_KEY)
       const { data } = await resend.emails.send({
-        from: env.NEWSLETTER_FROM_EMAIL || 'Fàdè <onboarding@resend.dev>',
+        from: env.NEWSLETTER_FROM_EMAIL || 'Fádé <onboarding@resend.dev>',
         to: message.to.email,
-        subject: message.subject ?? 'Fàdè Essence',
+        subject: message.subject ?? 'Fádé Essence',
         text: message.body,
       })
       return { channel: 'email', ok: true, providerId: data?.id }

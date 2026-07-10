@@ -12,7 +12,7 @@ export function NewsletterSection() {
 
         <div className="mx-auto max-w-2xl text-center">
 
-          <span className="eyebrow">The Fàdè Letter</span>
+          <span className="eyebrow">The Fádé Letter</span>
 
           <h2 className="mb-4 mt-3 font-serif text-2xl font-semibold tracking-tight md:text-3xl">Join the atelier list</h2>
 

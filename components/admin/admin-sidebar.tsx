@@ -29,7 +29,7 @@ function SidebarContent() {
       {/* Brand */}
       <div className="h-16 flex items-center px-6 border-b border-border">
         <Link href="/admin" className="font-serif text-xl font-semibold">
-          Fàdè
+          Fádé
         </Link>
         <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Admin</span>
       </div>

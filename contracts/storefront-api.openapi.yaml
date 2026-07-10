@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
-  title: Fàdè Essence Storefront API
+  title: Fádé Essence Storefront API
   version: 1.0.0
   description: >
-    Versioned storefront API (/api/v1) for the Fàdè Essence perfume store. All responses use a
+    Versioned storefront API (/api/v1) for the Fádé Essence perfume store. All responses use a
     single envelope { data, error, meta, requestId }. Errors use stable codes from
     contracts/error-catalogue.md. This document is the frontend contract; contract tests guard it.
 servers:

@@ -29,7 +29,7 @@ function baseLayout(content: string) {
     <div style="max-width: 580px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
       <!-- Header -->
       <div style="background: ${BRAND_COLOR}; padding: 28px 32px; text-align: center;">
-        <h1 style="margin: 0; font-family: Georgia, serif; font-size: 28px; font-weight: 400; color: ${ACCENT_COLOR}; letter-spacing: 0.1em;">Fàdè</h1>
+        <h1 style="margin: 0; font-family: Georgia, serif; font-size: 28px; font-weight: 400; color: ${ACCENT_COLOR}; letter-spacing: 0.1em;">Fádé</h1>
         <p style="margin: 4px 0 0; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.3em; text-transform: uppercase;">Essence</p>
       </div>
       <!-- Content -->
@@ -38,7 +38,7 @@ function baseLayout(content: string) {
       </div>
       <!-- Footer -->
       <div style="padding: 20px 32px; border-top: 1px solid #f0ebe3; text-align: center; background: #faf8f5;">
-        <p style="margin: 0; font-size: 12px; color: #999;">Thank you for choosing Fàdè Essence</p>
+        <p style="margin: 0; font-size: 12px; color: #999;">Thank you for choosing Fádé Essence</p>
         <p style="margin: 4px 0 0; font-size: 12px; color: #bbb;">Questions? <a href="mailto:fadeessencee@gmail.com" style="color: ${ACCENT_COLOR}; text-decoration: none;">fadeessencee@gmail.com</a></p>
       </div>
     </div>
@@ -75,7 +75,7 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
   }),
 
   PAID: (order, orderRef) => ({
-    subject: `Payment Confirmed — Your Fàdè Order is Being Prepared`,
+    subject: `Payment Confirmed — Your Fádé Order is Being Prepared`,
     html: baseLayout(`
       <h2 style="margin: 0 0 16px; font-size: 22px; font-weight: 600; color: ${BRAND_COLOR};">Payment Confirmed ✓</h2>
       <p style="margin: 0 0 12px; color: #555;">Hello ${order.user.name || "there"},</p>
@@ -99,11 +99,11 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
   }),
 
   SHIPPED: (order, orderRef) => ({
-    subject: `Your Fàdè Order is On Its Way — #${orderRef}`,
+    subject: `Your Fádé Order is On Its Way — #${orderRef}`,
     html: baseLayout(`
       <h2 style="margin: 0 0 16px; font-size: 22px; font-weight: 600; color: ${BRAND_COLOR};">Your Order Has Shipped 🚚</h2>
       <p style="margin: 0 0 12px; color: #555;">Hello ${order.user.name || "there"},</p>
-      <p style="color: #555;">Wonderful news — your Fàdè order is on its way to you. Estimated delivery is within <strong>2–5 business days</strong> depending on your location.</p>
+      <p style="color: #555;">Wonderful news — your Fádé order is on its way to you. Estimated delivery is within <strong>2–5 business days</strong> depending on your location.</p>
       ${orderBox(orderRef, order.totalNGN)}
 
       <!-- Delivery info -->
@@ -129,7 +129,7 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
       : `${siteUrl}/account/orders/${order.id}`
 
     return {
-      subject: `Your Fàdè Order Has Arrived — How Are You Wearing It?`,
+      subject: `Your Fádé Order Has Arrived — How Are You Wearing It?`,
       html: baseLayout(`
         <h2 style="margin: 0 0 16px; font-size: 22px; font-weight: 600; color: ${BRAND_COLOR};">It's Arrived. Enjoy ✨</h2>
         <p style="margin: 0 0 12px; color: #555;">Hello ${order.user.name || "there"},</p>
@@ -155,7 +155,7 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
         <!-- Social share -->
         <div style="margin-top: 24px; padding: 16px; background: #faf8f5; border-radius: 8px; text-align: center;">
           <p style="margin: 0 0 8px; font-size: 13px; color: #666;">Sharing your new fragrance? Tag us.</p>
-          <p style="margin: 0; font-size: 14px; font-weight: 600; color: ${BRAND_COLOR}; letter-spacing: 0.05em;">#FadèEssence &nbsp;@fadeeessence</p>
+          <p style="margin: 0; font-size: 14px; font-weight: 600; color: ${BRAND_COLOR}; letter-spacing: 0.05em;">#FádéEssence &nbsp;@fadeeessence</p>
         </div>
       `),
     }
@@ -178,7 +178,7 @@ export async function sendOrderStatusUpdate(order: OrderLike, newStatus: OrderSt
 
   try {
     await resend.emails.send({
-      from: process.env.NEWSLETTER_FROM_EMAIL || "Fàdè Essence <onboarding@resend.dev>",
+      from: process.env.NEWSLETTER_FROM_EMAIL || "Fádé Essence <onboarding@resend.dev>",
       to: order.user.email,
       subject,
       html,

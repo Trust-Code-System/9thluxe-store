@@ -66,23 +66,23 @@ export function SiteFooter() {
               </li>
               <li>
                 <a
-                  href="https://www.tiktok.com/@Fàdè"
+                  href="https://www.tiktok.com/@Fádé"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  TikTok: @Fàdè
+                  TikTok: @Fádé
                 </a>
               </li>
               <li>
                 <a
-                  href="https://instagram.com/Fàdè"
+                  href="https://instagram.com/Fádé"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Instagram className="h-4 w-4" />
-                  <span>@Fàdè</span>
+                  <span>@Fádé</span>
                 </a>
               </li>
             </ul>
@@ -91,7 +91,7 @@ export function SiteFooter() {
 
         {/* Copyright */}
         <div className="mt-12 border-t border-border pt-8 text-center text-xs text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Fàdè. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Fádé. All rights reserved.</p>
           <p className="mt-2">Nigeria-wide delivery. We ship to all 36 states and the FCT.</p>
         </div>
       </div>

@@ -12,7 +12,7 @@ import { getCommerceConfig } from "@/lib/config/commerce"
 
 export const metadata: Metadata = {
 
-  title: "Shopping Cart | Fàdè",
+  title: "Shopping Cart | Fádé",
 
   description: "Review your shopping cart and proceed to checkout.",
 

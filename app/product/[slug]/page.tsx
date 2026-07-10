@@ -18,17 +18,17 @@ export async function generateMetadata({ params }: ProductPageProps) {
   const product = await getProductBySlug(slug)
 
   if (!product) {
-    return { title: "Product Not Found | Fàdè" }
+    return { title: "Product Not Found | Fádé" }
   }
 
   const images = Array.isArray(product.images) ? (product.images as string[]) : []
   const firstImage = images[0] || ""
 
   return {
-    title: `${product.name} | ${product.brand || "Fàdè"} | Fàdè Essence`,
+    title: `${product.name} | ${product.brand || "Fádé"} | Fádé Essence`,
     description: product.description,
     openGraph: {
-      title: `${product.name} | Fàdè Essence`,
+      title: `${product.name} | Fádé Essence`,
       description: product.description,
       images: firstImage ? [firstImage] : [],
     },

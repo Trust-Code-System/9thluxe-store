@@ -174,7 +174,7 @@ export function Footer() {
 
             <Link href="/" className="font-serif text-2xl font-semibold">
 
-              Fàdè
+              Fádé
 
             </Link>
 
@@ -328,7 +328,7 @@ export function Footer() {
 
             {/* Copyright */}
 
-            <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Fàdè. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Fádé. All rights reserved.</p>
 
           </div>
 

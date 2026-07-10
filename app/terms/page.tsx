@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { MainLayout } from "@/components/layout/main-layout"
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Faded",
-  description: "Terms of service for Faded Essence.",
+  title: "Terms of Service | Fádé",
+  description: "Terms of service for Fádé.",
 }
 
 export default function TermsPage() {

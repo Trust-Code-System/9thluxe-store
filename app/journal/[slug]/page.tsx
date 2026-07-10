@@ -21,7 +21,7 @@ export async function generateMetadata({
   const article = journalArticles.find((a) => a.slug === slug)
   if (!article) return {}
   return {
-    title: `${article.title} | The Journal | Fàdè`,
+    title: `${article.title} | The Journal | Fádé`,
     description: article.excerpt,
   }
 }

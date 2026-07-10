@@ -3,8 +3,8 @@ import { MainLayout } from "@/components/layout/main-layout"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 export const metadata: Metadata = {
-  title: "FAQ | Fàdè Essence",
-  description: "Frequently asked questions about ordering, delivery, payments, and returns at Fàdè Essence.",
+  title: "FAQ | Fádé Essence",
+  description: "Frequently asked questions about ordering, delivery, payments, and returns at Fádé Essence.",
 }
 
 const faqs = [

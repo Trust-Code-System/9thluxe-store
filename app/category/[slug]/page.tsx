@@ -14,10 +14,10 @@ export async function generateMetadata({ params }: CategoryPageProps) {
   const { slug } = await params
   const category = categoryData[slug as keyof typeof categoryData]
   if (!category) {
-    return { title: "Category Not Found | Fàdè" }
+    return { title: "Category Not Found | Fádé" }
   }
   return {
-    title: `${category.title} | Fàdè`,
+    title: `${category.title} | Fádé`,
     description: category.description,
   }
 }

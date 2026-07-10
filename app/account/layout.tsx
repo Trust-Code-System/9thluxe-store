@@ -11,9 +11,9 @@ import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
 
-  title: "My Account | Fàdè",
+  title: "My Account | Fádé",
 
-  description: "Manage your Fàdè account.",
+  description: "Manage your Fádé account.",
 
 }
 

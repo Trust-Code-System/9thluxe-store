@@ -31,7 +31,7 @@ export default async function NewProductPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-serif text-2xl font-semibold tracking-tight">Add product</h1>
-          <p className="text-muted-foreground">Create a new product for the Fàdè storefront.</p>
+          <p className="text-muted-foreground">Create a new product for the Fádé storefront.</p>
         </div>
       </div>
 

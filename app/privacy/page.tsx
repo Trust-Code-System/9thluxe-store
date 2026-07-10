@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { MainLayout } from "@/components/layout/main-layout"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Faded",
-  description: "Privacy policy for Faded Essence.",
+  title: "Privacy Policy | Fádé",
+  description: "Privacy policy for Fádé.",
 }
 
 export default function PrivacyPage() {

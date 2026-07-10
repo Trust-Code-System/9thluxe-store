@@ -18,12 +18,12 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
 
   if (!brandName) {
     return {
-      title: "Brand Not Found | Fàdè",
+      title: "Brand Not Found | Fádé",
     }
   }
 
   return {
-    title: `${brandName} Collection | Fàdè`,
+    title: `${brandName} Collection | Fádé`,
     description: `Explore our curated collection of ${brandName} luxury products. Discover timeless elegance and premium craftsmanship.`,
   }
 }

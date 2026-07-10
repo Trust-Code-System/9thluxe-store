@@ -9,7 +9,7 @@ import { CollectionsStats } from "@/components/collections/collections-stats"
 import { prisma } from "@/lib/prisma"
 
 export const metadata: Metadata = {
-  title: "Collections | Fàdè",
+  title: "Collections | Fádé",
   description: "Explore our curated collections of luxury perfumes. Discover timeless elegance and premium craftsmanship.",
 }
 

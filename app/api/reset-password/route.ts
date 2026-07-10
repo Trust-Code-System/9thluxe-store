@@ -3,7 +3,7 @@ import { Resend } from 'resend'
 import { prisma } from '@/lib/prisma'
 import crypto from 'crypto'
 
-const FROM_EMAIL = process.env.NEWSLETTER_FROM_EMAIL || 'Fàdè Essence <onboarding@resend.dev>'
+const FROM_EMAIL = process.env.NEWSLETTER_FROM_EMAIL || 'Fádé Essence <onboarding@resend.dev>'
 
 export async function POST(request: Request) {
   try {
@@ -46,11 +46,11 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from: FROM_EMAIL,
         to: normalizedEmail,
-        subject: 'Reset your Fàdè Essence password',
+        subject: 'Reset your Fádé Essence password',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: #2f3e33; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-              <h1 style="margin: 0; font-family: serif;">Fàdè Essence</h1>
+              <h1 style="margin: 0; font-family: serif;">Fádé Essence</h1>
             </div>
             <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
               <h2 style="color: #2f3e33; margin-top: 0;">Password Reset Request</h2>

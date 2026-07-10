@@ -206,7 +206,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
         {/* Brand + search */}
         <div className="flex items-center gap-6 flex-1 min-w-0">
           <div className="hidden md:flex flex-col">
-            <span className="font-serif text-lg font-semibold leading-tight">Fàdè Admin</span>
+            <span className="font-serif text-lg font-semibold leading-tight">Fádé Admin</span>
             <span className="text-xs text-muted-foreground">Storefront management</span>
           </div>
 

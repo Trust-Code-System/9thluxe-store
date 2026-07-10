@@ -143,7 +143,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               <p className="text-sm font-medium text-primary">Your order has arrived!</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Share your unboxing on Instagram or TikTok with{" "}
-                <span className="font-medium">#FadeEssence</span>
+                <span className="font-medium">#Fádé</span>
               </p>
             </div>
           )}

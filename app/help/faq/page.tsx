@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 export const metadata: Metadata = {
-  title: "FAQ | Fàdè",
-  description: "Frequently asked questions about shopping at Fàdè.",
+  title: "FAQ | Fádé",
+  description: "Frequently asked questions about shopping at Fádé.",
 }
 
 const faqs = [
@@ -68,7 +68,7 @@ export default function FAQPage() {
         <div className="max-w-3xl mx-auto">
           <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-4">Frequently Asked Questions</h1>
           <p className="text-muted-foreground mb-8">
-            Find answers to common questions about shopping at Fàdè.
+            Find answers to common questions about shopping at Fádé.
           </p>
 
           <div className="space-y-4">
