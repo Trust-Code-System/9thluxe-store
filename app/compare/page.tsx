@@ -77,7 +77,23 @@ export default function ComparePage() {
     }
   }, [items])
 
-  if (!mounted) return null
+  // Pre-mount skeleton renders identically on the server and the first client paint (the persisted
+  // compare store only hydrates after mount), so the page always has an h1 without a flash of the
+  // wrong state or a hydration mismatch.
+  if (!mounted) {
+    return (
+      <MainLayout>
+        <div
+          aria-busy="true"
+          className="container mx-auto flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4 py-16 text-center"
+        >
+          <GitCompareArrows className="h-10 w-10 text-muted-foreground opacity-40" />
+          <h1 className="font-serif text-2xl">Compare fragrances</h1>
+          <p className="max-w-md text-sm text-muted-foreground">Loading your comparison…</p>
+        </div>
+      </MainLayout>
+    )
+  }
 
   if (items.length === 0) {
     return (
@@ -99,12 +115,12 @@ export default function ComparePage() {
   const val = (slug: string, key: keyof Enriched): string => {
     const e = enriched[slug]
     const v = e ? e[key] : null
-    return v == null || v === "" ? "—" : String(v)
+    return v == null || v === "" ? "N/A" : String(v)
   }
 
   const rows: { label: string; render: (slug: string, priceNGN: number) => React.ReactNode; key?: keyof Enriched }[] = [
     { label: "Price", render: (_s, price) => formatPrice(price) },
-    { label: "Price / ml", render: (s) => (enriched[s]?.pricePerMl ? formatPrice(enriched[s].pricePerMl as number) : "—") },
+    { label: "Price / ml", render: (s) => (enriched[s]?.pricePerMl ? formatPrice(enriched[s].pricePerMl as number) : "N/A") },
     { label: "Concentration", key: "concentration", render: (s) => val(s, "concentration") },
     {
       label: "Family",
@@ -201,7 +217,7 @@ export default function ComparePage() {
                 </th>
                 {items.map((it) => (
                   <td key={it.id} className="p-3 text-center">
-                    {it.hasSample ? "Available" : "—"}
+                    {it.hasSample ? "Available" : "N/A"}
                   </td>
                 ))}
               </tr>
@@ -223,7 +239,7 @@ export default function ComparePage() {
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
           Rows where every fragrance matches are dimmed so the differences stand out. Some attributes may show
-          &ldquo;—&rdquo; where the brand hasn&apos;t supplied that detail yet.
+          &ldquo;N/A&rdquo; where the brand hasn&apos;t supplied that detail yet.
         </p>
       </div>
     </MainLayout>
