@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import { CartHydrator } from "@/components/cart/cart-hydrator";
 import { ThemeProvider } from "@/components/theme-provider";
 
