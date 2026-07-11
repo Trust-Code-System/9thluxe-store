@@ -68,4 +68,43 @@ export const ORBIT_SLIDES: HomepagePerfumeSlide[] = [
     approvalStatus: "DRAFT",
     enabled: false,
   },
+
+  // ---- Expansion candidates (see HERO_ORBIT_RESEARCH_PROPOSAL.md, "Expansion round") ----
+  // These reference real third-party fragrances the merchant intends to carry. Each stays DRAFT
+  // until (1) the product exists in the catalogue with merchant-set price/availability and
+  // (2) the merchant approves the bottle asset (the in-repo renders are AI-generated with
+  // imperfect labels - flagged in the proposal; asset paths are filled only after approval).
+  {
+    id: "slide_tf_oud_wood",
+    productSlug: "tom-ford-oud-wood",
+    displayOrder: 4,
+    bottleAsset: null,
+    pedestalStyle: "STONE",
+    backgroundProfile: "night-adaptive",
+    motionProfile: "calm-orbit",
+    approvalStatus: "DRAFT",
+    enabled: false,
+  },
+  {
+    id: "slide_creed_aventus",
+    productSlug: "creed-aventus",
+    displayOrder: 5,
+    bottleAsset: null,
+    pedestalStyle: "STONE",
+    backgroundProfile: "night-adaptive",
+    motionProfile: "calm-orbit",
+    approvalStatus: "DRAFT",
+    enabled: false,
+  },
+  {
+    id: "slide_dior_sauvage_elixir",
+    productSlug: "dior-sauvage-elixir",
+    displayOrder: 6,
+    bottleAsset: null,
+    pedestalStyle: "STONE",
+    backgroundProfile: "night-adaptive",
+    motionProfile: "calm-orbit",
+    approvalStatus: "DRAFT",
+    enabled: false,
+  },
 ]

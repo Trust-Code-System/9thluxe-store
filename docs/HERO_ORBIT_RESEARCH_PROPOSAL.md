@@ -101,6 +101,31 @@ as `DRAFT` and require merchant approval before the flag is enabled in productio
   framework); first bottle eager, next preloaded, rest lazy; pauses off-viewport, on hidden tab and
   on hover/focus of interactive controls.
 
+## Expansion round (merchant-requested, 2026-07-11)
+
+The merchant asked for more perfumes in the carousel. The catalogue only has three products, so
+growing the orbit honestly means growing the catalogue with real third-party fragrances the store
+intends to carry. Three candidates already have (imperfect) bottle renders in `public/`:
+
+| Candidate | Profile slot | Internal lean | Widely documented notes (to verify against official pages before publication) | Ingredient-art coverage | Asset status |
+| --- | --- | --- | --- | --- | --- |
+| Tom Ford Oud Wood EDP | woody/smoky | unisex | rosewood, cardamom / oud, sandalwood / tonka, vanilla, amber | oud, cardamom, sandalwood, tonka bean, vanilla, amber (excellent) | `tom-ford-oud-wood-perfume-bottle.jpg`: upright AI render; main label legible and correct, sub-lines garbled at close zoom |
+| Creed Aventus EDP | fresh/fruity chypre | masculine-leaning | bergamot, blackcurrant, apple, pineapple / birch, patchouli, rose / musk, oakmoss, vanilla | bergamot, patchouli, rose, musk, vanilla (good) | `creed-aventus-perfume-bottle.jpg`: upright AI render; CREED emblem distorted, lower label text is gibberish |
+| Dior Sauvage Elixir | spicy/aromatic | masculine-leaning | grapefruit, cinnamon, nutmeg, cardamom / lavender / licorice, sandalwood, amber, vetiver | cardamom, lavender, sandalwood, amber, vetiver (good) | `dior-sauvage-elixir-perfume-bottle.jpg`: bottle photographed LYING ON ITS SIDE with mirrored/garbled label - unusable on a pedestal |
+
+**Asset honesty caveat (same standard applied to the Hermes/Aurelius block):** all three renders are
+AI-generated depictions of trademarked bottles with label defects. The brief requires accurate
+labels and forbids AI-generated substitutes for real products. Recommendation: use real merchant
+photography of actual stock (photograph the bottles the store sells, straight-on, then we cut the
+backgrounds). If the merchant knowingly approves an interim AI render despite the caveat, Tom Ford
+Oud Wood is the only one clean enough at display size; Aventus is marginal; Sauvage Elixir is
+unusable as-is.
+
+**Catalogue rule:** slides only render for products that exist in the catalogue. Adding these
+requires merchant-set prices and availability posture. To avoid inventing commerce data, new
+records should launch as waitlist/coming-soon (no purchase action) until the merchant sets real
+prices and stock.
+
 ## Open merchant decisions
 
 1. Approve Nocturne + Vesper Velvet as launch slides (2-slide orbit) - or hold for three.

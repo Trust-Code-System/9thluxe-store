@@ -67,6 +67,25 @@ supports and what is blocked).
   orbit active; home route sweep (fails on any console/hydration error) passes.
 - Flag OFF: full storefront + hero + a11y regression suites (see repo QA reports).
 
+## Expansion round status (2026-07-11, merchant-approved)
+
+Merchant approved adding Tom Ford Oud Wood, Creed Aventus and Dior Sauvage Elixir to the catalogue
+and carousel, with: real bottle photography later (slides stay DRAFT/hidden until photos are
+supplied and cut out - the in-repo AI renders were rejected per the label-accuracy rule), and a
+coming-soon launch (records created as DRAFT waitlist products, priceNGN 0 placeholder, nothing
+public until the merchant sets a real price and publishes).
+
+- DRAFT slides exist in lib/hero/orbit-config.ts (slide_tf_oud_wood, slide_creed_aventus,
+  slide_dior_sauvage_elixir) with bottleAsset: null.
+- The three DRAFT catalogue records were created on 2026-07-12 (notes verified against public
+  sources; merchant reviews in admin before publish). The one-off creation script was deleted.
+- To activate a slide later: (1) supply a straight-on bottle photo, background gets cut to
+  public/hero/<slug>-bottle.webp; (2) set the slide's bottleAsset + approvalStatus: "APPROVED" +
+  enabled: true; (3) set the product's real price/stock and publish it in admin.
+- Notes verified 2026-07-12: Oud Wood (tomfordbeauty.com, Fragrantica), Aventus (creedboutique.com,
+  Fragrantica - heart is jasmine/birch/patchouli, no rose), Sauvage Elixir (dior.com, Fragrantica -
+  base includes patchouli and Haitian vetiver).
+
 ## Follow-ups for the merchant
 1. Enable `hero_orbit` in production once slides + cutouts + annotation copy are approved.
 2. Supply a correct Aurelius Noir bottle image to unblock slide 3.

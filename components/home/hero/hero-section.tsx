@@ -25,7 +25,7 @@ export function HeroSection({ heroData }: { heroData: HeroData | null }) {
   return (
     <section
       data-surface="night"
-      className="veil grain relative flex min-h-[92svh] flex-col overflow-hidden bg-background text-foreground"
+      className="veil grain relative flex flex-col overflow-hidden bg-background text-foreground"
     >
       {/* Oversized whisper word behind the stage */}
       <div
@@ -37,7 +37,7 @@ export function HeroSection({ heroData }: { heroData: HeroData | null }) {
         </p>
       </div>
 
-      <div className="container relative z-10 mx-auto flex flex-1 items-center px-4 py-16 sm:px-6 lg:px-8">
+      <div className="container relative z-10 mx-auto flex flex-1 items-center px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
         <div className="grid w-full items-center gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
           {/* Copy */}
           <div className="order-2 max-w-xl lg:order-1">

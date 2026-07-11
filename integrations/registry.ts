@@ -13,6 +13,7 @@ import type { SearchProvider } from './search/types'
 import { postgresSearch } from './search/postgres'
 import { aiServices } from './ai'
 import type { AiServices } from './ai/types'
+import { conciergeProviderStatus } from './ai/router'
 
 export function getCommerce(): CommerceProvider {
   const shopifyConfigured = Boolean(env.SHOPIFY_STORE_DOMAIN && env.SHOPIFY_STOREFRONT_API_TOKEN)
@@ -40,5 +41,6 @@ export function providerStatus() {
     payments: getPayments().name,
     search: getSearch().name,
     ai: env.AI_PROVIDER,
+    conciergeAi: conciergeProviderStatus(),
   }
 }

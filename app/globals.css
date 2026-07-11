@@ -967,3 +967,9 @@
 .animate-accordion-up {
   animation: accordion-up 0.2s ease-out;
 }
+
+@media (max-width: 1023px) {
+  aside.\-translate-x-full {
+    visibility: hidden;
+  }
+}

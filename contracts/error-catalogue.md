@@ -50,6 +50,10 @@ Rules:
 | `AI_UNAVAILABLE` | 503 | AI provider unavailable / circuit open. |
 | `AI_OUTPUT_INVALID` | 502 | AI output failed schema validation. |
 | `AI_REQUEST_UNSUPPORTED` | 422 | Request outside catalogue-grounded scope. |
+| `GUEST_ALLOWANCE_EXHAUSTED` | 401 | Complimentary guest question has been used; sign-in is required. |
+| `DAILY_LIMIT_REACHED` | 429 | Authenticated daily concierge allowance reached. |
+| `WEB_SEARCH_LIMIT_REACHED` | 429 | Authenticated daily web research allowance reached. |
+| `AI_BUDGET_REACHED` | 503 | Configured concierge spend gate reached. |
 | `PROVIDER_ERROR` | 502 | Upstream provider error (normalized). |
 | `PROVIDER_TIMEOUT` | 504 | Upstream provider timed out. |
 | `FEATURE_DISABLED` | 403 | Feature flag off. |
