@@ -1,5 +1,5 @@
 // prisma/seed.ts
-// DEVELOPMENT FIXTURES ONLY — these are not real production products or prices. They exist so the
+// DEVELOPMENT FIXTURES ONLY: these are not real production products or prices. They exist so the
 // app and tests run against a populated perfume catalogue. Do not treat as business data.
 import { PrismaClient, ProductCategory, PublishStatus } from '@prisma/client'
 
@@ -11,7 +11,7 @@ async function main() {
       name: 'Nocturne Eau de Parfum 100ml',
       slug: 'nocturne-eau-de-parfum',
       description: 'Amber, oud and vanilla. Long lasting.',
-      images: ['/placeholder.png'],
+      images: ['/nocturne-eau-de-parfum.jpg'],
       priceNGN: 95000,
       category: ProductCategory.PERFUMES,
       brand: 'Fádé',
@@ -27,7 +27,7 @@ async function main() {
       name: 'Aurelius Noir Eau de Toilette 75ml',
       slug: 'aurelius-noir-eau-de-toilette',
       description: 'Fresh citrus top notes with woody base. Elegant and versatile.',
-      images: ['/placeholder.png'],
+      images: ['/aurelius-noir-eau-de-toilette.jpg'],
       priceNGN: 75000,
       category: ProductCategory.PERFUMES,
       brand: 'Aurelius',
@@ -43,7 +43,7 @@ async function main() {
       name: 'Vesper Velvet Eau de Parfum 50ml',
       slug: 'vesper-velvet-eau-de-parfum',
       description: 'Rose and patchouli. Bold and memorable.',
-      images: ['/placeholder.png'],
+      images: ['/vesper-velvet-eau-de-parfum.jpg'],
       priceNGN: 85000,
       category: ProductCategory.PERFUMES,
       brand: 'Vesper',

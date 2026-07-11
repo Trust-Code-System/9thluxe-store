@@ -1,47 +1,79 @@
-import Image from "next/image"
-import Link from "next/link"
-import { notFound } from "next/navigation"
-import { ArrowLeft, CheckCircle2, PackageCheck, Truck, Star } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { ReviewStatus } from "@/components/orders/review-status"
-import { requireUser } from "@/lib/session"
-import { prisma } from "@/lib/prisma"
-import { formatPrice } from "@/lib/format"
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  PackageCheck,
+  Truck,
+  Star,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ReviewStatus } from "@/components/orders/review-status";
+import { requireUser } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
+import { formatPrice } from "@/lib/format";
 
-const STATUS_ORDER = ["PENDING", "PAID", "SHIPPED", "DELIVERED"] as const
-type OrderStatus = (typeof STATUS_ORDER)[number]
+const STATUS_ORDER = ["PENDING", "PAID", "SHIPPED", "DELIVERED"] as const;
+type OrderStatus = (typeof STATUS_ORDER)[number];
 
-const STATUS_META: Record<OrderStatus, { label: string; description: string; icon: React.ElementType }> = {
-  PENDING:   { label: "Order Confirmed",  description: "We've received your order and are processing it.", icon: CheckCircle2 },
-  PAID:      { label: "Being Prepared",   description: "Your fragrance is being carefully prepared with love.", icon: PackageCheck },
-  SHIPPED:   { label: "On Its Way",       description: "Your order has been dispatched and is en route to you.", icon: Truck },
-  DELIVERED: { label: "Delivered",        description: "Enjoy your fragrance!", icon: Star },
-}
+const STATUS_META: Record<
+  OrderStatus,
+  { label: string; description: string; icon: React.ElementType }
+> = {
+  PENDING: {
+    label: "Order Confirmed",
+    description: "We've received your order and are processing it.",
+    icon: CheckCircle2,
+  },
+  PAID: {
+    label: "Being Prepared",
+    description: "Your fragrance is being carefully prepared with love.",
+    icon: PackageCheck,
+  },
+  SHIPPED: {
+    label: "On Its Way",
+    description: "Your order has been dispatched and is en route to you.",
+    icon: Truck,
+  },
+  DELIVERED: {
+    label: "Delivered",
+    description: "Enjoy your fragrance!",
+    icon: Star,
+  },
+};
 
 const statusColors: Record<string, string> = {
-  PENDING:   "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  PAID:      "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  SHIPPED:   "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  DELIVERED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-}
+  PENDING: "bg-warning/15 text-warning",
+  PAID: "bg-info/15 text-info",
+  SHIPPED: "bg-accent/15 text-accent",
+  DELIVERED: "bg-success/15 text-success",
+};
 
 function getProductImage(images: unknown): string {
-  if (Array.isArray(images) && images.length > 0 && typeof images[0] === "string") return images[0]
-  return "/placeholder.svg"
+  if (
+    Array.isArray(images) &&
+    images.length > 0 &&
+    typeof images[0] === "string"
+  )
+    return images[0];
+  return "/placeholder-flacon.svg";
 }
 
-import React from "react"
+import React from "react";
 
 interface OrderDetailPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
-export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
-  const user = await requireUser()
-  const { id } = await params
+export default async function OrderDetailPage({
+  params,
+}: OrderDetailPageProps) {
+  const user = await requireUser();
+  const { id } = await params;
 
   const order = await prisma.order.findFirst({
     where: { id, userId: user.id },
@@ -49,16 +81,22 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       items: {
         include: {
           product: {
-            select: { id: true, name: true, slug: true, brand: true, images: true },
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              brand: true,
+              images: true,
+            },
           },
         },
       },
     },
-  })
+  });
 
-  if (!order) notFound()
+  if (!order) notFound();
 
-  const currentStatusIndex = STATUS_ORDER.indexOf(order.status as OrderStatus)
+  const currentStatusIndex = STATUS_ORDER.indexOf(order.status as OrderStatus);
   const items = order.items.map((oi) => ({
     product: {
       id: oi.product.id,
@@ -69,7 +107,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       price: oi.priceNGN,
     },
     quantity: oi.quantity,
-  }))
+  }));
 
   return (
     <div className="space-y-6">
@@ -84,10 +122,16 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         <div>
           <h1 className="font-serif text-2xl font-semibold">Order Details</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {order.reference ? `Order ${order.reference}` : `Order ${order.id.slice(0, 8).toUpperCase()}`}
+            {order.reference
+              ? `Order ${order.reference}`
+              : `Order ${order.id.slice(0, 8).toUpperCase()}`}
           </p>
         </div>
-        <Badge className={`ml-auto ${statusColors[order.status] || "bg-muted"}`}>{order.status}</Badge>
+        <Badge
+          className={`ml-auto ${statusColors[order.status] || "bg-muted"}`}
+        >
+          {order.status}
+        </Badge>
       </div>
 
       {/* Tracking Timeline */}
@@ -97,15 +141,21 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         </CardHeader>
         <CardContent>
           <div className="relative">
-            <div className="absolute top-5 left-5 right-5 h-0.5 bg-border" aria-hidden="true" />
+            <div
+              className="absolute top-5 left-5 right-5 h-0.5 bg-border"
+              aria-hidden="true"
+            />
             <ol className="relative flex justify-between">
               {STATUS_ORDER.map((status, index) => {
-                const meta = STATUS_META[status]
-                const Icon = meta.icon
-                const isDone = index <= currentStatusIndex
-                const isCurrent = index === currentStatusIndex
+                const meta = STATUS_META[status];
+                const Icon = meta.icon;
+                const isDone = index <= currentStatusIndex;
+                const isCurrent = index === currentStatusIndex;
                 return (
-                  <li key={status} className="flex flex-col items-center gap-2 flex-1 first:items-start last:items-end">
+                  <li
+                    key={status}
+                    className="flex flex-col items-center gap-2 flex-1 first:items-start last:items-end"
+                  >
                     <span
                       className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors ${
                         isDone
@@ -123,7 +173,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                       {meta.label}
                     </span>
                   </li>
-                )
+                );
               })}
             </ol>
           </div>
@@ -140,7 +190,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           </p>
           {order.status === "DELIVERED" && (
             <div className="mt-4 text-center">
-              <p className="text-sm font-medium text-primary">Your order has arrived!</p>
+              <p className="text-sm font-medium text-primary">
+                Your order has arrived!
+              </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Share your unboxing on Instagram or TikTok with{" "}
                 <span className="font-medium">#Fádé</span>
@@ -161,7 +213,10 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               {items.map((item, index) => (
                 <div key={order.items[index].id}>
                   <div className="flex gap-4">
-                    <Link href={`/product/${item.product.slug}`} className="shrink-0">
+                    <Link
+                      href={`/product/${item.product.slug}`}
+                      className="shrink-0"
+                    >
                       <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-muted">
                         <Image
                           src={item.product.image}
@@ -174,13 +229,21 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                     </Link>
                     <div className="flex-1 min-w-0">
                       <Link href={`/product/${item.product.slug}`}>
-                        <h3 className="font-medium hover:text-primary transition-colors">{item.product.name}</h3>
+                        <h3 className="font-medium hover:text-primary transition-colors">
+                          {item.product.name}
+                        </h3>
                       </Link>
                       {item.product.brand && (
-                        <p className="text-sm text-muted-foreground">{item.product.brand}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {item.product.brand}
+                        </p>
                       )}
-                      <p className="text-sm text-muted-foreground mt-1">Qty: {item.quantity}</p>
-                      <p className="font-semibold mt-1">{formatPrice(item.product.price * item.quantity)}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Qty: {item.quantity}
+                      </p>
+                      <p className="font-semibold mt-1">
+                        {formatPrice(item.product.price * item.quantity)}
+                      </p>
                     </div>
                   </div>
                   {index < items.length - 1 && <Separator className="mt-4" />}
@@ -209,12 +272,18 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           {order.isGift && (
             <Card className="border-primary/20 bg-primary/5">
               <CardContent className="pt-6">
-                <p className="text-sm font-medium text-primary mb-1">This is a gift order</p>
+                <p className="text-sm font-medium text-primary mb-1">
+                  This is a gift order
+                </p>
                 {order.giftMessage && (
-                  <p className="text-sm text-muted-foreground italic">"{order.giftMessage}"</p>
+                  <p className="text-sm text-muted-foreground italic">
+                    "{order.giftMessage}"
+                  </p>
                 )}
                 {order.giftWrapping && (
-                  <p className="text-xs text-muted-foreground mt-2">Luxury gift wrapping included</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Luxury gift wrapping included
+                  </p>
                 )}
               </CardContent>
             </Card>
@@ -240,7 +309,11 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               )}
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
-                <span>{order.shippingNGN === 0 ? "Free" : formatPrice(order.shippingNGN)}</span>
+                <span>
+                  {order.shippingNGN === 0
+                    ? "Free"
+                    : formatPrice(order.shippingNGN)}
+                </span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold">
@@ -251,16 +324,22 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                 <>
                   <Separator />
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Payment reference</p>
-                    <p className="text-xs font-mono break-all">{order.reference}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Payment reference
+                    </p>
+                    <p className="text-xs font-mono break-all">
+                      {order.reference}
+                    </p>
                   </div>
                 </>
               )}
-              {order.status === "DELIVERED" && <ReviewStatus orderId={order.id} items={items} />}
+              {order.status === "DELIVERED" && (
+                <ReviewStatus orderId={order.id} items={items} />
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }

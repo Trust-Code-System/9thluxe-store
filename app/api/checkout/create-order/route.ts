@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: msg }, { status: 400 })
     }
 
-    const { addressLine1, city, state, phone, items, subtotalNGN, discountNGN, shippingNGN, totalNGN, couponId, isGift, giftMessage, giftWrapping, paymentMethod } = parsed.data
+    const { addressLine1, city, state, phone, items, subtotalNGN: _subtotalNGN, discountNGN, shippingNGN, totalNGN, couponId, isGift, giftMessage, giftWrapping, paymentMethod } = parsed.data
 
     // Resolve product IDs and validate prices (use DB price for consistency)
     const productIds = [...new Set(items.map((i) => i.productId))]

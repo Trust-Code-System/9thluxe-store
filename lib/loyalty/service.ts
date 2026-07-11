@@ -15,7 +15,7 @@ export async function getPointsBalance(userId: string): Promise<number> {
 }
 
 /**
- * Redeem points. Financial action — refused unless the `loyalty_rewards` flag is enabled. Records a
+ * Redeem points. Financial action; refused unless the `loyalty_rewards` flag is enabled. Records a
  * negative ledger entry atomically so concurrent redemptions cannot overspend.
  */
 export async function redeemPoints(userId: string, points: number, orderId?: string) {

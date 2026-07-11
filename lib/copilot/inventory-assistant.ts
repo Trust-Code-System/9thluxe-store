@@ -1,7 +1,7 @@
 // lib/copilot/inventory-assistant.ts
 // Owner Copilot inventory assistant. Produces reorder recommendations and stockout predictions from
 // real demand signals (recent paid-order velocity + back-in-stock demand). Forecasts always carry a
-// confidence level and the assumptions used — never presented as certainty.
+// confidence level and the assumptions used; never presented as certainty.
 import { prisma } from '@/lib/prisma'
 import { OrderStatus } from '@prisma/client'
 import { inventoryHealth } from '@/lib/catalogue/inventory'

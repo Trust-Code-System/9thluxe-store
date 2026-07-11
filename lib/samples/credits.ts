@@ -1,6 +1,6 @@
 // lib/samples/credits.ts
 // PURE sample-credit application. Given a customer's credits and an amount to cover, compute how
-// much credit applies — respecting expiry and available remaining balance, oldest-expiring first.
+// much credit applies, respecting expiry and available remaining balance, oldest-expiring first.
 // Duplicate redemption is prevented at the DB layer (unique [creditId, orderId]); this module never
 // applies more than a credit's remaining balance.
 

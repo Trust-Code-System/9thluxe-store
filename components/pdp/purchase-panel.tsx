@@ -35,11 +35,11 @@ interface PurchasePanelProps {
 
 function StockPill({ variant, state }: { variant: PdpVariant; state: PdpData["stockState"] }) {
   if (!variant.inStock && state === "preorder")
-    return <Pill tone="amber">Preorder — ships when back in stock</Pill>
+    return <Pill tone="amber">Preorder: ships when back in stock</Pill>
   if (!variant.inStock && state === "waitlist") return <Pill tone="amber">Join the waitlist</Pill>
   if (!variant.inStock) return <Pill tone="destructive">Out of stock</Pill>
   if (variant.stock != null && variant.stock <= 5)
-    return <Pill tone="amber">{variant.stock === 1 ? "Last one — order soon" : `Only ${variant.stock} left`}</Pill>
+    return <Pill tone="amber">{variant.stock === 1 ? "Last one, order soon" : `Only ${variant.stock} left`}</Pill>
   return (
     <span className="inline-flex items-center gap-1.5 text-sm text-moss">
       <Check className="h-4 w-4" /> In stock
@@ -265,7 +265,7 @@ export function PurchasePanel({ data, policyShipping, policyReturns }: PurchaseP
           </div>
           {samples.length > 0 && (
             <p className="text-xs text-muted-foreground">
-              Try the sample first — where eligible, its value can be redeemed against the full bottle.{" "}
+              Try the sample first. Where eligible, its value can be redeemed against the full bottle.{" "}
               <Link href="/help#samples" className="underline">
                 How sample credit works
               </Link>
@@ -295,7 +295,7 @@ export function PurchasePanel({ data, policyShipping, policyReturns }: PurchaseP
       ) : data.stockState === "preorder" || data.stockState === "waitlist" ? (
         waitlisted ? (
           <p className="flex items-center gap-2 rounded-lg border border-moss/30 bg-moss/10 px-3 py-2 text-sm text-moss">
-            <Check className="h-4 w-4" /> You&apos;re on the list — we&apos;ll email you.
+            <Check className="h-4 w-4" /> You&apos;re on the list. We&apos;ll email you.
           </p>
         ) : (
           <form onSubmit={submitWaitlist} className="flex flex-col gap-2 sm:flex-row">
@@ -336,7 +336,7 @@ export function PurchasePanel({ data, policyShipping, policyReturns }: PurchaseP
         </Button>
       </div>
 
-      {/* Gift options — honest: opens gift concierge flow */}
+      {/* Gift options, honest: opens gift concierge flow */}
       <Link
         href={`/concierge?gift=${data.slug}`}
         className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -344,7 +344,7 @@ export function PurchasePanel({ data, policyShipping, policyReturns }: PurchaseP
         <Gift className="h-4 w-4 text-accent" /> Add gift wrapping &amp; a message at checkout
       </Link>
 
-      {/* Trust / delivery / returns — single policy source */}
+      {/* Trust / delivery / returns: single policy source */}
       <div className="mt-1 grid grid-cols-1 gap-3 rounded-xl border border-border bg-secondary/50 p-4 sm:grid-cols-3">
         <TrustItem icon={<ShieldCheck className="h-4 w-4 text-accent" />} title="Inspected & sealed">
           <Link href="#authenticity" className="underline-offset-2 hover:underline">

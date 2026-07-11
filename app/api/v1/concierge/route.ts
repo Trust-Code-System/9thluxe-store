@@ -1,5 +1,5 @@
 // app/api/v1/concierge/route.ts
-// POST /api/v1/concierge — AI Scent Concierge. Conversational message in, grounded, typed
+// POST /api/v1/concierge: AI Scent Concierge. Conversational message in, grounded, typed
 // recommendations out. Refuses/clarifies requests outside the catalogue. No medical/health advice.
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'

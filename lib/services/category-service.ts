@@ -11,7 +11,7 @@ export const categoryInputSchema = z.object({
 
 export type CategoryInput = z.infer<typeof categoryInputSchema>
 
-export type AdminCategory = Prisma.CategoryGetPayload<{}> & {
+export type AdminCategory = Prisma.CategoryGetPayload<Record<string, never>> & {
   productCount: number
 }
 

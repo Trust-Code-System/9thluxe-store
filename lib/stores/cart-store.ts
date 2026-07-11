@@ -29,6 +29,8 @@ interface CartStore {
   couponCode: string | null
   couponId: string | null
   discount: number
+  /** True once the first server sync has completed (guards empty-cart redirects). */
+  hasHydrated: boolean
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number, maxStock?: number) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number, maxStock?: number) => void
@@ -49,6 +51,7 @@ export const useCartStore = create<CartStore>()((set, get) => ({
   couponCode: null,
   couponId: null,
   discount: 0,
+  hasHydrated: false,
   addItem: (item, quantity = 1, maxStock) => {
     set((state) => {
       const existingItem = state.items.find((i) => i.id === item.id)
@@ -139,6 +142,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
       get().setItemsFromServer(data.items ?? [])
     } catch {
       // Offline or API error; leave store as-is
+    } finally {
+      set({ hasHydrated: true })
     }
   },
 }))

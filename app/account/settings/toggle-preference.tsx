@@ -12,7 +12,7 @@ type TogglePreferenceProps = {
   type?: 'email' | 'sms'
 }
 
-export function TogglePreference({ title, description, enabled, disabled, email, type = 'email' }: TogglePreferenceProps) {
+export function TogglePreference({ title, description, enabled, disabled, email: _email, type = 'email' }: TogglePreferenceProps) {
   const [isChecked, setIsChecked] = useState(enabled)
   const router = useRouter()
 

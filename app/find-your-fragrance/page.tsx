@@ -1,10 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { MainLayout } from "@/components/layout/main-layout"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
+import { ArrowRight } from "lucide-react"
+
+import { MainLayout } from "@/components/layout/main-layout"
+import { Reveal } from "@/components/motion"
+import { cn } from "@/lib/utils"
 
 const OCCASIONS = [
   { value: "daily", label: "Everyday wear" },
@@ -31,6 +33,62 @@ const INTENSITY = [
   { value: "bold", label: "Bold & long-lasting" },
 ]
 
+function Chip({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cn(
+        "h-11 cursor-pointer border px-5 font-mono text-[11px] uppercase tracking-[0.16em] transition-all duration-200",
+        selected
+          ? "border-accent bg-accent text-accent-foreground"
+          : "border-border bg-transparent text-muted-foreground hover:border-accent/60 hover:text-foreground"
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+function QuestionBlock({
+  index,
+  title,
+  hint,
+  children,
+}: {
+  index: number
+  title: string
+  hint?: string
+  children: React.ReactNode
+}) {
+  return (
+    <fieldset className="border-t border-border py-8">
+      <legend className="sr-only">{title}</legend>
+      <div className="grid gap-5 sm:grid-cols-[3rem_1fr]">
+        <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground/60">
+          {String(index).padStart(2, "0")}
+        </span>
+        <div>
+          <p className="font-serif text-2xl font-light">{title}</p>
+          {hint && (
+            <p className="mt-1 text-sm text-muted-foreground">{hint}</p>
+          )}
+          <div className="mt-5 flex flex-wrap gap-2.5">{children}</div>
+        </div>
+      </div>
+    </fieldset>
+  )
+}
+
 export default function FindYourFragrancePage() {
   const router = useRouter()
   const [occasion, setOccasion] = useState<string>("")
@@ -54,87 +112,85 @@ export default function FindYourFragrancePage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto max-w-2xl px-4 py-12 lg:py-16">
-        <div className="mb-8 text-center">
-          <span className="eyebrow">Find your scent</span>
-          <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-            A few questions
-          </h1>
-          <p className="mx-auto mt-3 max-w-md leading-relaxed text-muted-foreground">
-            Tell us how you like to wear fragrance and we’ll point you to matching scents.
-            Prefer to chat?{" "}
-            <a href="/concierge" className="font-medium text-accent underline underline-offset-4">
-              Ask the Scent Concierge
-            </a>
-            .
-          </p>
-        </div>
+      <section
+        data-surface="night"
+        className="veil grain relative min-h-[80vh] bg-background text-foreground"
+      >
+        <div className="container relative z-10 mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:py-20">
+          <Reveal>
+            <div className="mb-12">
+              <span className="eyebrow">Find your scent</span>
+              <h1 className="mt-4 font-serif text-4xl font-light tracking-[-0.01em] md:text-6xl">
+                Compose your <em className="text-accent">profile</em>.
+              </h1>
+              <p className="mt-4 max-w-md leading-relaxed text-muted-foreground">
+                Three questions, no wrong answers. Prefer to talk it through?{" "}
+                <a
+                  href="/concierge"
+                  className="text-accent underline underline-offset-4 transition-opacity hover:opacity-80"
+                >
+                  Ask the Scent Concierge
+                </a>
+                .
+              </p>
+            </div>
+          </Reveal>
 
-        <form onSubmit={handleSubmit}>
-          <Card className="space-y-8 p-6 sm:p-8">
-            <div>
-              <label className="mb-3 block text-sm font-medium text-foreground">
-                Occasion
-              </label>
-              <div className="flex flex-wrap gap-2">
+          <Reveal delay={0.1}>
+            <form onSubmit={handleSubmit}>
+              <QuestionBlock index={1} title="When will you wear it?">
                 {OCCASIONS.map((opt) => (
-                  <Button
+                  <Chip
                     key={opt.value}
-                    type="button"
-                    variant={occasion === opt.value ? "default" : "outline"}
-                    size="sm"
+                    selected={occasion === opt.value}
                     onClick={() => setOccasion(opt.value)}
                   >
                     {opt.label}
-                  </Button>
+                  </Chip>
                 ))}
-              </div>
-            </div>
+              </QuestionBlock>
 
-            <div>
-              <label className="mb-3 block text-sm font-medium text-foreground">
-                Favourite notes (pick one or more)
-              </label>
-              <div className="flex flex-wrap gap-2">
+              <QuestionBlock
+                index={2}
+                title="Which notes call to you?"
+                hint="Pick one or more."
+              >
                 {NOTES.map((opt) => (
-                  <Button
+                  <Chip
                     key={opt.value}
-                    type="button"
-                    variant={notes.includes(opt.value) ? "default" : "outline"}
-                    size="sm"
+                    selected={notes.includes(opt.value)}
                     onClick={() => toggleNote(opt.value)}
                   >
                     {opt.label}
-                  </Button>
+                  </Chip>
                 ))}
-              </div>
-            </div>
+              </QuestionBlock>
 
-            <div>
-              <label className="mb-3 block text-sm font-medium text-foreground">
-                Intensity
-              </label>
-              <div className="flex flex-wrap gap-2">
+              <QuestionBlock index={3} title="How loud should it speak?">
                 {INTENSITY.map((opt) => (
-                  <Button
+                  <Chip
                     key={opt.value}
-                    type="button"
-                    variant={intensity === opt.value ? "default" : "outline"}
-                    size="sm"
+                    selected={intensity === opt.value}
                     onClick={() => setIntensity(opt.value)}
                   >
                     {opt.label}
-                  </Button>
+                  </Chip>
                 ))}
-              </div>
-            </div>
+              </QuestionBlock>
 
-            <Button type="submit" className="w-full">
-              Find my fragrances
-            </Button>
-          </Card>
-        </form>
-      </div>
+              <div className="border-t border-border pt-8">
+                <button
+                  type="submit"
+                  className="group inline-flex h-13 w-full cursor-pointer items-center justify-center gap-2.5 bg-primary px-8 font-mono text-[12px] uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90 sm:w-auto"
+                >
+                  Find my fragrances
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </button>
+              </div>
+            </form>
+          </Reveal>
+        </div>
+      </section>
     </MainLayout>
   )
 }

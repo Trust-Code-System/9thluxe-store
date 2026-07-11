@@ -11,7 +11,7 @@ const STYLES: Record<Provenance, string> = {
 
 /**
  * A truthful source label so subjective fragrance data is never presented as a laboratory fact.
- * Text (not colour) always carries the meaning — colour is decorative only.
+ * Text (not colour) always carries the meaning; colour is decorative only.
  */
 export function ProvenanceChip({
   source,

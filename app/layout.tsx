@@ -1,43 +1,49 @@
-import type { Metadata } from "next"
-import { Inter, Playfair_Display } from "next/font/google"
-import "./globals.css"
-import { Toaster } from "@/components/ui/sonner"
-import { Analytics } from "@vercel/analytics/react"
-import { ThemeProvider } from "@/components/theme-provider"
-import { CartHydrator } from "@/components/cart/cart-hydrator"
+import type { Metadata } from "next";
+import { Fraunces, Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/react";
+import { CartHydrator } from "@/components/cart/cart-hydrator";
+import { ThemeProvider } from "@/components/theme-provider";
 
-const inter = Inter({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-})
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  variable: "--font-playfair",
+  variable: "--font-fraunces",
   display: "swap",
-})
+});
+
+const instrument = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-instrument",
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
+  display: "swap",
+});
 
 function resolveSiteUrl() {
   const raw =
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.APP_URL ||
-    "http://localhost:3000"
+    "http://localhost:3000";
 
   try {
-    return new URL(raw)
+    return new URL(raw);
   } catch {
     try {
-      return new URL(`https://${raw}`)
+      return new URL(`https://${raw}`);
     } catch {
-      return new URL("http://localhost:3000")
+      return new URL("http://localhost:3000");
     }
   }
 }
 
-const siteUrl = resolveSiteUrl()
+const siteUrl = resolveSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -45,8 +51,15 @@ export const metadata: Metadata = {
     default: "Fádé Essence | Luxury Perfumes",
     template: "%s | Fádé Essence",
   },
-  description: "Discover premium luxury perfumes at Fádé Essence. Curated collection of timeless fragrances and sophistication.",
-  keywords: ["luxury perfumes", "fragrances", "Fádé", "premium perfume", "Nigeria"],
+  description:
+    "Discover premium luxury perfumes at Fádé Essence. Curated collection of timeless fragrances and sophistication.",
+  keywords: [
+    "luxury perfumes",
+    "fragrances",
+    "Fádé",
+    "premium perfume",
+    "Nigeria",
+  ],
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -95,20 +108,24 @@ export const metadata: Metadata = {
     // google: "your-google-verification-code",
     // yandex: "your-yandex-verification-code",
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fraunces.variable} ${instrument.variable} ${plexMono.variable}`}
+    >
       <head>
-        <meta name="theme-color" content="#17110d" />
+        <meta name="theme-color" content="#111310" />
       </head>
       <body className="font-sans">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider>
           <CartHydrator />
           {children}
           <Toaster position="top-center" />
@@ -116,5 +133,5 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

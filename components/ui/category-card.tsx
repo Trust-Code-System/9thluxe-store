@@ -46,7 +46,7 @@ export function CategoryCard({ title, subtitle, image, href, className }: Catego
 
       <Image
 
-        src={image || "/placeholder.svg"}
+        src={image || "/placeholder-flacon.svg"}
 
         alt={title}
 

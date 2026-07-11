@@ -11,7 +11,7 @@ import { formatPrice } from "@/lib/format"
 export const RETURNS_WINDOW_DAYS = 7
 
 // Fallbacks mirror the schema defaults in lib/env.ts. Used only if commerce config can't be read
-// (e.g. a misconfigured env in local dev) so the PDP degrades gracefully instead of crashing —
+// (e.g. a misconfigured env in local dev) so the PDP degrades gracefully instead of crashing,
 // the purchase area must stay functional even when a dependency fails.
 const FALLBACK_FREE_SHIPPING_NGN = 500_000
 const FALLBACK_FLAT_SHIPPING_NGN = 2_500
@@ -42,7 +42,7 @@ export function getPdpPolicy(): PdpPolicy {
 
   const shippingSummary =
     flat > 0
-      ? `Flat ${formatPrice(flat)} nationwide delivery — free over ${formatPrice(freeThreshold)}.`
+      ? `Flat ${formatPrice(flat)} nationwide delivery, free over ${formatPrice(freeThreshold)}.`
       : `Free nationwide delivery over ${formatPrice(freeThreshold)}.`
 
   const returnsSummary = (returnEligible: boolean) =>
@@ -71,7 +71,7 @@ export function getPdpPolicy(): PdpPolicy {
       },
       {
         q: "Which payment methods can I use?",
-        a: "Payments are processed securely through Paystack — cards, bank transfer and USSD are supported.",
+        a: "Payments are processed securely through Paystack: cards, bank transfer and USSD are supported.",
       },
       {
         q: "What is your return policy?",
@@ -82,7 +82,7 @@ export function getPdpPolicy(): PdpPolicy {
         a: "Orders can be cancelled before dispatch. After dispatch, an eligible unopened item can be exchanged within the returns window subject to stock.",
       },
       {
-        q: "My order arrived damaged — what now?",
+        q: "My order arrived damaged, what now?",
         a: "Contact support within 48 hours of delivery with photos of the packaging and bottle. Verified damaged or faulty items are replaced or refunded at no cost to you.",
       },
       {

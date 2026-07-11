@@ -49,7 +49,7 @@ export function ImageLightbox({ src, alt, width, height, className = "" }: Image
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center bg-black/90 p-4"
           onClick={() => setIsOpen(false)}
         >
           <button

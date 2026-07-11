@@ -1,6 +1,6 @@
 // lib/approvals/service.ts
 // Approval Centre. High-risk / outward-facing / financial actions are proposed, reviewed, and only
-// then executed — NEVER auto-executed. Approval and execution are SEPARATE steps for every action.
+// then executed, NEVER auto-executed. Approval and execution are SEPARATE steps for every action.
 import { prisma } from '@/lib/prisma'
 import { AppError } from '@/lib/http/errors'
 import { writeAudit } from '@/lib/audit'
@@ -92,7 +92,7 @@ export async function decideApproval(id: string, decision: 'approve' | 'reject',
   return updated
 }
 
-/** Execute an APPROVED action. Separate step — high-risk actions are never executed at decision time. */
+/** Execute an APPROVED action. Separate step; high-risk actions are never executed at decision time. */
 export async function executeApproval(id: string, actorId: string) {
   const existing = await prisma.approvalRequest.findUnique({ where: { id } })
   if (!existing) throw new AppError('NOT_FOUND')

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Mail, TrendingUp, Users, Plus, X } from "lucide-react"
+import { TrendingUp, Users, Plus, X } from "lucide-react"
 import { NewsletterEditor } from "@/components/admin/newsletter-editor"
 import { CampaignList } from "@/components/admin/campaign-list"
 import { SubscriberList } from "@/components/admin/subscriber-list"
@@ -14,7 +14,7 @@ export default function AdminNewsletterPage() {
   const [subscribers, setSubscribers] = React.useState(0)
   const [totalUsers, setTotalUsers] = React.useState(0)
   const [campaigns, setCampaigns] = React.useState<any[]>([])
-  const [loading, setLoading] = React.useState(true)
+  const [_loading, setLoading] = React.useState(true)
   const [editingCampaign, setEditingCampaign] = React.useState<any | null>(null)
   const [showEditor, setShowEditor] = React.useState(false)
 

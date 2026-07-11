@@ -97,7 +97,7 @@ export function AdminSidebar() {
       {/* Mobile Sidebar */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="lg:hidden fixed top-4 left-4 z-50">
+          <Button variant="ghost" size="icon" className="lg:hidden fixed top-4 left-4 z-[var(--z-nav)]">
             <Menu className="h-5 w-5" />
             <span className="sr-only">Open menu</span>
           </Button>

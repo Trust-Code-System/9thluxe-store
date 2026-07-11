@@ -31,7 +31,7 @@ export const POST = route(async ({ req }) => {
     ? await prisma.user.findUnique({ where: { email: sessionEmail }, select: { id: true } })
     : null
 
-  // Upsert on the unique (productId, email) pair — idempotent re-subscribe.
+  // Upsert on the unique (productId, email) pair: idempotent re-subscribe.
   await prisma.backInStockSubscription.upsert({
     where: { productId_email: { productId: product.id, email } },
     update: { notified: false, userId: user?.id ?? undefined },

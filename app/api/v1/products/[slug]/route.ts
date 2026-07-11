@@ -1,5 +1,5 @@
 // app/api/v1/products/[slug]/route.ts
-// GET /api/v1/products/:slug — single product by slug (envelope, 404 on miss).
+// GET /api/v1/products/:slug returns a single product by slug (envelope, 404 on miss).
 import { route, raise } from '@/lib/http/handler'
 import { getCommerce } from '@/integrations/registry'
 

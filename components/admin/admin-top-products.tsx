@@ -48,7 +48,7 @@ export function AdminTopProducts() {
 
           <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-muted shrink-0">
 
-            <Image src={product.image || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
+            <Image src={product.image || "/placeholder-flacon.svg"} alt={product.name} fill className="object-cover" />
 
           </div>
 

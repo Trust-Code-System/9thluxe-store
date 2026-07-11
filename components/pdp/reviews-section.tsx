@@ -4,6 +4,7 @@ import * as React from "react"
 import { Loader2, MessageSquare, Sparkles, RefreshCw, Star, BadgeCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { RatingStars } from "@/components/ui/rating-stars"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { trackPdp } from "@/lib/analytics/pdp-events"
 import type { PdpReviewSummary, PdpReview } from "@/lib/pdp/types"
@@ -172,7 +173,7 @@ export function ReviewsSection({
                   <p className="text-sm leading-relaxed text-foreground/90">{ai.summary}</p>
                   <p className="mt-2 text-[11px] text-muted-foreground">
                     AI-generated from {ai.reviewsSummarized} real review{ai.reviewsSummarized === 1 ? "" : "s"}. Original
-                    reviews remain below — read them for the full picture.
+                    reviews remain below. Read them for the full picture.
                   </p>
                 </>
               ) : (
@@ -203,19 +204,16 @@ export function ReviewsSection({
             placeholder="Search reviews"
             className="h-9 min-w-[160px] flex-1 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
-          <label className="sr-only" htmlFor="review-sort">
-            Sort reviews
-          </label>
-          <select
-            id="review-sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            className="h-9 rounded-lg border border-input bg-background px-2 text-sm"
-          >
-            <option value="recent">Most recent</option>
-            <option value="highest">Highest rated</option>
-            <option value="lowest">Lowest rated</option>
-          </select>
+          <Select value={sort} onValueChange={(v) => setSort(v as Sort)}>
+            <SelectTrigger id="review-sort" aria-label="Sort reviews" className="h-9 w-[150px] rounded-lg">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Most recent</SelectItem>
+              <SelectItem value="highest">Highest rated</SelectItem>
+              <SelectItem value="lowest">Lowest rated</SelectItem>
+            </SelectContent>
+          </Select>
           <button
             type="button"
             onClick={() => {

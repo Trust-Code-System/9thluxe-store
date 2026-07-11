@@ -1,329 +1,177 @@
-"use client"
+"use client";
 
+import * as React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Heart, Star, Eye } from "lucide-react";
 
-
-import * as React from "react"
-
-import Link from "next/link"
-
-import Image from "next/image"
-
-import { Heart, Star, Eye } from "lucide-react"
-
-import { cn } from "@/lib/utils"
-
-import { Button } from "@/components/ui/button"
-
-import { Badge } from "@/components/ui/badge"
-
-
+import { cn } from "@/lib/utils";
 
 export interface Product {
-
-  id: string
-
-  slug: string
-
-  name: string
-
-  brand: string
-
-  price: number
-
-  originalPrice?: number
-
-  image: string
-
-  rating: number
-
-  reviewCount: number
-
-  tags?: ("new" | "bestseller" | "limited")[]
-
-  category: "perfumes"
-
+  id: string;
+  slug: string;
+  name: string;
+  brand: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  rating: number;
+  reviewCount: number;
+  tags?: ("new" | "bestseller" | "limited")[];
+  category: "perfumes";
 }
-
-
 
 interface ProductCardProps {
-
-  product: Product
-
-  onAddToWishlist?: (productId: string) => void
-
-  onQuickView?: (productId: string) => void
-
-  className?: string
-
+  product: Product;
+  imageLoading?: "eager" | "lazy";
+  onAddToWishlist?: (productId: string) => void;
+  onQuickView?: (productId: string) => void;
+  className?: string;
 }
-
-
 
 const tagLabels: Record<string, string> = {
-
   new: "New",
-
   bestseller: "Bestseller",
-
   limited: "Limited",
+};
 
+export function formatNaira(amount: number) {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
-
-
-const tagColors: Record<string, string> = {
-
-  new: "bg-moss text-white",
-
-  bestseller: "bg-accent text-accent-foreground",
-
-  limited: "bg-espresso text-[color:var(--primary-foreground)]",
-
-}
-
-
-
-export function ProductCard({ product, onAddToWishlist, onQuickView, className }: ProductCardProps) {
-
-  const [isHovered, setIsHovered] = React.useState(false)
-
-
-
-  const formatPrice = (amount: number) => {
-
-    return new Intl.NumberFormat("en-NG", {
-
-      style: "currency",
-
-      currency: "NGN",
-
-      minimumFractionDigits: 0,
-
-      maximumFractionDigits: 0,
-
-    }).format(amount)
-
-  }
-
-
+export function ProductCard({
+  product,
+  imageLoading,
+  onAddToWishlist,
+  onQuickView,
+  className,
+}: ProductCardProps) {
+  const [imageFailed, setImageFailed] = React.useState(false);
 
   const discount = product.originalPrice
+    ? Math.round(
+        ((product.originalPrice - product.price) / product.originalPrice) * 100,
+      )
+    : null;
 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-
-    : null
-
-
+  const primaryTag = product.tags?.[0];
 
   return (
-
-    <div
-
-      className={cn(
-
-        "group relative flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card transition-all duration-300",
-
-        isHovered && "-translate-y-1 border-accent/30 shadow-[0_18px_40px_-24px_rgba(33,24,19,0.55)]",
-
-        className,
-
-      )}
-
-      onMouseEnter={() => setIsHovered(true)}
-
-      onMouseLeave={() => setIsHovered(false)}
-
-    >
-
-      {/* Image Container */}
-
+    <div className={cn("group relative flex flex-col", className)}>
+      {/* Image plate */}
       <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
-
-        <Link href={`/product/${product.slug}`}>
-
-          <Image
-
-            src={product.image || "/placeholder.svg"}
-
-            alt={product.name}
-
-            fill
-
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-
-          />
-
-        </Link>
-
-
-
-        {/* Tags */}
-
-        {product.tags && product.tags.length > 0 && (
-
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-
-            {product.tags.map((tag) => (
-
-              <Badge key={tag} className={cn("text-xs font-medium px-2 py-0.5", tagColors[tag])}>
-
-                {tagLabels[tag]}
-
-              </Badge>
-
-            ))}
-
-          </div>
-
-        )}
-
-
-
-        {/* Discount Badge */}
-
-        {discount && (
-
-          <Badge className="absolute top-3 right-3 bg-destructive text-destructive-foreground text-xs font-medium px-2 py-0.5">
-
-            -{discount}%
-
-          </Badge>
-
-        )}
-
-
-
-        {/* Hover Actions */}
-
-        <div
-
-          className={cn(
-
-            "absolute bottom-3 left-3 right-3 flex gap-2 transition-all duration-300",
-
-            isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
-
-          )}
-
+        <Link
+          href={`/product/${product.slug}`}
+          aria-label={product.name}
+          className="relative block h-full w-full"
         >
-
-          {onQuickView && (
-
-            <Button
-
-              variant="secondary"
-
-              size="sm"
-
-              className="flex-1 h-9 text-xs font-medium"
-
-              onClick={() => onQuickView(product.id)}
-
-            >
-
-              <Eye className="h-3.5 w-3.5 mr-1.5" />
-
-              Quick View
-
-            </Button>
-
-          )}
-
-          {onAddToWishlist && (
-
-            <Button variant="secondary" size="icon" className="h-9 w-9" onClick={() => onAddToWishlist(product.id)}>
-
-              <Heart className="h-4 w-4" />
-
-              <span className="sr-only">Add to wishlist</span>
-
-            </Button>
-
-          )}
-
-        </div>
-
-      </div>
-
-
-
-      {/* Content */}
-
-      <div className="flex flex-col gap-2 p-4">
-
-        {/* Brand */}
-
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">{product.brand}</span>
-
-
-
-        {/* Name */}
-
-        <Link href={`/product/${product.slug}`}>
-
-          <h3 className="font-serif text-[15px] font-medium leading-snug line-clamp-2 transition-colors hover:text-accent">
-
-            {product.name}
-
-          </h3>
-
+          <Image
+            src={
+              imageFailed
+                ? "/placeholder-flacon.svg"
+                : product.image || "/placeholder-flacon.svg"
+            }
+            alt={product.name}
+            fill
+            loading={imageLoading}
+            onError={() => setImageFailed(true)}
+            className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          />
+          {/* Pedestal light on hover */}
+          <span
+            aria-hidden
+            className="pedestal-light pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          />
         </Link>
 
-
-
-        {/* Rating */}
-
-        <div className="flex items-center gap-1.5">
-
-          <div className="flex items-center gap-0.5">
-
-            {Array.from({ length: 5 }).map((_, i) => (
-
-              <Star
-
-                key={i}
-
-                className={cn(
-
-                  "h-3 w-3",
-
-                  i < Math.floor(product.rating) ? "fill-accent text-accent" : "fill-muted text-muted",
-
-                )}
-
-              />
-
-            ))}
-
-          </div>
-
-          <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
-
-        </div>
-
-
-
-        {/* Price */}
-
-        <div className="flex items-center gap-2 mt-auto pt-1">
-
-          <span className="font-semibold text-base">{formatPrice(product.price)}</span>
-
-          {product.originalPrice && (
-
-            <span className="text-sm text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
-
+        {/* Tag + discount: mono whispers, not badges */}
+        <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1">
+          {primaryTag && (
+            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
+              <span className="h-1 w-1 rounded-full bg-accent" aria-hidden />
+              {tagLabels[primaryTag]}
+            </span>
           )}
-
         </div>
+        {discount && (
+          <span className="absolute right-3 top-3 font-mono text-[10px] uppercase tracking-[0.18em] text-accent [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
+            −{discount}%
+          </span>
+        )}
 
+        {/* Hover actions */}
+        {(onQuickView || onAddToWishlist) && (
+          <div className="absolute bottom-3 right-3 flex gap-1.5 opacity-0 transition-all duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+            {onQuickView && (
+              <button
+                type="button"
+                onClick={() => onQuickView(product.id)}
+                className="flex h-10 w-10 cursor-pointer items-center justify-center border border-border/60 bg-background/80 text-foreground backdrop-blur-sm transition-colors hover:border-accent hover:text-accent"
+                aria-label={`Quick view ${product.name}`}
+              >
+                <Eye className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
+            {onAddToWishlist && (
+              <button
+                type="button"
+                onClick={() => onAddToWishlist(product.id)}
+                className="flex h-10 w-10 cursor-pointer items-center justify-center border border-border/60 bg-background/80 text-foreground backdrop-blur-sm transition-colors hover:border-accent hover:text-accent"
+                aria-label={`Add ${product.name} to wishlist`}
+              >
+                <Heart className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
+      {/* Meta: editorial rows under a hairline */}
+      <div className="flex flex-1 flex-col gap-1 border-t border-border/70 pt-3.5 mt-3.5">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            {product.brand || "Fádé"}
+          </span>
+          {product.reviewCount > 0 && (
+            <span className="flex shrink-0 items-center gap-1 font-mono text-[10px] tracking-[0.08em] text-muted-foreground">
+              <Star
+                className="h-2.5 w-2.5 fill-accent text-accent"
+                aria-hidden
+              />
+              {product.rating.toFixed(1)}
+              <span className="text-muted-foreground/60">
+                ({product.reviewCount})
+              </span>
+            </span>
+          )}
+        </div>
+
+        <Link
+          href={`/product/${product.slug}`}
+          className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <h3 className="line-clamp-2 font-serif text-lg font-normal leading-snug transition-colors group-hover:text-accent">
+            {product.name}
+          </h3>
+        </Link>
+
+        <div className="mt-auto flex items-baseline gap-2.5 pt-1">
+          <span className="font-mono text-sm tracking-[0.04em]">
+            {formatNaira(product.price)}
+          </span>
+          {product.originalPrice && (
+            <span className="font-mono text-xs tracking-[0.04em] text-muted-foreground line-through">
+              {formatNaira(product.originalPrice)}
+            </span>
+          )}
+        </div>
+      </div>
     </div>
-
-  )
-
+  );
 }

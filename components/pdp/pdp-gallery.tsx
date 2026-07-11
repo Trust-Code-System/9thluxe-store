@@ -1,16 +1,23 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Image from "next/image"
-import { ChevronLeft, ChevronRight, Expand, Play, ImageOff, X } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { trackPdp } from "@/lib/analytics/pdp-events"
-import type { PdpMedia } from "@/lib/pdp/types"
+import * as React from "react";
+import Image from "next/image";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Expand,
+  Play,
+  ImageOff,
+  X,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { trackPdp } from "@/lib/analytics/pdp-events";
+import type { PdpMedia } from "@/lib/pdp/types";
 
 interface PdpGalleryProps {
-  media: PdpMedia[]
-  productName: string
-  productId: string
+  media: PdpMedia[];
+  productName: string;
+  productId: string;
 }
 
 function BrokenImageFallback() {
@@ -19,77 +26,86 @@ function BrokenImageFallback() {
       <ImageOff className="h-8 w-8" aria-hidden />
       <span className="text-xs">Image unavailable</span>
     </div>
-  )
+  );
 }
 
 export function PdpGallery({ media, productName, productId }: PdpGalleryProps) {
-  const items = media.length > 0 ? media : []
-  const [active, setActive] = React.useState(0)
-  const [fullscreen, setFullscreen] = React.useState(false)
-  const [errored, setErrored] = React.useState<Record<number, boolean>>({})
-  const touchStartX = React.useRef<number | null>(null)
+  const items = media.length > 0 ? media : [];
+  const [active, setActive] = React.useState(0);
+  const [fullscreen, setFullscreen] = React.useState(false);
+  const [errored, setErrored] = React.useState<Record<number, boolean>>({});
+  const touchStartX = React.useRef<number | null>(null);
 
-  const count = items.length
-  const current = items[active]
+  const count = items.length;
+  const current = items[active];
 
   const go = React.useCallback(
     (next: number) => {
-      if (count === 0) return
-      const idx = (next + count) % count
-      setActive(idx)
-      trackPdp("media_viewed", { productId, index: idx, kind: items[idx]?.kind ?? "image" })
+      if (count === 0) return;
+      const idx = (next + count) % count;
+      setActive(idx);
+      trackPdp("media_viewed", {
+        productId,
+        index: idx,
+        kind: items[idx]?.kind ?? "image",
+      });
     },
     [count, items, productId],
-  )
+  );
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowRight") {
-      e.preventDefault()
-      go(active + 1)
+      e.preventDefault();
+      go(active + 1);
     } else if (e.key === "ArrowLeft") {
-      e.preventDefault()
-      go(active - 1)
+      e.preventDefault();
+      go(active - 1);
     } else if (e.key === "Escape" && fullscreen) {
-      setFullscreen(false)
+      setFullscreen(false);
     }
-  }
+  };
 
   const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0]?.clientX ?? null
-  }
+    touchStartX.current = e.touches[0]?.clientX ?? null;
+  };
   const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current == null) return
-    const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current
-    if (Math.abs(dx) > 40) go(dx < 0 ? active + 1 : active - 1)
-    touchStartX.current = null
-  }
+    if (touchStartX.current == null) return;
+    const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
+    if (Math.abs(dx) > 40) go(dx < 0 ? active + 1 : active - 1);
+    touchStartX.current = null;
+  };
 
   // Fullscreen focus management: focus the dialog, restore on close.
-  const dialogRef = React.useRef<HTMLDivElement | null>(null)
-  const triggerRef = React.useRef<HTMLButtonElement | null>(null)
+  const dialogRef = React.useRef<HTMLDivElement | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   React.useEffect(() => {
     if (fullscreen) {
-      dialogRef.current?.focus()
-      document.body.style.overflow = "hidden"
+      dialogRef.current?.focus();
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = ""
-      triggerRef.current?.focus()
+      document.body.style.overflow = "";
+      triggerRef.current?.focus();
     }
     return () => {
-      document.body.style.overflow = ""
-    }
-  }, [fullscreen])
+      document.body.style.overflow = "";
+    };
+  }, [fullscreen]);
 
   if (count === 0) {
     return (
       <div className="aspect-square w-full overflow-hidden rounded-2xl border border-border">
         <BrokenImageFallback />
       </div>
-    )
+    );
   }
 
-  const renderMedia = (item: PdpMedia, index: number, sizes: string, priority = false) => {
-    if (errored[index]) return <BrokenImageFallback />
+  const renderMedia = (
+    item: PdpMedia,
+    index: number,
+    sizes: string,
+    priority = false,
+  ) => {
+    if (errored[index]) return <BrokenImageFallback />;
     if (item.kind === "video") {
       return (
         <video
@@ -101,20 +117,20 @@ export function PdpGallery({ media, productName, productId }: PdpGalleryProps) {
         >
           <source src={item.url} />
         </video>
-      )
+      );
     }
     return (
       <Image
         src={item.url}
-        alt={item.alt || `${productName} — view ${index + 1} of ${count}`}
+        alt={item.alt || `${productName}, view ${index + 1} of ${count}`}
         fill
         sizes={sizes}
-        priority={priority}
+        preload={priority}
         className="object-cover"
         onError={() => setErrored((e) => ({ ...e, [index]: true }))}
       />
-    )
-  }
+    );
+  };
 
   return (
     <div className="flex flex-col gap-3" onKeyDown={onKeyDown}>
@@ -163,7 +179,10 @@ export function PdpGallery({ media, productName, productId }: PdpGalleryProps) {
 
       {/* Thumbnails */}
       {count > 1 && (
-        <ul className="flex gap-2 overflow-x-auto pb-1" aria-label="Product image thumbnails">
+        <ul
+          className="flex gap-2 overflow-x-auto pb-1"
+          aria-label="Product image thumbnails"
+        >
           {items.map((item, i) => (
             <li key={`${item.url}-${i}`} className="shrink-0">
               <button
@@ -173,7 +192,9 @@ export function PdpGallery({ media, productName, productId }: PdpGalleryProps) {
                 aria-current={i === active}
                 className={cn(
                   "relative block h-16 w-16 overflow-hidden rounded-lg border-2 transition-colors",
-                  i === active ? "border-accent" : "border-border hover:border-muted-foreground",
+                  i === active
+                    ? "border-accent"
+                    : "border-border hover:border-muted-foreground",
                 )}
               >
                 {item.kind === "video" ? (
@@ -208,7 +229,7 @@ export function PdpGallery({ media, productName, productId }: PdpGalleryProps) {
           aria-modal="true"
           aria-label={`${productName} full-screen media viewer`}
           tabIndex={-1}
-          className="fixed inset-0 z-[100] flex flex-col bg-espresso/95 p-4 outline-none backdrop-blur-sm"
+          className="fixed inset-0 z-[var(--z-modal)] flex flex-col bg-espresso/95 p-4 outline-none backdrop-blur-sm"
           onKeyDown={onKeyDown}
         >
           <div className="flex items-center justify-between text-white">
@@ -254,5 +275,5 @@ export function PdpGallery({ media, productName, productId }: PdpGalleryProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

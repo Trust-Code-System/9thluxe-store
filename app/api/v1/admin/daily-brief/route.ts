@@ -27,7 +27,7 @@ export const GET = route(async () => {
   return {
     data: {
       brief,
-      ai: summary, // null if AI unavailable — metrics still returned
+      ai: summary, // null if AI unavailable, metrics still returned
       note: 'Every metric is traceable via brief.sources. AI actions are suggestions and execute nothing.',
     },
   }

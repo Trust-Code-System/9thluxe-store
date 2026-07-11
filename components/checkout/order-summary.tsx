@@ -198,7 +198,7 @@ export function OrderSummary({
 
                 <Image
 
-                  src={item.product.image || "/placeholder.svg"}
+                  src={item.product.image || "/placeholder-flacon.svg"}
 
                   alt={item.product.name}
 

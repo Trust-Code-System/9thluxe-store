@@ -1,159 +1,128 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { ArrowUpRight } from "lucide-react"
+
 import { MainLayout } from "@/components/layout/main-layout"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Mail, Phone, Clock, Truck, MessageCircle, HelpCircle, ArrowLeft } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Help Center | Fádé",
   description: "Get help with your orders, shipping, and returns.",
 }
 
+const helpTopics = [
+  {
+    title: "FAQ",
+    note: "Common questions about orders, delivery and returns.",
+    href: "/help/faq",
+    external: false,
+  },
+  {
+    title: "Contact us",
+    note: "Send a message. We reply within a business day.",
+    href: "/help/contact",
+    external: false,
+  },
+  {
+    title: "WhatsApp",
+    note: "Usually minutes during business hours.",
+    href: "https://wa.me/2348160591348",
+    external: true,
+  },
+  {
+    title: "Shipping",
+    note: "Nationwide delivery, 1–5 business days by state.",
+    href: "/help/shipping",
+    external: false,
+  },
+  {
+    title: "Returns & exchanges",
+    note: "7-day policy for sealed, unused items.",
+    href: "/help/returns",
+    external: false,
+  },
+]
+
 export default function HelpPage() {
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <Button variant="ghost" size="sm" className="mb-4 -ml-2" asChild>
-              <Link href="/">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to home
-              </Link>
-            </Button>
-            <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-2">Help Center</h1>
-            <p className="text-muted-foreground">We're here to help. Find answers or get in touch with our team.</p>
-          </div>
+      <section
+        data-surface="night"
+        className="grain relative bg-background py-14 text-foreground lg:py-20"
+      >
+        <div className="container relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <span className="eyebrow">Help center</span>
+          <h1 className="mt-4 font-serif text-4xl font-light tracking-[-0.01em] md:text-5xl">
+            How can we <em className="text-accent">help</em>?
+          </h1>
+          <p className="mt-4 max-w-md leading-relaxed text-muted-foreground">
+            Find answers, or reach a person quickly, whichever you prefer.
+          </p>
 
-          {/* Contact Information Card */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-primary/10 p-3 shrink-0">
-                    <Truck className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Delivery Information</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Delivery across Nigeria within 1-5 business days, depending on your state.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="border-t pt-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-muted-foreground shrink-0" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Email</p>
-                      <a
-                        href="mailto:fadeessencee@gmail.com"
-                        className="font-medium text-primary hover:underline"
-                      >
-                        fadeessencee@gmail.com
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Phone / WhatsApp</p>
-                      <a
-                        href="tel:+2348160591348"
-                        className="font-medium text-primary hover:underline"
-                      >
-                        +234 8160591348
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-muted-foreground shrink-0" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Business Hours</p>
-                      <p className="font-medium">
-                        <span className="whitespace-nowrap">8:00 AM - 8:00 PM</span> WAT, Mon - Sat
-                        <br />
-                        <span className="whitespace-nowrap">12:00 PM - 9:00 PM</span> Sun
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Help Options */}
-          <div className="grid gap-4 sm:grid-cols-2 mb-8">
-            <Card className="group hover:shadow-md transition-shadow">
-              <Link href="/help/faq">
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-4">
-                    <div className="rounded-full bg-primary/10 p-3 shrink-0 group-hover:bg-primary/20 transition-colors">
-                      <HelpCircle className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">FAQ</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Common questions about orders, shipping, and returns.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Link>
-            </Card>
-
-            <Card className="group hover:shadow-md transition-shadow">
-              <a
-                href="https://wa.me/2348160591348"
-                target="_blank"
-                rel="noopener noreferrer"
+          {/* Topics ledger */}
+          <div className="mt-12 border-t border-border">
+            {helpTopics.map((topic, i) => (
+              <Link
+                key={topic.title}
+                href={topic.href}
+                target={topic.external ? "_blank" : undefined}
+                rel={topic.external ? "noopener noreferrer" : undefined}
+                className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-x-5 border-b border-border py-6 transition-colors hover:bg-secondary/40 sm:gap-x-8"
               >
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-4">
-                    <div className="rounded-full bg-green-500/10 p-3 shrink-0 group-hover:bg-green-500/20 transition-colors">
-                      <MessageCircle className="h-5 w-5 text-green-600 dark:text-green-500" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
-                        Message us on WhatsApp
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        We usually reply within minutes during business hours.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </a>
-            </Card>
+                <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground/60">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0">
+                  <p className="font-serif text-2xl font-light transition-all duration-300 group-hover:italic group-hover:text-accent">
+                    {topic.title}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">{topic.note}</p>
+                </div>
+                <ArrowUpRight
+                  className="h-5 w-5 self-center text-muted-foreground/50 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
+                  strokeWidth={1.5}
+                  aria-hidden
+                />
+              </Link>
+            ))}
           </div>
 
-          {/* Additional Help Links */}
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Button variant="outline" className="h-auto py-4 justify-start" asChild>
-              <Link href="/help/contact">
-                <Mail className="h-4 w-4 mr-2" />
-                Contact Us
-              </Link>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 justify-start" asChild>
-              <Link href="/help/shipping">
-                <Truck className="h-4 w-4 mr-2" />
-                Shipping Info
-              </Link>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 justify-start" asChild>
-              <Link href="/help/returns">
-                <HelpCircle className="h-4 w-4 mr-2" />
-                Returns
-              </Link>
-            </Button>
+          {/* Direct lines */}
+          <div className="mt-12 grid gap-8 border-t border-border pt-10 sm:grid-cols-3">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                Email
+              </p>
+              <a
+                href="mailto:fadeessencee@gmail.com"
+                className="mt-2 block text-sm text-foreground transition-colors hover:text-accent"
+              >
+                fadeessencee@gmail.com
+              </a>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                Phone / WhatsApp
+              </p>
+              <a
+                href="tel:+2348160591348"
+                className="mt-2 block text-sm text-foreground transition-colors hover:text-accent"
+              >
+                +234 816 059 1348
+              </a>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                Hours (WAT)
+              </p>
+              <p className="mt-2 text-sm text-foreground">
+                Mon–Sat · 8:00–20:00
+                <br />
+                Sun · 12:00–21:00
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </MainLayout>
   )
 }

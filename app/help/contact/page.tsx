@@ -91,7 +91,7 @@ export default function ContactPage() {
     <MainLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-4">Contact Us</h1>
+          <h1 className="font-serif text-4xl md:text-5xl font-light tracking-[-0.01em] mb-4">Contact Us</h1>
           <p className="text-muted-foreground mb-8">
             Have a question or need assistance? We're here to help. Reach out to us through any of the methods below.
           </p>

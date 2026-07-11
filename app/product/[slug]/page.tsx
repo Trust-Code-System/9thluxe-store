@@ -12,6 +12,9 @@ import { AtAGlance } from "@/components/pdp/at-a-glance"
 import { ScentExplanation } from "@/components/pdp/scent-explanation"
 import { FragrancePyramid } from "@/components/pdp/fragrance-pyramid"
 import { MainAccords } from "@/components/pdp/main-accords"
+import { AccordProminenceBars } from "@/components/pdp/accord-prominence"
+import { ScentComposition } from "@/components/pdp/scent-composition"
+import { ScentTimeline } from "@/components/pdp/scent-timeline"
 import { WearTimeline } from "@/components/pdp/wear-timeline"
 import { PerformanceProfile } from "@/components/pdp/performance-profile"
 import { ClimateGuidance } from "@/components/pdp/climate-guidance"
@@ -80,6 +83,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
     { name: data.name, url: `/product/${data.slug}` },
   ]
 
+  const composition = data.composition
+  const bottleImage = images[0] ?? null
+  const hasComposition = !!composition && composition.notes.length > 0
   const hasProfile = data.profileFacets.length > 0
   const hasPyramid = data.notesTop.length + data.notesHeart.length + data.notesBase.length > 0
   const hasScentStory =
@@ -98,7 +104,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <ProductJsonLd
         name={data.name}
         description={data.description}
-        image={images.length ? images : ["/placeholder.svg"]}
+        image={images.length ? images : ["/placeholder-flacon.svg"]}
         price={data.basePriceNGN}
         currency={data.currency}
         brand={data.brand || undefined}
@@ -110,16 +116,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       <div className="container mx-auto px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-16 lg:pt-10">
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-8 flex flex-wrap items-center gap-2.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+        >
           {crumbs.map((c, i) => (
-            <span key={c.url} className="flex items-center gap-2">
-              {i > 0 && <span aria-hidden className="text-border">/</span>}
+            <span key={c.url} className="flex items-center gap-2.5">
+              {i > 0 && (
+                <span aria-hidden className="text-border">
+                  /
+                </span>
+              )}
               {i < crumbs.length - 1 ? (
-                <Link href={c.url} className="transition-colors hover:text-foreground">
+                <Link href={c.url} className="transition-colors hover:text-accent">
                   {c.name}
                 </Link>
               ) : (
-                <span className="truncate text-foreground/70">{c.name}</span>
+                <span className="truncate normal-case text-foreground/70">{c.name}</span>
               )}
             </span>
           ))}
@@ -151,8 +164,25 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </PdpSection>
 
         <PdpSection
-          show={hasPyramid}
+          show={hasComposition}
           eyebrow="Composition"
+          title="The ingredients"
+          description="Every note in this fragrance, arranged by when you meet it. Select any ingredient to explore its scent character and role."
+        >
+          {composition && (
+            <ScentComposition
+              composition={composition}
+              bottleImage={bottleImage}
+              productName={data.name}
+              productId={data.id}
+              template={composition.selectedTemplate ?? undefined}
+            />
+          )}
+        </PdpSection>
+
+        <PdpSection
+          show={hasPyramid}
+          eyebrow="At a glance"
           title="The fragrance pyramid"
           description="A scent unfolds in three acts. Select any note to explore other fragrances built around it."
         >
@@ -165,7 +195,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </PdpSection>
 
         <PdpSection show={hasAccords} eyebrow="Character" title="Main accords">
-          <MainAccords accords={data.accords} productId={data.id} />
+          {hasComposition && composition ? (
+            <AccordProminenceBars accords={composition.accords} productId={data.id} />
+          ) : (
+            <MainAccords accords={data.accords} productId={data.id} />
+          )}
         </PdpSection>
 
         <PdpSection
@@ -174,14 +208,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
           title="How it wears"
           description="An editorial guide to how this fragrance is likely to evolve on skin."
         >
-          <WearTimeline stages={data.timeline} />
+          {hasComposition && composition && composition.timeline.length > 0 ? (
+            <ScentTimeline stages={composition.timeline} />
+          ) : (
+            <WearTimeline stages={data.timeline} />
+          )}
         </PdpSection>
 
         <PdpSection
           show={hasPerformance}
           eyebrow="From wearers"
           title="Performance"
-          description="Aggregated from verified customer reviews — not a laboratory measurement."
+          description="Aggregated from verified customer reviews, not a laboratory measurement."
         >
           <PerformanceProfile metrics={data.performance} />
         </PdpSection>
@@ -190,7 +228,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           show={hasClimate}
           eyebrow="For your weather"
           title="Wearing it in Nigeria"
-          description="Descriptive guidance for local conditions. Choose a setting — we never use your location automatically."
+          description="Descriptive guidance for local conditions. Choose a setting. We never use your location automatically."
         >
           <ClimateGuidance
             family={data.fragranceFamily}

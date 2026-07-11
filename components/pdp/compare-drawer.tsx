@@ -23,7 +23,7 @@ export function CompareDrawer() {
   if (!mounted || items.length === 0) return null
 
   return (
-    <div className="fixed bottom-24 right-4 z-40 lg:bottom-6">
+    <div className="fixed bottom-24 right-4 z-[var(--z-sticky)] lg:bottom-6">
       {open ? (
         <div className="w-[300px] rounded-2xl border border-border bg-card p-4 shadow-xl">
           <div className="mb-3 flex items-center justify-between">

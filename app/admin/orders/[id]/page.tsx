@@ -1,16 +1,33 @@
-import { notFound, redirect } from "next/navigation"
-import { OrderStatus } from "@prisma/client"
+import { notFound, redirect } from "next/navigation";
+import { OrderStatus } from "@prisma/client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { getAdminOrderById, updateOrderStatus } from "@/lib/services/order-service"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  getAdminOrderById,
+  updateOrderStatus,
+} from "@/lib/services/order-service";
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
 interface OrderDetailPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 const statusOptions: { label: string; value: OrderStatus }[] = [
@@ -18,21 +35,26 @@ const statusOptions: { label: string; value: OrderStatus }[] = [
   { label: "Paid", value: "PAID" },
   { label: "Shipped", value: "SHIPPED" },
   { label: "Delivered", value: "DELIVERED" },
-]
+];
 
 const statusClasses: Record<OrderStatus, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  PENDING:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
   PAID: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  SHIPPED: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  DELIVERED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-}
+  SHIPPED:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+  DELIVERED:
+    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+};
 
-export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
-  const { id } = await params
-  const order = await getAdminOrderById(id)
+export default async function OrderDetailPage({
+  params,
+}: OrderDetailPageProps) {
+  const { id } = await params;
+  const order = await getAdminOrderById(id);
 
   if (!order) {
-    notFound()
+    notFound();
   }
 
   const formatPrice = (amount: number) =>
@@ -40,19 +62,22 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       style: "currency",
       currency: "NGN",
       minimumFractionDigits: 0,
-    }).format(amount)
+    }).format(amount);
 
   async function updateStatusAction(formData: FormData) {
-    "use server"
+    "use server";
 
-    const { id: orderId } = await params
-    const status = formData.get("status") as OrderStatus
-    await updateOrderStatus(orderId, status)
+    const { id: orderId } = await params;
+    const status = formData.get("status") as OrderStatus;
+    await updateOrderStatus(orderId, status);
 
-    redirect(`/admin/orders/${orderId}`)
+    redirect(`/admin/orders/${orderId}`);
   }
 
-  const itemsTotal = order.items.reduce((total, item) => total + item.quantity, 0)
+  const itemsTotal = order.items.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
 
   return (
     <div className="space-y-6">
@@ -72,17 +97,21 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         </div>
         <form action={updateStatusAction} className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground">Status</span>
-          <select
-            name="status"
-            defaultValue={order.status}
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1.5 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <Select name="status" defaultValue={order.status}>
+            <SelectTrigger
+              className="h-9 w-[180px] text-xs"
+              aria-label="Order status"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button type="submit" size="sm">
             Update
           </Button>
@@ -94,7 +123,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between gap-4">
             <CardTitle className="text-base">Items ({itemsTotal})</CardTitle>
-            <Badge className={statusClasses[order.status]}>{order.status.toLowerCase()}</Badge>
+            <Badge className={statusClasses[order.status]}>
+              {order.status.toLowerCase()}
+            </Badge>
           </CardHeader>
           <CardContent>
             <Table>
@@ -111,10 +142,13 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                   <TableRow key={item.id}>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-medium text-sm">{item.product?.name ?? "Deleted product"}</span>
+                        <span className="font-medium text-sm">
+                          {item.product?.name ?? "Deleted product"}
+                        </span>
                         {item.product && (
                           <span className="text-xs text-muted-foreground">
-                            {item.product.slug} · {formatPrice(item.product.priceNGN)}
+                            {item.product.slug} ·{" "}
+                            {formatPrice(item.product.priceNGN)}
                           </span>
                         )}
                       </div>
@@ -142,8 +176,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             <CardContent className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Payment</span>
-                <span className={`font-medium ${order.paymentMethod === "BANK_TRANSFER" ? "text-amber-600 dark:text-amber-400" : ""}`}>
-                  {order.paymentMethod === "BANK_TRANSFER" ? "Bank Transfer" : "Card / Paystack"}
+                <span
+                  className={`font-medium ${order.paymentMethod === "BANK_TRANSFER" ? "text-amber-600 dark:text-amber-400" : ""}`}
+                >
+                  {order.paymentMethod === "BANK_TRANSFER"
+                    ? "Bank Transfer"
+                    : "Card / Paystack"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -160,17 +198,26 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               </div>
               {order.coupon && (
                 <div className="pt-2 text-xs text-muted-foreground">
-                  Coupon applied: <span className="font-mono">{order.coupon.code}</span>
+                  Coupon applied:{" "}
+                  <span className="font-mono">{order.coupon.code}</span>
                 </div>
               )}
-              {order.paymentMethod === "BANK_TRANSFER" && order.status === "PENDING" && (
-                <form action={updateStatusAction} className="pt-3 border-t border-border mt-2">
-                  <input type="hidden" name="status" value="PAID" />
-                  <Button type="submit" size="sm" className="w-full bg-green-600 hover:bg-green-700 text-white">
-                    ✓ Mark as Paid (Bank Transfer Received)
-                  </Button>
-                </form>
-              )}
+              {order.paymentMethod === "BANK_TRANSFER" &&
+                order.status === "PENDING" && (
+                  <form
+                    action={updateStatusAction}
+                    className="pt-3 border-t border-border mt-2"
+                  >
+                    <input type="hidden" name="status" value="PAID" />
+                    <Button
+                      type="submit"
+                      size="sm"
+                      className="w-full bg-success text-success-foreground hover:bg-success/90"
+                    >
+                      ✓ Mark as Paid (Bank Transfer Received)
+                    </Button>
+                  </form>
+                )}
             </CardContent>
           </Card>
 
@@ -194,5 +241,5 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -20,7 +20,7 @@ const schema = z.object({
   AUTH_SECRET: z.string().min(1).optional(),
   NEXTAUTH_URL: z.string().url().optional(),
 
-  // Payments (Paystack) — sandbox/test only in this project
+  // Payments (Paystack): sandbox/test only in this project
   PAYSTACK_SECRET_KEY: z.string().optional(),
   PAYSTACK_PUBLIC_KEY: z.string().optional(),
 
@@ -62,7 +62,7 @@ const schema = z.object({
   // Feature flags (comma-separated list of enabled flags)
   FEATURE_FLAGS: z.string().default(''),
 
-  // Durable rate limiting / cache (optional; Upstash Redis REST — serverless-friendly, fetch-based).
+  // Durable rate limiting / cache (optional; Upstash Redis REST, serverless-friendly, fetch-based).
   // When absent, rate limiting degrades to an in-memory per-instance limiter (documented limitation).
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
@@ -72,16 +72,25 @@ export type Env = z.infer<typeof schema>
 
 let cached: Env | null = null
 
+/** Empty-string env vars behave as unset (e.g. `UPSTASH_REDIS_REST_URL=""` in .env). */
+function withoutEmptyStrings(source: NodeJS.ProcessEnv): Record<string, string | undefined> {
+  const cleaned: Record<string, string | undefined> = {}
+  for (const [key, value] of Object.entries(source)) {
+    cleaned[key] = typeof value === 'string' && value.trim() === '' ? undefined : value
+  }
+  return cleaned
+}
+
 export function getEnv(): Env {
   if (cached) return cached
-  const parsed = schema.safeParse(process.env)
+  const parsed = schema.safeParse(withoutEmptyStrings(process.env))
   if (!parsed.success) {
     // Do not print values. Only the offending keys.
     const keys = parsed.error.errors.map((e) => e.path.join('.')).join(', ')
     // In production we still boot with defaults where possible, but log loudly.
     if (process.env.NODE_ENV === 'production') {
       console.error(JSON.stringify({ level: 'error', message: 'env_validation_failed', keys }))
-      cached = schema.parse({ ...process.env, NODE_ENV: 'production' })
+      cached = schema.parse({ ...withoutEmptyStrings(process.env), NODE_ENV: 'production' })
       return cached
     }
     throw new Error(`Environment validation failed for: ${keys}`)

@@ -1,7 +1,8 @@
 /**
- * Maps brand slugs to brand names used in product data.
- * This ensures we can convert URL-friendly slugs to the exact brand names
- * stored in the product data.
+ * Brand slug helpers.
+ *
+ * Brand pages resolve dynamically from the brands actually present in the
+ * database. The static map below only keeps legacy marketing URLs alive.
  */
 export const brandSlugMap: Record<string, string> = {
   "tom-ford": "Tom Ford",
@@ -14,18 +15,41 @@ export const brandSlugMap: Record<string, string> = {
   "jo-malone": "Jo Malone",
 }
 
+/** URL-friendly slug for a brand name ("Jo Malone" → "jo-malone"). */
+export function slugifyBrand(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // strip accents (Fàdè → Fade)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+}
+
 /**
- * Gets the brand name from a slug.
- * Returns undefined if the slug doesn't match any known brand.
+ * Resolves a slug against the real brand list from the database first,
+ * then the legacy map.
+ */
+export function resolveBrandFromSlug(
+  slug: string,
+  dbBrands: string[]
+): string | undefined {
+  const lower = slug.toLowerCase()
+  return (
+    dbBrands.find((brand) => slugifyBrand(brand) === lower) ??
+    brandSlugMap[lower]
+  )
+}
+
+/**
+ * Gets the brand name from a slug (legacy static map only).
  */
 export function getBrandNameFromSlug(slug: string): string | undefined {
   return brandSlugMap[slug.toLowerCase()]
 }
 
 /**
- * Gets all valid brand slugs.
+ * Gets all valid brand slugs (legacy static map only).
  */
 export function getAllBrandSlugs(): string[] {
   return Object.keys(brandSlugMap)
 }
-

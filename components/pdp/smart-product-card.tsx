@@ -23,7 +23,7 @@ const AVAILABILITY_LABEL: Record<PdpCard["availability"], string> = {
 
 /**
  * Progressive-disclosure product card: image + essentials always visible; notes/actions revealed on
- * hover/focus (and always available to keyboard + touch). No fabricated data — every field is real
+ * hover/focus (and always available to keyboard + touch). No fabricated data; every field is real
  * or omitted.
  */
 export function SmartProductCard({ card, className }: { card: PdpCard; className?: string }) {

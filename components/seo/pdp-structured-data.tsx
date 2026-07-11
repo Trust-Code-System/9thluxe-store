@@ -5,7 +5,7 @@ interface Crumb {
 
 /**
  * Breadcrumb + FAQ structured data for the PDP. The FAQ block is emitted ONLY from the same policy
- * FAQ pairs that are visibly rendered on the page — never hidden or fabricated Q&A. Aggregate rating
+ * FAQ pairs that are visibly rendered on the page, never hidden or fabricated Q&A. Aggregate rating
  * / reviews live in <ProductJsonLd> and only appear when real.
  */
 export function PdpStructuredData({

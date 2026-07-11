@@ -4,7 +4,21 @@ import { notFound, redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/admin'
 import { ImageUploader } from '@/components/admin/image-uploader'
+import { ScentStoryComposer } from '@/components/admin/scent-story-composer'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { sendPriceDropAlert } from '@/emails/sendPriceDropAlert'
+import {
+  getProductTemplate,
+  setProductTemplate,
+  ensureScentTemplateColumn,
+  isTemplateId,
+} from '@/lib/fragrance/template-store'
+
+/** Empty / sentinel string -> null, for optional text columns. */
+function nn(v: FormDataEntryValue | null): string | null {
+  const s = (v as string | null)?.trim()
+  return s && s !== 'NONE' ? s : null
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -45,7 +59,27 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       }
     }
 
-    const fragranceFamily = ((formData.get('fragranceFamily') as string) || '').trim() || null
+    const fragranceFamily = nn(formData.get('fragranceFamily'))
+
+    // Scent-story fields (persisted to real columns; the composition regenerates from these).
+    const scentData = {
+      notesTop: nn(formData.get('notesTop')),
+      notesHeart: nn(formData.get('notesHeart')),
+      notesBase: nn(formData.get('notesBase')),
+      mainAccords: nn(formData.get('mainAccords')),
+      olfactoryDesc: nn(formData.get('olfactoryDesc')),
+      moodTags: nn(formData.get('moodTags')),
+      season: nn(formData.get('season')),
+      climate: nn(formData.get('climate')),
+      timeOfDay: nn(formData.get('timeOfDay')),
+      occasion: nn(formData.get('occasion')),
+    }
+
+    // Draft / publish action. Only set when a draft/publish button was the submitter; the plain
+    // "Update Product" button leaves publish status untouched.
+    const rawPublish = formData.get('publishStatus') as string | null
+    const publishStatus =
+      rawPublish === 'PUBLISHED' ? 'PUBLISHED' : rawPublish === 'DRAFT' ? 'DRAFT' : undefined
 
     // Fetch current price to check for price drops
     const currentProduct = await prisma.product.findUnique({
@@ -64,8 +98,19 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         stock,
         images,
         fragranceFamily,
+        ...scentData,
+        ...(publishStatus ? { publishStatus } : {}),
       },
     })
+
+    // Persist the chosen visual template (resilient: additive column, applied on demand). Empty
+    // value clears the override so the storefront uses the recommended template.
+    if (formData.has('scentTemplate')) {
+      const rawTemplate = ((formData.get('scentTemplate') as string) || '').trim()
+      const template = rawTemplate && isTemplateId(rawTemplate) ? rawTemplate : null
+      await ensureScentTemplateColumn()
+      await setProductTemplate(productId, template)
+    }
 
     // Send price drop alerts if price decreased
     if (currentProduct && !isNaN(priceNGN) && priceNGN < currentProduct.priceNGN) {
@@ -93,6 +138,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   }
 
   const images = Array.isArray(productRecord.images) ? (productRecord.images as string[]) : []
+  const savedTemplate = await getProductTemplate(productRecord.id)
 
   return (
     <div className="space-y-6">
@@ -121,9 +167,14 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             <label htmlFor="category" className="text-sm font-medium text-foreground">
               Category *
             </label>
-            <select id="category" name="category" required className="input w-full" defaultValue={productRecord.category}>
-              <option value="PERFUMES">Perfumes</option>
-            </select>
+            <Select name="category" required defaultValue={productRecord.category}>
+              <SelectTrigger id="category" className="w-full" aria-label="Category">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PERFUMES">Perfumes</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -170,26 +221,6 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="fragranceFamily" className="text-sm font-medium text-foreground">
-              Fragrance Family
-            </label>
-            <select
-              id="fragranceFamily"
-              name="fragranceFamily"
-              defaultValue={productRecord.fragranceFamily || ''}
-              className="input w-full"
-            >
-              <option value="">None</option>
-              <option value="CITRUS">Citrus</option>
-              <option value="WOODY">Woody</option>
-              <option value="FLORAL">Floral</option>
-              <option value="ORIENTAL">Oriental</option>
-              <option value="FRESH">Fresh</option>
-              <option value="SPICY">Spicy</option>
-              <option value="GOURMAND">Gourmand</option>
-            </select>
-          </div>
         </div>
 
         <div className="space-y-2">
@@ -219,6 +250,26 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             Upload up to 4 images from different angles. Use images with transparent background for best results.
           </p>
         </div>
+
+        <ScentStoryComposer
+          initial={{
+            notesTop: productRecord.notesTop || '',
+            notesHeart: productRecord.notesHeart || '',
+            notesBase: productRecord.notesBase || '',
+            mainAccords: productRecord.mainAccords || '',
+            fragranceFamily: productRecord.fragranceFamily || '',
+            olfactoryDesc: productRecord.olfactoryDesc || '',
+            moodTags: productRecord.moodTags || '',
+            season: productRecord.season || '',
+            climate: productRecord.climate || '',
+            timeOfDay: productRecord.timeOfDay || '',
+            occasion: productRecord.occasion || '',
+            bottleImage: images[0] ?? null,
+            productName: productRecord.name,
+            publishStatus: productRecord.publishStatus,
+            scentTemplate: savedTemplate ?? '',
+          }}
+        />
 
         <div className="flex gap-3">
           <button type="submit" className="btn">

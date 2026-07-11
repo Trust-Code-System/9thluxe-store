@@ -1,12 +1,18 @@
-import type { Metadata } from "next"
-import { MainLayout } from "@/components/layout/main-layout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import type { Metadata } from "next";
+import { MainLayout } from "@/components/layout/main-layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { RETURNS_WINDOW_DAYS } from "@/lib/pdp/policy";
 
 export const metadata: Metadata = {
   title: "FAQ | Fádé",
   description: "Frequently asked questions about shopping at Fádé.",
-}
+};
 
 const faqs = [
   {
@@ -26,8 +32,7 @@ const faqs = [
   },
   {
     question: "What is your return policy?",
-    answer:
-      "We offer a 14-day return policy for unused items in their original packaging. Items must be in the same condition as when received. Please contact us within 14 days of delivery to initiate a return.",
+    answer: `We accept eligible returns within ${RETURNS_WINDOW_DAYS} days of delivery when a fragrance is sealed, unused, and in its original packaging. Please contact us within that window to start a return.`,
   },
   {
     question: "How do I track my order?",
@@ -37,7 +42,7 @@ const faqs = [
   {
     question: "Are your products authentic?",
     answer:
-      "Yes, all our products are 100% authentic and sourced directly from authorized dealers. We guarantee the authenticity of every item we sell.",
+      "Every bottle is inspected and sealed by Fádé before dispatch. Product pages distinguish retailer inspection from manufacturer verification, so you can see the available provenance for each fragrance.",
   },
   {
     question: "Do you offer gift wrapping?",
@@ -57,16 +62,18 @@ const faqs = [
   {
     question: "Do you have a physical store?",
     answer:
-      "Currently, we operate as an online-only store. However, we're planning to open physical locations in major cities. Follow our newsletter for updates on store openings.",
+      "Fádé currently operates online and delivers across Nigeria. Join the Sillage letter for any future service updates.",
   },
-]
+];
 
 export default function FAQPage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-4">Frequently Asked Questions</h1>
+          <h1 className="font-serif text-4xl md:text-5xl font-light tracking-[-0.01em] mb-4">
+            Frequently Asked Questions
+          </h1>
           <p className="text-muted-foreground mb-8">
             Find answers to common questions about shopping at Fádé.
           </p>
@@ -75,15 +82,22 @@ export default function FAQPage() {
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, index) => (
                 <Card key={index}>
-                  <AccordionItem value={`item-${index}`} className="border-none">
+                  <AccordionItem
+                    value={`item-${index}`}
+                    className="border-none"
+                  >
                     <AccordionTrigger className="px-6 py-4 hover:no-underline">
                       <CardHeader className="p-0">
-                        <CardTitle className="text-left text-base font-medium">{faq.question}</CardTitle>
+                        <CardTitle className="text-left text-base font-medium">
+                          {faq.question}
+                        </CardTitle>
                       </CardHeader>
                     </AccordionTrigger>
                     <AccordionContent className="px-6 pb-4">
                       <CardContent className="p-0">
-                        <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {faq.answer}
+                        </p>
                       </CardContent>
                     </AccordionContent>
                   </AccordionItem>
@@ -94,6 +108,5 @@ export default function FAQPage() {
         </div>
       </div>
     </MainLayout>
-  )
+  );
 }
-

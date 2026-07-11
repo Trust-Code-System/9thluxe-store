@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Search, MessageCircleQuestion } from "lucide-react"
-import { trackPdp } from "@/lib/analytics/pdp-events"
+import * as React from "react";
+import { Search, MessageCircleQuestion } from "lucide-react";
+import { trackPdp } from "@/lib/analytics/pdp-events";
 
 const CATEGORIES = [
   "Authenticity",
@@ -14,7 +14,7 @@ const CATEGORIES = [
   "Occasion",
   "Sample availability",
   "Returns",
-]
+];
 
 /**
  * Product Questions & Answers.
@@ -26,14 +26,14 @@ const CATEGORIES = [
  * component binds to it directly.
  */
 export function QaSection({ productId }: { productId: string }) {
-  const [query, setQuery] = React.useState("")
+  const [query, setQuery] = React.useState("");
 
   return (
     <div className="max-w-2xl">
       <form
         onSubmit={(e) => {
-          e.preventDefault()
-          trackPdp("question_searched", { productId })
+          e.preventDefault();
+          trackPdp("question_searched", { productId });
         }}
         className="flex items-center gap-2"
         role="search"
@@ -52,7 +52,10 @@ export function QaSection({ productId }: { productId: string }) {
 
       <div className="mt-3 flex flex-wrap gap-1.5">
         {CATEGORIES.map((c) => (
-          <span key={c} className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground">
+          <span
+            key={c}
+            className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground"
+          >
             {c}
           </span>
         ))}
@@ -62,13 +65,15 @@ export function QaSection({ productId }: { productId: string }) {
         <MessageCircleQuestion className="h-8 w-8 text-muted-foreground opacity-50" />
         <p className="font-medium">Questions &amp; answers are coming soon</p>
         <p className="max-w-md text-sm text-muted-foreground">
-          Community Q&amp;A isn&apos;t enabled in this environment yet. In the meantime, our team is happy to help —{" "}
-          <a href="/help" className="text-accent underline-offset-2 hover:underline">
+          Community Q&amp;A isn&apos;t enabled in this environment yet. In the
+          meantime, our team is happy to help,{" "}
+          <a href="/help" className="text-accent underline underline-offset-2">
             contact support
           </a>{" "}
-          with any question about authenticity, performance, delivery, or samples.
+          with any question about authenticity, performance, delivery, or
+          samples.
         </p>
       </div>
     </div>
-  )
+  );
 }

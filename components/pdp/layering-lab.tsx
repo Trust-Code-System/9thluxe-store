@@ -36,7 +36,7 @@ const COMPAT_COPY: Record<LayeringAdvice["compatibility"], { label: string; tone
 /**
  * Layering Lab. Partner candidates come from the grounded recommender (real, in-catalogue products
  * only). Compatibility is decided by the backend's deterministic editorial rules
- * (/api/v1/layering) — results are clearly subjective guidance, never guarantees. Saving a
+ * (/api/v1/layering): results are clearly subjective guidance, never guarantees. Saving a
  * combination and "add both" are gated on backend R6 and shown as a documented, honest state.
  */
 export function LayeringLab({
@@ -108,7 +108,7 @@ export function LayeringLab({
     <PdpSection
       eyebrow="Layering Lab"
       title="Pair it with another"
-      description="Layering is personal and subjective — this is editorial guidance for pairings worth trying."
+      description="Layering is personal and subjective. This is editorial guidance for pairings worth trying."
     >
     <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
       <div>
@@ -188,7 +188,7 @@ export function LayeringLab({
               </Button>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Layering results are subjective — this is editorial guidance. Saving &amp; add-both arrive with the wardrobe
+              Layering results are subjective. This is editorial guidance. Saving &amp; add-both arrive with the wardrobe
               update.
             </p>
           </div>

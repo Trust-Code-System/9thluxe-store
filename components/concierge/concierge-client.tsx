@@ -284,7 +284,7 @@ export function ConciergeClient() {
 
 function ConciergeCard({ item }: { item: ConciergeItem }) {
   const { product } = item
-  const image = product.images?.[0] || "/placeholder.svg"
+  const image = product.images?.[0] || "/placeholder-flacon.svg"
   return (
     <Link
       href={`/product/${product.slug}`}

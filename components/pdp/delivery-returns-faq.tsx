@@ -4,7 +4,7 @@ import type { PdpPolicy } from "@/lib/pdp/policy"
 /**
  * Delivery, returns & purchasing FAQ. Reads from the SINGLE policy source (`lib/pdp/policy.ts`) so it
  * can never contradict the near-cart summary. The same `faqs` array powers the FAQPage structured
- * data — so the JSON-LD only ever contains questions that are visibly present here.
+ * data, so the JSON-LD only ever contains questions that are visibly present here.
  */
 export function DeliveryReturnsFaq({ policy }: { policy: PdpPolicy }) {
   return (

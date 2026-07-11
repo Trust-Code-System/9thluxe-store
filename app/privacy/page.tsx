@@ -9,9 +9,10 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <MainLayout>
-      <section className="container mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="font-serif text-3xl font-semibold tracking-tight">Privacy Policy</h1>
-        <p className="mt-4 text-sm text-muted-foreground">Last updated: February 10, 2026</p>
+      <section data-surface="night" className="container mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+        <span className="eyebrow">Legal</span>
+        <h1 className="mt-4 font-serif text-4xl font-light tracking-[-0.01em]">Privacy policy</h1>
+        <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Last updated · February 10, 2026</p>
 
         <div className="mt-8 space-y-6 text-sm leading-7 text-foreground/90">
           <div>

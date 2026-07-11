@@ -177,7 +177,7 @@ export default function ReviewPage() {
                   <Link href={`/product/${item.product.slug}`} className="shrink-0">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-muted">
                       <Image
-                        src={item.product.image || "/placeholder.svg"}
+                        src={item.product.image || "/placeholder-flacon.svg"}
                         alt={item.product.name}
                         fill
                         className="object-cover"

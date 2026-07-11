@@ -17,7 +17,7 @@ export interface ProductForCard {
 
 export function mapPrismaProductToCard(product: any): ProductForCard {
   const images = Array.isArray(product.images) ? product.images : []
-  const mainImage = (images[0] as string) || "/placeholder.svg"
+  const mainImage = (images[0] as string) || "/placeholder-flacon.svg"
 
   const categoryMap: Record<ProductCategory, "perfumes"> = {
     PERFUMES: "perfumes",

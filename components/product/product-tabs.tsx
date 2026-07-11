@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { RatingStars } from "@/components/ui/rating-stars"
 import { Button } from "@/components/ui/button"
 import { Loader2, MessageSquare, Clock, Sparkles } from "lucide-react"
@@ -50,7 +49,7 @@ function FragrancePyramid({
   return (
     <div className="max-w-2xl">
       <p className="text-sm text-muted-foreground mb-8">
-        Every great fragrance tells a story in three acts — the opening top notes, the evolving heart, and the lasting
+        Every great fragrance tells a story in three acts: the opening top notes, the evolving heart, and the lasting
         base that lingers on your skin.
       </p>
 

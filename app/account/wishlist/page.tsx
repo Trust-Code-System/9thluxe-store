@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma"
 
 function getProductImage(images: unknown): string {
   if (Array.isArray(images) && images.length > 0 && typeof images[0] === "string") return images[0]
-  return "/placeholder.svg"
+  return "/placeholder-flacon.svg"
 }
 
 export const dynamic = "force-dynamic"

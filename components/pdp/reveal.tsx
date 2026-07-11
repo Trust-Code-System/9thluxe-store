@@ -17,7 +17,7 @@ function usePrefersReducedMotion() {
 
 /**
  * IntersectionObserver-driven "reveal once". CRITICAL a11y rule: when reduced motion is preferred
- * (or IO is unavailable), the content starts in its FINAL visible state — there is never a
+ * (or IO is unavailable), the content starts in its FINAL visible state; there is never a
  * hidden-content trap.
  */
 export function useInView<T extends HTMLElement>(options?: IntersectionObserverInit) {

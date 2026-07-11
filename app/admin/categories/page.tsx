@@ -43,7 +43,7 @@ const productCategoryOptions = [
 ]
 
 export default function AdminCategoriesPage() {
-  const router = useRouter()
+  const _router = useRouter()
   const [categories, setCategories] = React.useState<Category[]>([])
   const [loading, setLoading] = React.useState(true)
   const [editingId, setEditingId] = React.useState<string | null>(null)
@@ -374,7 +374,7 @@ export default function AdminCategoriesPage() {
                               {category.slug}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
-                              {category.enumKey ? category.enumKey.toLowerCase() : "—"}
+                              {category.enumKey ? category.enumKey.toLowerCase() : "N/A"}
                             </TableCell>
                             <TableCell className="text-right text-sm">
                               {category.productCount}

@@ -18,7 +18,7 @@ interface CompareStore {
 
 /**
  * Client-side comparison set (up to 4). Persisted so the selection survives navigation and the
- * dedicated /compare page can read it. Stores only public card data — never private fields.
+ * dedicated /compare page can read it. Stores only public card data; never private fields.
  */
 export const useCompareStore = create<CompareStore>()(
   persist(

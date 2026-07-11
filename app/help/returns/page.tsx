@@ -1,23 +1,27 @@
-import type { Metadata } from "next"
-import { MainLayout } from "@/components/layout/main-layout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Package, Clock, CheckCircle, XCircle } from "lucide-react"
-import Link from "next/link"
+import type { Metadata } from "next";
+import { MainLayout } from "@/components/layout/main-layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Package, Clock, CheckCircle, XCircle } from "lucide-react";
+import Link from "next/link";
+import { RETURNS_WINDOW_DAYS } from "@/lib/pdp/policy";
 
 export const metadata: Metadata = {
   title: "Returns & Exchanges | Fádé",
   description: "Learn about our return and exchange policy.",
-}
+};
 
 export default function ReturnsPage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-4">Returns & Exchanges</h1>
+          <h1 className="font-serif text-4xl md:text-5xl font-light tracking-[-0.01em] mb-4">
+            Returns & Exchanges
+          </h1>
           <p className="text-muted-foreground mb-8">
-            We want you to be completely satisfied with your purchase. Learn about our return and exchange policy below.
+            We want you to be completely satisfied with your purchase. Learn
+            about our return and exchange policy below.
           </p>
 
           <div className="space-y-6">
@@ -30,15 +34,20 @@ export default function ReturnsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  We offer a 14-day return policy for unused items in their original packaging. Items must be in the same
-                  condition as when received, with all tags and labels attached.
+                  We offer a {RETURNS_WINDOW_DAYS}-day return policy for sealed,
+                  unused items in their original packaging. Items must be in the
+                  same condition as when received, with all tags and labels
+                  attached.
                 </p>
                 <div className="space-y-2">
                   <h4 className="font-medium">To be eligible for a return:</h4>
                   <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
                     <li>Item must be unused and in original condition</li>
                     <li>Original packaging and tags must be included</li>
-                    <li>Return request must be made within 14 days of delivery</li>
+                    <li>
+                      Return request must be made within {RETURNS_WINDOW_DAYS}{" "}
+                      days of delivery
+                    </li>
                     <li>Proof of purchase is required</li>
                   </ul>
                 </div>
@@ -54,12 +63,19 @@ export default function ReturnsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-2">
-                  <li>Contact our customer service team within 14 days of delivery</li>
+                  <li>
+                    Contact our customer service team within{" "}
+                    {RETURNS_WINDOW_DAYS} days of delivery
+                  </li>
                   <li>Provide your order number and reason for return</li>
-                  <li>We'll send you a return authorization and shipping label</li>
+                  <li>
+                    We'll send you a return authorization and shipping label
+                  </li>
                   <li>Package the item securely in its original packaging</li>
                   <li>Ship the item back using the provided label</li>
-                  <li>Once received and inspected, we'll process your refund</li>
+                  <li>
+                    Once received and inspected, we'll process your refund
+                  </li>
                 </ol>
               </CardContent>
             </Card>
@@ -92,7 +108,7 @@ export default function ReturnsPage() {
                   <li>Items without original packaging</li>
                   <li>Personalized or customized items</li>
                   <li>Items damaged due to misuse</li>
-                  <li>Items returned after 14 days</li>
+                  <li>Items returned after {RETURNS_WINDOW_DAYS} days</li>
                 </ul>
               </CardContent>
             </Card>
@@ -103,12 +119,15 @@ export default function ReturnsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Refunds will be processed to the original payment method within 5-10 business days after we receive and
-                  inspect the returned item. Shipping costs are non-refundable unless the item was defective or incorrect.
+                  Refunds will be processed to the original payment method
+                  within 5-10 business days after we receive and inspect the
+                  returned item. Shipping costs are non-refundable unless the
+                  item was defective or incorrect.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  For exchanges, we'll ship the replacement item once we receive your return. If the replacement item is of
-                  higher value, you'll be charged the difference.
+                  For exchanges, we'll ship the replacement item once we receive
+                  your return. If the replacement item is of higher value,
+                  you'll be charged the difference.
                 </p>
               </CardContent>
             </Card>
@@ -125,6 +144,5 @@ export default function ReturnsPage() {
         </div>
       </div>
     </MainLayout>
-  )
+  );
 }
-

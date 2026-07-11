@@ -118,7 +118,7 @@ export async function recommend(input: RecommendInput, deps: EngineDeps): Promis
   }
 
   // 3. Retrieve with HARD filters (in-catalogue, in-stock unless sample-first, within budget).
-  //    Note: we do NOT pass the raw natural-language sentence to the provider's substring `q` — that
+  //    Note: we do NOT pass the raw natural-language sentence to the provider's substring `q`, that
   //    matches almost nothing. We retrieve by structured filters + a short keyword (a matched note or
   //    a 1-2 word query), then fall back to a filtered listing so there are always candidates to rank.
   const wantN = limit * 4
@@ -144,7 +144,7 @@ export async function recommend(input: RecommendInput, deps: EngineDeps): Promis
     for (const p of page.items) ids.add(p.id)
   }
 
-  // 4. Load full products (source of truth for price/stock/notes) — never trust the search cache alone.
+  // 4. Load full products (source of truth for price/stock/notes), never trust the search cache alone.
   const products = (
     await Promise.all([...ids].map((id) => deps.catalog.getProductById(id)))
   ).filter((p): p is CommerceProduct => p !== null)

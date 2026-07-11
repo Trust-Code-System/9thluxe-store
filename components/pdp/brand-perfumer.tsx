@@ -6,7 +6,7 @@ import type { PdpBrand, PdpPerfumer } from "@/lib/pdp/types"
 /**
  * Brand & perfumer profiles. Renders only verified information: the brand name/country and the
  * brand's other available products; the perfumer name and their other products. Story/bio copy is
- * shown only when a real value exists — never AI-invented (columns are absent today; see backend R1).
+ * shown only when a real value exists, never AI-invented (columns are absent today; see backend R1).
  */
 export function BrandPerfumer({ brand, perfumer }: { brand: PdpBrand | null; perfumer: PdpPerfumer | null }) {
   if (!brand && !perfumer) return null

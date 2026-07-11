@@ -1,50 +1,61 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Send, Save, Eye, Loader2, AlertCircle, Image as ImageIcon, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent } from "@/components/ui/card"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Send,
+  Save,
+  Loader2,
+  AlertCircle,
+  Image as ImageIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
 
 interface NewsletterEditorProps {
-  subscriberCount: number
-  campaignId?: string
+  subscriberCount: number;
+  campaignId?: string;
   initialData?: {
-    subject?: string
-    html?: string
-    text?: string
-  }
-  onSave?: () => void
+    subject?: string;
+    html?: string;
+    text?: string;
+  };
+  onSave?: () => void;
 }
 
-export function NewsletterEditor({ subscriberCount, campaignId, initialData, onSave }: NewsletterEditorProps) {
-  const [subject, setSubject] = React.useState(initialData?.subject || "")
-  const [htmlContent, setHtmlContent] = React.useState(initialData?.html || "")
-  const [textContent, setTextContent] = React.useState(initialData?.text || "")
-  const [isSaving, setIsSaving] = React.useState(false)
-  const [isSending, setIsSending] = React.useState(false)
-  const [activeTab, setActiveTab] = React.useState("compose")
-  const [uploadedImages, setUploadedImages] = React.useState<string[]>([])
+export function NewsletterEditor({
+  subscriberCount,
+  campaignId,
+  initialData,
+  onSave,
+}: NewsletterEditorProps) {
+  const [subject, setSubject] = React.useState(initialData?.subject || "");
+  const [htmlContent, setHtmlContent] = React.useState(initialData?.html || "");
+  const [textContent, setTextContent] = React.useState(initialData?.text || "");
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [isSending, setIsSending] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState("compose");
+  const [_uploadedImages, setUploadedImages] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     if (initialData) {
-      setSubject(initialData.subject || "")
-      setHtmlContent(initialData.html || "")
-      setTextContent(initialData.text || "")
+      setSubject(initialData.subject || "");
+      setHtmlContent(initialData.html || "");
+      setTextContent(initialData.text || "");
     }
-  }, [initialData])
+  }, [initialData]);
 
   const handleSaveDraft = async () => {
     if (!subject.trim() || !htmlContent.trim()) {
-      toast.error("Subject and HTML content are required")
-      return
+      toast.error("Subject and HTML content are required");
+      return;
     }
 
-    setIsSaving(true)
+    setIsSaving(true);
     try {
       const response = await fetch("/api/admin/newsletter/campaigns", {
         method: campaignId ? "PATCH" : "POST",
@@ -56,103 +67,104 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
           text: textContent,
           status: "DRAFT",
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
-        toast.success("Draft saved successfully")
-        if (onSave) onSave()
+        toast.success("Draft saved successfully");
+        if (onSave) onSave();
       } else {
-        toast.error(data.error || "Failed to save draft")
+        toast.error(data.error || "Failed to save draft");
       }
     } catch (error) {
-      console.error("Save draft error:", error)
-      toast.error("An unexpected error occurred")
+      console.error("Save draft error:", error);
+      toast.error("An unexpected error occurred");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleSend = async () => {
     if (!subject.trim() || !htmlContent.trim()) {
-      toast.error("Subject and HTML content are required")
-      return
+      toast.error("Subject and HTML content are required");
+      return;
     }
 
     if (subscriberCount === 0) {
-      toast.error("No subscribers to send to")
-      return
+      toast.error("No subscribers to send to");
+      return;
     }
 
-    setIsSending(true)
+    setIsSending(true);
     try {
       const response = await fetch("/api/newsletter/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject, html: htmlContent, text: textContent }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok && data.success) {
-        const failed = data.failed ?? 0
-        const sent = data.sent ?? 0
+        const failed = data.failed ?? 0;
+        const sent = data.sent ?? 0;
         if (failed > 0 && data.failures?.length) {
-          toast.warning(
-            `Sent to ${sent}; ${failed} failed`,
-            { description: data.failures.slice(0, 3).join(" — ") }
-          )
+          toast.warning(`Sent to ${sent}; ${failed} failed`, {
+            description: data.failures.slice(0, 3).join(", "),
+          });
         } else {
-          toast.success(`Newsletter sent to ${sent} subscriber${sent !== 1 ? "s" : ""}`)
+          toast.success(
+            `Newsletter sent to ${sent} subscriber${sent !== 1 ? "s" : ""}`,
+          );
         }
         if (data.hint) {
-          toast.info("Delivery tip", { description: data.hint })
+          toast.info("Delivery tip", { description: data.hint });
         }
-        setSubject("")
-        setHtmlContent("")
-        setTextContent("")
-        if (onSave) onSave()
+        setSubject("");
+        setHtmlContent("");
+        setTextContent("");
+        if (onSave) onSave();
       } else {
         toast.error(data.error || "Failed to send newsletter", {
           description: data.details ? String(data.details) : undefined,
-        })
+        });
       }
     } catch (error) {
-      console.error("Send newsletter error:", error)
-      toast.error("An unexpected error occurred")
+      console.error("Send newsletter error:", error);
+      toast.error("An unexpected error occurred");
     } finally {
-      setIsSending(false)
+      setIsSending(false);
     }
-  }
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file")
-      return
+      toast.error("Please select an image file");
+      return;
     }
 
     // Convert to base64 for embedding
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = event.target?.result as string
-      const imgTag = `<img src="${base64}" alt="Uploaded image" style="max-width: 100%; height: auto;" />`
-      setHtmlContent((prev) => prev + "\n" + imgTag)
-      setUploadedImages((prev) => [...prev, base64])
-      toast.success("Image added to content")
-    }
-    reader.readAsDataURL(file)
-  }
+      const base64 = event.target?.result as string;
+      const imgTag = `<img src="${base64}" alt="Uploaded image" style="max-width: 100%; height: auto;" />`;
+      setHtmlContent((prev) => prev + "\n" + imgTag);
+      setUploadedImages((prev) => [...prev, base64]);
+      toast.success("Image added to content");
+    };
+    reader.readAsDataURL(file);
+  };
 
   const insertTemplate = (template: string) => {
-    setHtmlContent((prev) => prev + "\n" + template)
-    toast.success("Template inserted")
-  }
+    setHtmlContent((prev) => prev + "\n" + template);
+    toast.success("Template inserted");
+  };
 
-  const siteUrl = typeof window !== "undefined" ? window.location.origin : ""
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   const templates = {
     header: `<div style="text-align: center; padding: 20px; background: #f8f9fa;">
@@ -169,7 +181,7 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
     <a href="{{unsubscribe}}" style="color: #6b7280;">Unsubscribe</a>
   </p>
 </div>`,
-  }
+  };
 
   return (
     <Card className="shadow-sm">
@@ -178,9 +190,12 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold">Create Newsletter Campaign</h3>
+              <h3 className="text-xl font-semibold">
+                Create Newsletter Campaign
+              </h3>
               <p className="text-sm text-muted-foreground mt-1">
-                To: {subscriberCount} subscriber{subscriberCount !== 1 ? "s" : ""}
+                To: {subscriberCount} subscriber
+                {subscriberCount !== 1 ? "s" : ""}
               </p>
             </div>
             <div className="flex gap-2">
@@ -246,7 +261,12 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
               {/* Image Upload */}
               <div className="flex items-center gap-4">
                 <Label htmlFor="image-upload" className="cursor-pointer">
-                  <Button type="button" variant="outline" className="gap-2" asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="gap-2"
+                    asChild
+                  >
                     <span>
                       <ImageIcon className="h-4 w-4" />
                       Upload Image
@@ -279,13 +299,16 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
                   disabled={isSaving || isSending}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Use HTML for rich formatting. You can use {"{{name}}"} to personalize with subscriber names.
+                  Use HTML for rich formatting. You can use {"{{name}}"} to
+                  personalize with subscriber names.
                 </p>
               </div>
 
               {/* Plain Text Content */}
               <div className="space-y-2">
-                <Label htmlFor="textContent">Plain Text Content (Optional)</Label>
+                <Label htmlFor="textContent">
+                  Plain Text Content (Optional)
+                </Label>
                 <Textarea
                   id="textContent"
                   value={textContent}
@@ -302,13 +325,15 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
             </TabsContent>
 
             <TabsContent value="preview" className="mt-4">
-              <div className="border rounded-lg p-6 bg-white">
+              <div className="rounded-lg border bg-card p-6 text-card-foreground">
                 <div className="mb-4 pb-4 border-b">
                   <p className="text-sm text-muted-foreground">Subject:</p>
                   <p className="font-semibold">{subject || "No subject"}</p>
                 </div>
                 <div
-                  dangerouslySetInnerHTML={{ __html: htmlContent || "<p>No content yet</p>" }}
+                  dangerouslySetInnerHTML={{
+                    __html: htmlContent || "<p>No content yet</p>",
+                  }}
                   className="prose max-w-none"
                 />
               </div>
@@ -316,22 +341,37 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
 
             <TabsContent value="templates" className="mt-4 space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
-                <Card className="cursor-pointer hover:border-primary transition-colors" onClick={() => insertTemplate(templates.header)}>
+                <Card
+                  className="cursor-pointer hover:border-primary transition-colors"
+                  onClick={() => insertTemplate(templates.header)}
+                >
                   <CardContent className="pt-6">
                     <h4 className="font-semibold mb-2">Header</h4>
-                    <p className="text-xs text-muted-foreground">Branded header with logo</p>
+                    <p className="text-xs text-muted-foreground">
+                      Branded header with logo
+                    </p>
                   </CardContent>
                 </Card>
-                <Card className="cursor-pointer hover:border-primary transition-colors" onClick={() => insertTemplate(templates.product)}>
+                <Card
+                  className="cursor-pointer hover:border-primary transition-colors"
+                  onClick={() => insertTemplate(templates.product)}
+                >
                   <CardContent className="pt-6">
                     <h4 className="font-semibold mb-2">Product Card</h4>
-                    <p className="text-xs text-muted-foreground">Product showcase template</p>
+                    <p className="text-xs text-muted-foreground">
+                      Product showcase template
+                    </p>
                   </CardContent>
                 </Card>
-                <Card className="cursor-pointer hover:border-primary transition-colors" onClick={() => insertTemplate(templates.footer)}>
+                <Card
+                  className="cursor-pointer hover:border-primary transition-colors"
+                  onClick={() => insertTemplate(templates.footer)}
+                >
                   <CardContent className="pt-6">
                     <h4 className="font-semibold mb-2">Footer</h4>
-                    <p className="text-xs text-muted-foreground">Email footer with unsubscribe</p>
+                    <p className="text-xs text-muted-foreground">
+                      Email footer with unsubscribe
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -341,12 +381,13 @@ export function NewsletterEditor({ subscriberCount, campaignId, initialData, onS
           {subscriberCount === 0 && (
             <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
               <AlertCircle className="h-4 w-4" />
-              <span>No subscribers to send to. Encourage users to sign up!</span>
+              <span>
+                No subscribers to send to. Encourage users to sign up!
+              </span>
             </div>
           )}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

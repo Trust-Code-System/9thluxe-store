@@ -170,7 +170,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps = {}) {
           id="search-suggestions"
           ref={listRef}
           role="listbox"
-          className="panel absolute z-50 mt-2 max-h-[70vh] w-[28rem] max-w-[90vw] overflow-auto p-2"
+          className="panel absolute z-[var(--z-popover)] mt-2 max-h-[70vh] w-[28rem] max-w-[90vw] overflow-auto p-2"
         >
           {items.map((item, index) => {
             const images = normalizeImages(item.images)
@@ -212,7 +212,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps = {}) {
       )}
 
       {open && items.length === 0 && debouncedQuery.trim().length >= 2 && (
-        <div className="panel absolute z-50 mt-2 w-[28rem] max-w-[90vw] p-3 text-sm text-muted-foreground">
+        <div className="panel absolute z-[var(--z-popover)] mt-2 w-[28rem] max-w-[90vw] p-3 text-sm text-muted-foreground">
           No results for "{debouncedQuery}"
         </div>
       )}

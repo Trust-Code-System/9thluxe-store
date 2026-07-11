@@ -21,8 +21,8 @@ interface Condition {
 }
 
 const CONDITIONS: Condition[] = [
-  { key: "lagos", label: "Lagos — heat & humidity", hint: "Hot, humid, coastal" },
-  { key: "abuja", label: "Abuja — dry heat", hint: "Warm, dry" },
+  { key: "lagos", label: "Lagos: heat & humidity", hint: "Hot, humid, coastal" },
+  { key: "abuja", label: "Abuja: dry heat", hint: "Warm, dry" },
   { key: "rainy", label: "Rainy season", hint: "Cooler, damp" },
   { key: "harmattan", label: "Harmattan", hint: "Dry, dusty, cool mornings" },
   { key: "office", label: "Air-conditioned office", hint: "Cool, enclosed" },
@@ -32,7 +32,7 @@ const CONDITIONS: Condition[] = [
 
 /**
  * Locally relevant, DESCRIPTIVE climate guidance. It derives a cautious verdict from the product's
- * real family/concentration/performance strings — never a medical, chemical, or guaranteed-performance
+ * real family/concentration/performance strings, never a medical, chemical, or guaranteed-performance
  * claim. The customer chooses a condition manually; geolocation is never requested.
  */
 export function ClimateGuidance({
@@ -113,7 +113,7 @@ export function ClimateGuidance({
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{guidanceText(verdict, active.label)}</p>
       </div>
       <p className="mt-3 text-xs italic text-muted-foreground">
-        Descriptive guidance based on this fragrance&apos;s style — not a performance guarantee. Skin, application and the
+        Descriptive guidance based on this fragrance&apos;s style, not a performance guarantee. Skin, application and the
         day itself all change how a scent behaves.
       </p>
     </div>
@@ -123,14 +123,14 @@ export function ClimateGuidance({
 function guidanceText(verdict: Verdict, condition: string): string {
   switch (verdict) {
     case "excellent":
-      return `This composition tends to shine in ${condition.toLowerCase()} — expect it to project pleasantly without needing much.`
+      return `This composition tends to shine in ${condition.toLowerCase()}. Expect it to project pleasantly without needing much.`
     case "good":
       return `A comfortable match for ${condition.toLowerCase()}. A couple of sprays should carry you through.`
     case "controlled":
-      return `Rich for ${condition.toLowerCase()} — apply lightly (one or two sprays) so it reads elegant rather than heavy.`
+      return `Rich for ${condition.toLowerCase()}. Apply lightly (one or two sprays) so it reads elegant rather than heavy.`
     case "evening":
       return `Leans expressive; it often suits ${condition.toLowerCase()} best when the air is cooler.`
     default:
-      return `Everyone wears this differently — a sample is the surest way to know how it behaves for you in ${condition.toLowerCase()}.`
+      return `Everyone wears this differently. A sample is the surest way to know how it behaves for you in ${condition.toLowerCase()}.`
   }
 }

@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Loader2, Sparkles, Check, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { SmartProductCard } from "./smart-product-card"
 import { trackPdp } from "@/lib/analytics/pdp-events"
@@ -30,7 +31,7 @@ const OCCASIONS = ["Everyday", "Office", "Evening", "Wedding", "Date"]
 const CLIMATES = ["Lagos humid", "Abuja dry", "Rainy", "Harmattan", "AC office"]
 
 /**
- * "Will this suit me?" — optional, AI-ASSISTED fit guidance. It reasons ONLY over this product's real
+ * "Will this suit me?": optional, AI-ASSISTED fit guidance. It reasons ONLY over this product's real
  * attributes and, for alternatives, over the catalogue-grounded recommender (which never invents a
  * product, price, or note). The match is computed transparently from your inputs; we show exactly
  * which attributes matched or conflicted. Output is labelled guidance, not a guarantee, and internal
@@ -165,7 +166,7 @@ export function AiFitCheck({ product }: { product: ProductFacts }) {
       </span>
       <h3 className="font-serif text-xl">Will this suit me?</h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        Tell us what you love and we&apos;ll check it against this fragrance&apos;s real profile — and suggest grounded
+        Tell us what you love and we&apos;ll check it against this fragrance&apos;s real profile, and suggest grounded
         alternatives from our catalogue. Guidance only, never a guarantee.
       </p>
 
@@ -177,24 +178,34 @@ export function AiFitCheck({ product }: { product: ProductFacts }) {
           <input className={inputCls} value={disliked} onChange={(e) => setDisliked(e.target.value)} placeholder="anise" />
         </Field>
         <Field label="Occasion">
-          <select className={inputCls} value={occasion} onChange={(e) => setOccasion(e.target.value)}>
-            <option value="">Any</option>
-            {OCCASIONS.map((o) => (
-              <option key={o} value={o}>
-                {o}
-              </option>
-            ))}
-          </select>
+          <Select value={occasion || "any"} onValueChange={(v) => setOccasion(v === "any" ? "" : v)}>
+            <SelectTrigger className="h-10 rounded-lg" aria-label="Occasion">
+              <SelectValue placeholder="Any" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any</SelectItem>
+              {OCCASIONS.map((o) => (
+                <SelectItem key={o} value={o}>
+                  {o}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
         <Field label="Climate">
-          <select className={inputCls} value={climate} onChange={(e) => setClimate(e.target.value)}>
-            <option value="">Any</option>
-            {CLIMATES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          <Select value={climate || "any"} onValueChange={(v) => setClimate(v === "any" ? "" : v)}>
+            <SelectTrigger className="h-10 rounded-lg" aria-label="Climate">
+              <SelectValue placeholder="Any" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any</SelectItem>
+              {CLIMATES.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
         <Field label="Budget (₦)">
           <input
@@ -229,7 +240,7 @@ export function AiFitCheck({ product }: { product: ProductFacts }) {
               <p className="text-sm font-medium">
                 {result.score >= 70 ? "Strong match" : result.score >= 45 ? "Worth exploring" : "May not be your best fit"}
               </p>
-              <p className="text-xs text-muted-foreground">AI-assisted — based only on this fragrance&apos;s real data.</p>
+              <p className="text-xs text-muted-foreground">AI-assisted, based only on this fragrance&apos;s real data.</p>
             </div>
           </div>
 

@@ -21,6 +21,7 @@ export type PdpEventName =
   | "comparison_completed"
   | "note_selected"
   | "accord_selected"
+  | "ingredient_opened"
   | "review_filter_used"
   | "question_searched"
   | "question_submitted"
@@ -71,7 +72,7 @@ export function trackPdp(name: PdpEventName, payload: Payload = {}): void {
     if (Array.isArray(w.dataLayer)) {
       w.dataLayer.push({ event: `pdp.${name}`, ...clean })
     }
-    // Dev visibility only — never in production bundles' hot path beyond a guarded log.
+    // Dev visibility only; never in production bundles' hot path beyond a guarded log.
     if (process.env.NODE_ENV !== "production") {
       console.debug(`[analytics] pdp.${name}`, clean)
     }

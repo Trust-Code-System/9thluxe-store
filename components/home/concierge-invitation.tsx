@@ -1,44 +1,56 @@
-import Link from "next/link"
-import { Sparkles, ArrowRight, MessageCircle } from "lucide-react"
+"use client";
+
+import Link from "next/link";
+import { ArrowRight, MessageCircle } from "lucide-react";
+
+import { LogoMark } from "@/components/logo";
+import { Reveal } from "@/components/motion";
 
 export function ConciergeInvitation() {
   return (
-    <section className="py-16 lg:py-24">
-      <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-espresso px-6 py-14 text-center sm:px-12 lg:py-20">
-          {/* Ambient amber glow */}
-          <div className="amber-glow pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl" aria-hidden />
-
-          <div className="relative z-10 mx-auto max-w-xl text-[#f4efe7]">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber/15 text-amber">
-              <Sparkles className="h-5 w-5" />
-            </span>
-            <h2 className="mt-6 font-serif text-3xl font-semibold tracking-tight md:text-4xl">
-              Not sure where to start?
-            </h2>
-            <p className="mt-4 leading-relaxed text-[#e6ddcd]/85">
-              Describe a mood, a memory or an occasion. The Scent Concierge listens and
-              recommends real, in-stock fragrances from our house — no guesswork.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/concierge"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-amber px-7 text-sm font-medium text-[#1b140f] transition-colors hover:bg-amber/90"
-              >
-                <MessageCircle className="h-4 w-4" />
-                Talk to the Concierge
-              </Link>
-              <Link
-                href="/find-your-fragrance"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[#e6ddcd]/25 px-7 text-sm font-medium text-[#f4efe7] transition-colors hover:bg-[#f4efe7]/10"
-              >
-                Take the quick guide
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+    <section
+      data-surface="night"
+      className="veil grain relative overflow-hidden bg-background py-20 text-foreground lg:py-28"
+    >
+      <div className="container relative z-10 mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
+        <Reveal>
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-border bg-secondary/50">
+            <LogoMark className="h-7 w-[21px] text-accent" />
+          </span>
+        </Reveal>
+        <Reveal delay={0.08}>
+          <h2 className="mt-8 text-balance">
+            Describe a <em className="text-accent">memory</em>.
+            <br />
+            We&apos;ll find the scent.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.16}>
+          <p className="mx-auto mt-5 max-w-md leading-relaxed text-muted-foreground">
+            A mood, an evening, someone you remember. The Scent Concierge
+            listens and recommends real, in-stock fragrances from our house. no
+            guesswork.
+          </p>
+        </Reveal>
+        <Reveal delay={0.24}>
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/concierge"
+              className="inline-flex h-13 items-center justify-center gap-2.5 bg-primary px-8 font-mono text-[12px] uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Talk to the Concierge
+            </Link>
+            <Link
+              href="/find-your-fragrance"
+              className="group inline-flex h-13 items-center justify-center gap-2 border border-border px-8 font-mono text-[12px] uppercase tracking-[0.2em] text-foreground transition-colors hover:border-accent hover:text-accent"
+            >
+              Take the scent quiz
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
-  )
+  );
 }

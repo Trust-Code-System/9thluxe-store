@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 
 export const runtime = 'nodejs'
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await auth()
     const email = session?.user?.email
@@ -62,7 +62,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { firstName, lastName, phone, orderUpdates, promotionalEmails, wishlistAlerts } = body
+    const { firstName, lastName, phone: _phone, orderUpdates, promotionalEmails, wishlistAlerts } = body
 
     // Find user
     const user = await prisma.user.findUnique({

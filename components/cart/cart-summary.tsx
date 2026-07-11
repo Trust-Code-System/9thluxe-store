@@ -142,7 +142,7 @@ export function CartSummary({
 
     <Card className="p-6 sticky top-24">
 
-      <h2 className="font-serif text-xl font-semibold mb-6">Order Summary</h2>
+      <h2 className="mb-6 font-serif text-2xl font-light">Order summary</h2>
 
 
 

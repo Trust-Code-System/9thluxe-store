@@ -1,6 +1,6 @@
 // lib/pdp/loader.ts
 // SERVER-ONLY. Assembles the typed PdpData view model from real backend data (Prisma today). This is
-// the frontend-owned integration boundary — it does not modify any backend contract file. Every
+// the frontend-owned integration boundary; it does not modify any backend contract file. Every
 // value is real or null; nothing here fabricates commerce, review, or fragrance data.
 import "server-only"
 import { prisma } from "@/lib/prisma"
@@ -14,6 +14,8 @@ import {
   buildTimeline,
   buildScentStory,
 } from "./parse"
+import { enrichComposition } from "@/lib/fragrance/enrich"
+import { getProductTemplate } from "@/lib/fragrance/template-store"
 import type {
   PdpData,
   PdpMedia,
@@ -257,7 +259,7 @@ async function loadReviewSummary(productId: string): Promise<PdpReviewSummary | 
     value: metric("value", "Value", "Perceived value for the price paid.", agg.value),
     climateHistogram: agg.climateHistogram,
     occasionHistogram: agg.occasionHistogram,
-    imageCount: 0, // Review model has no image field yet — see backend R7-adjacent note.
+    imageCount: 0, // Review model has no image field yet; see backend R7-adjacent note.
   }
 }
 
@@ -279,6 +281,29 @@ export async function loadPdpData(slug: string): Promise<PdpData | null> {
   const accords = toAccords(p.mainAccords)
   const moodTags = splitList(p.moodTags)
   const variants = buildVariants(p)
+
+  // Visual scent-intelligence composition, derived purely from the product's real fragrance data.
+  // Returns null when there are no notes at all, so the composition sections simply do not render.
+  const hasAnyNotes = notesTop.length + notesHeart.length + notesBase.length > 0
+  const composition = hasAnyNotes
+    ? enrichComposition({
+        top: notesTop.map((n) => n.name),
+        heart: notesHeart.map((n) => n.name),
+        base: notesBase.map((n) => n.name),
+        accords: accords.map((a) => a.name),
+        family: p.fragranceFamily,
+        olfactoryDesc: p.olfactoryDesc,
+        moods: moodTags,
+        season: p.season,
+        climate: p.climate,
+        timeOfDay: p.timeOfDay,
+        occasion: p.occasion,
+      })
+    : null
+  // Apply the admin's saved template override, if any (resilient: null when unset or unavailable).
+  if (composition) {
+    composition.selectedTemplate = await getProductTemplate(p.id)
+  }
   const hasSample = variants.some((v) => v.isSample && v.inStock)
 
   const [reviewSummary, brandOthers, perfumerOthers] = await Promise.all([
@@ -344,6 +369,7 @@ export async function loadPdpData(slug: string): Promise<PdpData | null> {
     notesBase,
     accords,
     moodTags,
+    composition,
 
     performance: buildPerformance(reviewSummary),
 
@@ -381,7 +407,7 @@ export async function loadPdpData(slug: string): Promise<PdpData | null> {
     perfumer: p.perfumer
       ? {
           name: p.perfumer,
-          bio: null, // no perfumer bio column; never AI-invented — see backend R1
+          bio: null, // no perfumer bio column; never AI-invented; see backend R1
           otherProducts: perfumerCards,
         }
       : null,

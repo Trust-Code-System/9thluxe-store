@@ -1,25 +1,31 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Search } from "lucide-react"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import SearchBar from "@/components/SearchBar"
+import * as React from "react";
+import { Search } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import SearchBar from "@/components/SearchBar";
 
 export function SearchDialog() {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
-  const handleClose = React.useCallback(() => setOpen(false), [])
+  const handleClose = React.useCallback(() => setOpen(false), []);
 
   // Close dialog when user clicks a search result (SearchBar calls onNavigate; this backs it up for outside clicks)
   React.useEffect(() => {
-    if (!open) return
+    if (!open) return;
     const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      if (target.closest('[role="option"]')) setTimeout(handleClose, 100)
-    }
-    document.addEventListener("click", handleClick)
-    return () => document.removeEventListener("click", handleClick)
-  }, [open, handleClose])
+      const target = e.target as HTMLElement;
+      if (target.closest('[role="option"]')) setTimeout(handleClose, 100);
+    };
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [open, handleClose]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -35,12 +41,16 @@ export function SearchDialog() {
       <DialogContent className="sm:max-w-[600px] p-0">
         <div className="p-6">
           <div className="mb-4">
-            <h2 className="font-serif text-2xl font-semibold mb-2">Search Products</h2>
-            <p className="text-sm text-muted-foreground">Find your favorite luxury items</p>
+            <DialogTitle className="mb-2 font-serif text-2xl font-semibold">
+              Search products
+            </DialogTitle>
+            <DialogDescription>
+              Find a fragrance in the Fádé collection.
+            </DialogDescription>
           </div>
           <SearchBar onNavigate={handleClose} />
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -122,7 +122,7 @@ export async function buildMarginReport(days = 30): Promise<MarginReport> {
     sources: {
       revenue: 'Order.totalNGN (status in PAID/SHIPPED/DELIVERED, windowed)',
       cogs: 'sum(OrderItem.quantity * Product.costPriceNGN) where cost present',
-      paymentFee: 'paymentFee(order.totalNGN) — Paystack NGN model',
+      paymentFee: 'paymentFee(order.totalNGN): Paystack NGN model',
       discount: 'sum(Order.discountNGN)',
     },
   }

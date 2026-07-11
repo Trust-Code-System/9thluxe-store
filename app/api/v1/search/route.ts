@@ -1,5 +1,5 @@
 // app/api/v1/search/route.ts
-// GET /api/v1/search — faceted search (hard filters applied in the provider before any ranking).
+// GET /api/v1/search: faceted search (hard filters applied in the provider before any ranking).
 import { route } from '@/lib/http/handler'
 import { getSearch } from '@/integrations/registry'
 import type { SearchFilters } from '@/integrations/search/types'

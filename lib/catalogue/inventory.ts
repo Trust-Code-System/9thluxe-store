@@ -1,6 +1,6 @@
 // lib/catalogue/inventory.ts
 // Inventory service. Source of truth for stock is the local Postgres `Product.stock` column (see
-// docs/SHOPIFY_INTEGRATION.md — when Shopify is enabled it becomes authoritative and syncs here).
+// docs/SHOPIFY_INTEGRATION.md; when Shopify is enabled it becomes authoritative and syncs here).
 // Setting stock from 0 -> positive fires back-in-stock notifications to waiting subscribers.
 import { prisma } from '@/lib/prisma'
 import { AppError } from '@/lib/http/errors'

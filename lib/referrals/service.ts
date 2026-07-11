@@ -47,7 +47,7 @@ export async function qualifyReferral(referredUserId: string, orderId: string) {
 }
 
 /**
- * Request a reward for a qualified referral. Never pays out directly — it creates an Approval Centre
+ * Request a reward for a qualified referral. Never pays out directly; it creates an Approval Centre
  * record. Refused unless the `referral_rewards` flag is on AND the referral is QUALIFIED.
  */
 export async function requestReferralReward(referralId: string, actorId: string) {

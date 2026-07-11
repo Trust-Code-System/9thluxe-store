@@ -8,7 +8,7 @@ import type { PdpAccord } from "@/lib/pdp/types"
 
 /**
  * Ranked main accords as proportional bars. The width encodes RANK ORDER (strongest = full width),
- * NOT a fabricated laboratory percentage — there is no numeric claim on screen. Rank number carries
+ * NOT a fabricated laboratory percentage: there is no numeric claim on screen. Rank number carries
  * the meaning for screen readers and colour is never the only signal. Each accord links to an
  * exploration of the catalogue.
  */

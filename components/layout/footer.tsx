@@ -1,343 +1,209 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
-import Link from "next/link"
-
-import { Shield, Truck, RotateCcw, BadgeCheck } from "lucide-react"
-
-import { Input } from "@/components/ui/input"
-
-import { Button } from "@/components/ui/button"
-
-import { toast } from "sonner"
-
-import { SocialLinks } from "@/components/footer/SocialLinks"
-
-
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { SocialLinks } from "@/components/footer/SocialLinks";
 
 const shopLinks = [
-  { name: "Perfumes", href: "/category/perfumes" },
+  { name: "All perfumes", href: "/shop" },
   { name: "Collections", href: "/collections" },
-  { name: "Limited Drops", href: "/drops" },
+  { name: "Limited drops", href: "/drops" },
+  { name: "New arrivals", href: "/shop?sort=newest" },
+];
+
+const discoverLinks = [
+  { name: "Find your fragrance", href: "/find-your-fragrance" },
+  { name: "Scent discovery", href: "/discovery" },
+  { name: "Concierge", href: "/concierge" },
   { name: "The Journal", href: "/journal" },
-]
-
-
+];
 
 const helpLinks = [
-
   { name: "FAQ", href: "/help/faq" },
+  { name: "Contact us", href: "/help/contact" },
+  { name: "Returns & exchanges", href: "/help/returns" },
+  { name: "Shipping", href: "/help/shipping" },
+];
 
-  { name: "Contact Us", href: "/help/contact" },
+const companyLinks = [
+  { name: "About Fádé", href: "/about" },
+  { name: "Privacy policy", href: "/privacy" },
+  { name: "Terms of service", href: "/terms" },
+  { name: "My account", href: "/account" },
+];
 
-  { name: "Returns & Exchanges", href: "/help/returns" },
-
-  { name: "Shipping Info", href: "/help/shipping" },
-
-]
-
-
-
-
-
+function LinkColumn({
+  title,
+  links,
+}: {
+  title: string;
+  links: { name: string; href: string }[];
+}) {
+  return (
+    <div>
+      <h3 className="mb-5 font-mono text-[11px] font-medium uppercase tracking-[0.28em] text-muted-foreground">
+        {title}
+      </h3>
+      <ul className="space-y-3">
+        {links.map((link) => (
+          <li key={link.name}>
+            <Link
+              href={link.href}
+              className="text-sm text-foreground/75 transition-colors hover:text-foreground"
+            >
+              {link.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export function Footer() {
-
-  const [email, setEmail] = React.useState("")
-
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
-
-
+  const [email, setEmail] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
-
-    e.preventDefault()
-
+    e.preventDefault();
     if (!email || !email.includes("@")) {
-
       toast.error("Invalid email", {
-
         description: "Please enter a valid email address.",
-
-      })
-
-      return
-
+      });
+      return;
     }
 
-
-
-    setIsSubmitting(true)
-
+    setIsSubmitting(true);
     try {
-
       const response = await fetch("/api/newsletter/subscribe", {
-
         method: "POST",
-
-        headers: {
-
-          "Content-Type": "application/json",
-
-        },
-
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
+      });
 
-      })
-
-
-
-      const data = await response.json()
-
-
+      const data = await response.json();
 
       if (!response.ok) {
-
-        throw new Error(data.error || "Failed to subscribe")
-
+        throw new Error(data.error || "Failed to subscribe");
       }
-
-
 
       if (data.alreadySubscribed) {
-
         toast.info("Already subscribed", {
-
-          description: "You're already subscribed to our newsletter!",
-
-        })
-
+          description: "You're already on the list.",
+        });
       } else {
-
-        toast.success("Subscribed successfully!", {
-
-          description: "Thank you for subscribing. You'll receive our latest updates and exclusive offers.",
-
-        })
-
+        toast.success("Subscribed", {
+          description: "Welcome. New scents and stories, occasionally.",
+        });
       }
-
-      setEmail("")
-
-    } catch (error: any) {
-
+      setEmail("");
+    } catch (error) {
       toast.error("Subscription failed", {
-
-        description: error.message || "Please try again later.",
-
-      })
-
+        description:
+          error instanceof Error ? error.message : "Please try again later.",
+      });
     } finally {
-
-      setIsSubmitting(false)
-
+      setIsSubmitting(false);
     }
-
-  }
-
-
-
-  const trustStrip = [
-    { icon: Shield, label: "Secure payment", detail: "SSL & Paystack" },
-    { icon: Truck, label: "Free shipping", detail: "On orders over ₦500,000" },
-    { icon: RotateCcw, label: "Easy returns", detail: "7-day comfort policy" },
-    { icon: BadgeCheck, label: "Authenticity", detail: "100% genuine" },
-  ]
+  };
 
   return (
-
-    <footer className="bg-card border-t border-border">
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-
-        {/* Trust strip - e-commerce best practice: reassurance site-wide */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-12 pb-8 border-b border-border">
-          {trustStrip.map(({ icon: Icon, label, detail }) => (
-            <div key={label} className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent">
-                <Icon className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">{label}</p>
-                <p className="text-xs text-muted-foreground">{detail}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
-
-          {/* Brand Column */}
-
-          <div className="lg:col-span-1">
-
-            <Link href="/" className="font-serif text-2xl font-semibold">
-
-              Fádé
-
-            </Link>
-
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-
-              Curated luxury perfumes. We bring you the finest selection of premium fragrances
-
-              for the discerning individual.
-
+    <footer
+      data-surface="fixed-dark"
+      className="relative overflow-hidden border-t border-border bg-background text-foreground"
+    >
+      <div className="container relative z-10 mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        {/* Newsletter */}
+        <div className="mb-16 grid gap-10 border-b border-border/70 pb-16 lg:grid-cols-2 lg:items-end">
+          <div>
+            <p className="eyebrow mb-4">The Sillage letter</p>
+            <h2 className="font-serif text-3xl font-light md:text-4xl">
+              Leave a trail<span className="text-accent">.</span>
+            </h2>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+              New arrivals, limited drops and notes from the atelier. Sent
+              occasionally, written carefully.
             </p>
-
           </div>
-
-
-
-          {/* Shop Links */}
-
-          <div>
-
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4">Shop</h3>
-
-            <ul className="space-y-3">
-
-              {shopLinks.map((link) => (
-
-                <li key={link.name}>
-
-                  <Link
-
-                    href={link.href}
-
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-
-                  >
-
-                    {link.name}
-
-                  </Link>
-
-                </li>
-
-              ))}
-
-            </ul>
-
-          </div>
-
-
-
-          {/* Help Links */}
-
-          <div>
-
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4">Help</h3>
-
-            <ul className="space-y-3">
-
-              {helpLinks.map((link) => (
-
-                <li key={link.name}>
-
-                  <Link
-
-                    href={link.href}
-
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-
-                  >
-
-                    {link.name}
-
-                  </Link>
-
-                </li>
-
-              ))}
-
-            </ul>
-
-          </div>
-
-
-
-          {/* Newsletter */}
-
-          <div className="min-w-0">
-
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4">Newsletter</h3>
-
-            <p className="text-sm text-muted-foreground mb-4">Subscribe for exclusive offers and new arrivals.</p>
-
-            <form onSubmit={handleNewsletterSubmit} className="flex gap-2 min-w-0 w-full">
-
-              <Input
-
-                type="email"
-
-                placeholder="Your email"
-
-                value={email}
-
-                onChange={(e) => setEmail(e.target.value)}
-
-                required
-
-                disabled={isSubmitting}
-
-                className="flex-1 min-w-0 h-10 px-4 sm:px-6"
-
-              />
-
-              <Button type="submit" size="sm" className="h-10 px-3 sm:px-4 shrink-0" disabled={isSubmitting}>
-
-                {isSubmitting ? (
-
-                  <span>...</span>
-
-                ) : (
-
-                  <>
-
-                    <span className="hidden sm:inline">Subscribe</span>
-
-                    <span className="sm:hidden">Join</span>
-
-                  </>
-
-                )}
-
-              </Button>
-
-            </form>
-
-          </div>
-
+          <form
+            onSubmit={handleNewsletterSubmit}
+            className="flex w-full max-w-md gap-0 lg:ml-auto"
+          >
+            <label htmlFor="footer-newsletter-email" className="sr-only">
+              Email address
+            </label>
+            <Input
+              id="footer-newsletter-email"
+              type="email"
+              autoComplete="email"
+              placeholder="Your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-12 rounded-none border-0 border-b border-border bg-transparent px-0 text-sm focus-visible:border-accent focus-visible:ring-0"
+            />
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              variant="ghost"
+              className="h-12 shrink-0 rounded-none border-b border-border px-4 font-mono text-[11px] uppercase tracking-[0.24em] hover:border-accent hover:bg-transparent hover:text-accent"
+            >
+              {isSubmitting ? "Sending…" : "Subscribe"}
+              <ArrowRight className="ml-1 h-3.5 w-3.5" />
+            </Button>
+          </form>
         </div>
 
+        {/* Link columns */}
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4 lg:gap-8">
+          <LinkColumn title="Shop" links={shopLinks} />
+          <LinkColumn title="Discover" links={discoverLinks} />
+          <LinkColumn title="Help" links={helpLinks} />
+          <LinkColumn title="Company" links={companyLinks} />
+        </div>
 
-
-        {/* Bottom Section */}
-
-        <div className="mt-12 pt-8 border-t border-border">
-
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-
-            {/* Social Links */}
-
+        {/* Bottom bar */}
+        <div className="mt-16 flex flex-col gap-6 border-t border-border/70 pt-8 md:flex-row md:items-center md:justify-between">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+            © {new Date().getFullYear()} Fádé Essence · Lagos, Nigeria
+          </p>
+          <div className="flex items-center gap-6">
+            <p className="hidden font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground sm:block">
+              Secure payment via Paystack
+            </p>
             <SocialLinks />
-
-
-
-            {/* Copyright */}
-
-            <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Fádé. All rights reserved.</p>
-
           </div>
-
         </div>
-
       </div>
 
+      {/* Watermark wordmark */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none overflow-hidden pb-2"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          viewBox="0 0 1200 220"
+          className="mx-auto block h-auto w-full max-w-[1200px] text-foreground/[0.04]"
+        >
+          <text
+            x="600"
+            y="190"
+            textAnchor="middle"
+            fill="currentColor"
+            fontSize="240"
+            fontWeight="300"
+            style={{ fontFamily: "var(--font-fraunces), Georgia, serif" }}
+          >
+            Fádé
+          </text>
+        </svg>
+      </div>
     </footer>
-
-  )
-
+  );
 }

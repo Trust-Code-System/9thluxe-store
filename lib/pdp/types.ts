@@ -1,10 +1,12 @@
 // lib/pdp/types.ts
 // Typed frontend view model for the product-detail + discovery experience. This is the
 // frontend-owned integration boundary: `lib/pdp/loader.ts` assembles it from real backend data
-// (Prisma today; the widened CommerceProduct DTO tomorrow — see docs/PDP_BACKEND_REQUIREMENTS.md).
+// (Prisma today; the widened CommerceProduct DTO tomorrow; see docs/PDP_BACKEND_REQUIREMENTS.md).
 //
 // Every field is designed so a section can decide, purely from the data, whether it has anything
 // meaningful to show. Absent data is `null`/`[]`, never a fabricated placeholder.
+
+import type { ScentComposition } from "@/lib/fragrance/types"
 
 /** Where a subjective/attribute value came from. Rendered as a truthful provenance chip. */
 export type Provenance = "BRAND" | "EDITORIAL" | "CUSTOMER_AGGREGATE"
@@ -192,6 +194,13 @@ export interface PdpData {
   notesBase: PdpNote[]
   accords: PdpAccord[]
   moodTags: string[]
+
+  /**
+   * Full visual scent-intelligence composition (matched ingredients, perceived prominence, timeline,
+   * template recommendation). Built from the product's real notes by the enrichment pipeline. null
+   * when the product has no note data at all, so the composition sections hide gracefully.
+   */
+  composition: ScentComposition | null
 
   // subjective performance (labelled, editorial/aggregate)
   performance: PdpPerformanceMetric[]

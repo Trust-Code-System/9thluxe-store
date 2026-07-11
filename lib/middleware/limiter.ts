@@ -1,7 +1,7 @@
 // lib/middleware/limiter.ts
 // Rate-limiter abstraction with a pluggable store. Fixed-window counters.
 //  - Default: in-memory (per serverless instance). Correct for single-instance/dev; on multi-instance
-//    serverless it under-counts across instances — a documented limitation.
+//    serverless it under-counts across instances; a documented limitation.
 //  - Durable: Upstash Redis REST store (fetch-based, no extra dependency) when UPSTASH_REDIS_REST_URL
 //    + UPSTASH_REDIS_REST_TOKEN are set. This gives cross-instance durable limiting.
 import { env } from '@/lib/env'
@@ -73,7 +73,7 @@ function store(): RateLimitStore {
 
 /**
  * Consume one request against a fixed-window limit. Fails OPEN (allows the request) if the durable
- * store errors, so a limiter outage never takes down the API — the error is logged.
+ * store errors, so a limiter outage never takes down the API; the error is logged.
  */
 export async function consumeRateLimit(identifier: string, limit: number, windowMs: number): Promise<RateLimitResult> {
   const key = `rl:${identifier}`

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getAdminProducts } from "@/lib/services/product-service"
 import { DeleteButton } from "./delete-button"
@@ -79,14 +80,15 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
                   className="h-10 pl-10 pr-3"
                 />
               </div>
-              <select
-                name="category"
-                defaultValue={categorySlug}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:w-44"
-              >
-                <option value="all">All categories</option>
-                <option value="perfumes">Perfumes</option>
-              </select>
+              <Select name="category" defaultValue={categorySlug}>
+                <SelectTrigger className="h-10 w-full sm:w-44" aria-label="Filter by category">
+                  <SelectValue placeholder="All categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All categories</SelectItem>
+                  <SelectItem value="perfumes">Perfumes</SelectItem>
+                </SelectContent>
+              </Select>
               <Button type="submit" variant="outline" size="sm" className="h-10 px-4">
                 Filter
               </Button>
@@ -115,7 +117,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
                 <TableBody>
                   {products.map((product) => {
                     const images = Array.isArray(product.images) ? (product.images as string[]) : []
-                    const mainImage = images[0] || "/placeholder.svg"
+                    const mainImage = images[0] || "/placeholder-flacon.svg"
                     const inStock = product.stock > 0
 
                     return (
@@ -139,7 +141,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
                           </div>
                         </TableCell>
                         <TableCell className="text-sm">
-                          {categoryLabels[product.category] || "—"}
+                          {categoryLabels[product.category] || "N/A"}
                         </TableCell>
                         <TableCell className="text-sm">
                           {formatPrice(product.priceNGN)}

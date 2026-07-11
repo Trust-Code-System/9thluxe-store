@@ -13,7 +13,7 @@ interface ReviewStatusProps {
 
 export function ReviewStatus({ orderId, items }: ReviewStatusProps) {
   const hasReviewed = useReviewStore((state) => state.hasReviewed)
-  const getReviewByOrderAndProduct = useReviewStore((state) => state.getReviewByOrderAndProduct)
+  const _getReviewByOrderAndProduct = useReviewStore((state) => state.getReviewByOrderAndProduct)
 
   const allReviewed = items.every((item) => hasReviewed(orderId, item.product.id))
   const someReviewed = items.some((item) => hasReviewed(orderId, item.product.id))

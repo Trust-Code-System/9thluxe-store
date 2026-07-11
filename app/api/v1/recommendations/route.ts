@@ -1,5 +1,5 @@
 // app/api/v1/recommendations/route.ts
-// GET /api/v1/recommendations — catalogue-grounded recommendations. Never returns an unavailable
+// GET /api/v1/recommendations: catalogue-grounded recommendations. Never returns an unavailable
 // product as available (enforced by the engine).
 import { route } from '@/lib/http/handler'
 import { getSearch, getCommerce, getAi } from '@/integrations/registry'

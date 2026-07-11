@@ -1,9 +1,9 @@
 import { journalArticles, articleContent } from "@/lib/journal-articles"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, ArrowUpRight } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { MainLayout } from "@/components/layout/main-layout"
 import { ProductCard } from "@/components/ui/product-card"
 import { mapPrismaProductToCard } from "@/lib/queries/products"
 import type { Metadata } from "next"
@@ -26,7 +26,11 @@ export async function generateMetadata({
   }
 }
 
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
   const article = journalArticles.find((a) => a.slug === slug)
   if (!article) notFound()
@@ -46,87 +50,99 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   }
 
   return (
-    <article className="py-16">
-      <div className="container mx-auto max-w-[800px] px-6 space-y-10">
-        {/* Back link */}
-        <Link
-          href="/journal"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          The Journal
-        </Link>
+    <MainLayout>
+      <article
+        data-surface="night"
+        className="grain relative bg-background py-14 text-foreground lg:py-20"
+      >
+        <div className="container relative z-10 mx-auto max-w-[760px] px-4 sm:px-6">
+          {/* Back link */}
+          <Link
+            href="/journal"
+            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-accent"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            The Journal
+          </Link>
 
-        {/* Header */}
-        <header className="space-y-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            <Badge variant="secondary">{article.category}</Badge>
-            <span className="text-xs text-muted-foreground">{article.readTime}</span>
-            <span className="text-xs text-muted-foreground">·</span>
-            <span className="text-xs text-muted-foreground">
-              {new Date(article.date).toLocaleDateString("en-NG", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-semibold leading-tight">{article.title}</h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">{article.excerpt}</p>
-        </header>
-
-        {/* Hero image placeholder */}
-        <div className="aspect-[16/7] rounded-2xl overflow-hidden bg-muted">
-          <div className="w-full h-full bg-gradient-to-br from-primary/15 via-primary/5 to-muted" />
-        </div>
-
-        {/* Body */}
-        <div className="space-y-6">
-          {paragraphs.map((para, i) => (
-            <p key={i} className="text-base leading-relaxed text-muted-foreground">
-              {para}
+          {/* Header */}
+          <header className="mt-10">
+            <div className="flex flex-wrap items-center gap-4 font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+              <span className="text-accent">{article.category}</span>
+              <span aria-hidden>·</span>
+              <span>{article.readTime}</span>
+              <span aria-hidden>·</span>
+              <span>
+                {new Date(article.date).toLocaleDateString("en-NG", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            <h1 className="mt-6 text-balance font-serif text-4xl font-light leading-[1.08] tracking-[-0.01em] md:text-5xl">
+              {article.title}
+            </h1>
+            <p className="mt-6 font-serif text-lg italic leading-relaxed text-muted-foreground md:text-xl">
+              {article.excerpt}
             </p>
-          ))}
-        </div>
+          </header>
 
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <div className="border-t border-border pt-10 space-y-6">
-            <h2 className="text-xl font-semibold">Shop What&apos;s Referenced</h2>
-            <div className="grid gap-6 sm:grid-cols-2">
-              {relatedProducts.map((p) => (
-                <ProductCard key={p.id} product={mapPrismaProductToCard(p)} />
+          <div className="rule-fade my-10" aria-hidden />
+
+          {/* Body */}
+          <div className="space-y-7">
+            {paragraphs.map((para, i) => (
+              <p
+                key={i}
+                className="text-base leading-[1.85] text-foreground/85 first:first-letter:float-left first:first-letter:mr-3 first:first-letter:font-serif first:first-letter:text-6xl first:first-letter:leading-[0.85] first:first-letter:text-accent"
+              >
+                {para}
+              </p>
+            ))}
+          </div>
+
+          {/* Related Products */}
+          {relatedProducts.length > 0 && (
+            <div className="mt-16 border-t border-border pt-12">
+              <p className="eyebrow mb-8">Referenced in this story</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6">
+                {relatedProducts.map((p) => (
+                  <ProductCard key={p.id} product={mapPrismaProductToCard(p)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* More Articles */}
+          <div className="mt-16 border-t border-border pt-12">
+            <p className="eyebrow mb-6">More from the Journal</p>
+            <div className="border-t border-border">
+              {others.map((a) => (
+                <Link
+                  key={a.slug}
+                  href={`/journal/${a.slug}`}
+                  className="group grid grid-cols-[1fr_auto] items-baseline gap-x-6 border-b border-border py-5 transition-colors hover:bg-secondary/40"
+                >
+                  <div className="min-w-0">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                      {a.category} · {a.readTime}
+                    </p>
+                    <p className="mt-1.5 line-clamp-2 font-serif text-lg font-light leading-snug transition-colors group-hover:text-accent">
+                      {a.title}
+                    </p>
+                  </div>
+                  <ArrowUpRight
+                    className="h-4 w-4 self-center text-muted-foreground/50 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
+                    strokeWidth={1.5}
+                    aria-hidden
+                  />
+                </Link>
               ))}
             </div>
           </div>
-        )}
-
-        {/* More Articles */}
-        <div className="border-t border-border pt-10 space-y-6">
-          <h2 className="text-xl font-semibold">More from the Journal</h2>
-          <div className="space-y-4">
-            {others.map((a) => (
-              <Link
-                key={a.slug}
-                href={`/journal/${a.slug}`}
-                className="group flex items-start gap-4 p-4 rounded-xl border border-border hover:border-primary/40 transition-colors"
-              >
-                <div className="h-16 w-16 rounded-lg bg-muted shrink-0 overflow-hidden">
-                  <div className="h-full w-full bg-gradient-to-br from-primary/10 to-muted" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    {a.category} · {a.readTime}
-                  </p>
-                  <p className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                    {a.title}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </MainLayout>
   )
 }

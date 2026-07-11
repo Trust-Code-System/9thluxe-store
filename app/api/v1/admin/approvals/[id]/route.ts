@@ -1,6 +1,6 @@
 // app/api/v1/admin/approvals/[id]/route.ts
 // POST /api/v1/admin/approvals/:id  { op: 'approve' | 'reject' | 'execute' }
-// Approval and execution are SEPARATE operations — an approval is never executed at decision time.
+// Approval and execution are SEPARATE operations: an approval is never executed at decision time.
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'

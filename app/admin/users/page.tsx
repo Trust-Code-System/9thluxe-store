@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/admin'
-import Link from 'next/link'
 import { User, Mail, Calendar } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'

@@ -1,75 +1,78 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Edit, Trash2, Send, Copy, Eye, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { toast } from "sonner"
-import Link from "next/link"
+import * as React from "react";
+import { Edit, Trash2, Copy, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
 
 interface Campaign {
-  id: string
-  subject: string
-  status: "DRAFT" | "SCHEDULED" | "SENT"
-  createdAt: string
-  sentAt?: string | null
-  html: string
-  text?: string | null
+  id: string;
+  subject: string;
+  status: "DRAFT" | "SCHEDULED" | "SENT";
+  createdAt: string;
+  sentAt?: string | null;
+  html: string;
+  text?: string | null;
 }
 
 interface CampaignListProps {
-  campaigns: Campaign[]
-  onRefresh: () => void
-  onEdit?: (campaign: Campaign) => void
+  campaigns: Campaign[];
+  onRefresh: () => void;
+  onEdit?: (campaign: Campaign) => void;
 }
 
 const statusStyles: Record<string, string> = {
-  DRAFT: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-  SCHEDULED: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  SENT: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-}
+  DRAFT: "bg-muted text-muted-foreground",
+  SCHEDULED: "bg-info/15 text-info",
+  SENT: "bg-success/15 text-success",
+};
 
-export function CampaignList({ campaigns, onRefresh, onEdit }: CampaignListProps) {
-  const [deleting, setDeleting] = React.useState<string | null>(null)
+export function CampaignList({
+  campaigns,
+  onRefresh,
+  onEdit,
+}: CampaignListProps) {
+  const [deleting, setDeleting] = React.useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this campaign?")) return
+    if (!confirm("Are you sure you want to delete this campaign?")) return;
 
-    setDeleting(id)
+    setDeleting(id);
     try {
       const response = await fetch(`/api/admin/newsletter/campaigns/${id}`, {
         method: "DELETE",
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
-        toast.success("Campaign deleted")
-        onRefresh()
+        toast.success("Campaign deleted");
+        onRefresh();
       } else {
-        toast.error(data.error || "Failed to delete campaign")
+        toast.error(data.error || "Failed to delete campaign");
       }
     } catch (error) {
-      console.error("Delete campaign error:", error)
-      toast.error("An unexpected error occurred")
+      console.error("Delete campaign error:", error);
+      toast.error("An unexpected error occurred");
     } finally {
-      setDeleting(null)
+      setDeleting(null);
     }
-  }
+  };
 
   const handleDuplicate = (campaign: Campaign) => {
     if (onEdit) {
-      onEdit(campaign)
-      toast.success("Campaign loaded for editing")
+      onEdit(campaign);
+      toast.success("Campaign loaded for editing");
     }
-  }
+  };
 
   if (campaigns.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground border rounded-lg">
         <p>No campaigns yet. Create your first newsletter campaign!</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -89,7 +92,8 @@ export function CampaignList({ campaigns, onRefresh, onEdit }: CampaignListProps
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Created {new Date(campaign.createdAt).toLocaleDateString()}
-                  {campaign.sentAt && ` • Sent ${new Date(campaign.sentAt).toLocaleDateString()}`}
+                  {campaign.sentAt &&
+                    ` • Sent ${new Date(campaign.sentAt).toLocaleDateString()}`}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -132,6 +136,5 @@ export function CampaignList({ campaigns, onRefresh, onEdit }: CampaignListProps
         </Card>
       ))}
     </div>
-  )
+  );
 }
-

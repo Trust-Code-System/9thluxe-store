@@ -64,7 +64,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://fade.ng"
 
 const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) => { subject: string; html: string }> = {
   PENDING: (order, orderRef) => ({
-    subject: `Order Received — #${orderRef}`,
+    subject: `Order Received: #${orderRef}`,
     html: baseLayout(`
       <h2 style="margin: 0 0 16px; font-size: 22px; font-weight: 600; color: ${BRAND_COLOR};">Order Received</h2>
       <p style="margin: 0 0 12px; color: #555;">Hello ${order.user.name || "there"},</p>
@@ -75,7 +75,7 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
   }),
 
   PAID: (order, orderRef) => ({
-    subject: `Payment Confirmed — Your Fádé Order is Being Prepared`,
+    subject: `Payment Confirmed: Your Fádé Order is Being Prepared`,
     html: baseLayout(`
       <h2 style="margin: 0 0 16px; font-size: 22px; font-weight: 600; color: ${BRAND_COLOR};">Payment Confirmed ✓</h2>
       <p style="margin: 0 0 12px; color: #555;">Hello ${order.user.name || "there"},</p>
@@ -86,7 +86,7 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
       <div style="margin: 24px 0; padding: 20px; border-left: 3px solid ${ACCENT_COLOR}; background: #fdfbf7;">
         <h3 style="margin: 0 0 12px; font-size: 15px; font-family: Georgia, serif; color: ${BRAND_COLOR};">How to Get the Most from Your Fragrance</h3>
         <ul style="margin: 0; padding: 0 0 0 18px; color: #666; font-size: 13px; line-height: 1.8;">
-          <li>Apply to pulse points — wrists, neck, inner elbows — for best projection</li>
+          <li>Apply to pulse points (wrists, neck, inner elbows) for best projection</li>
           <li>Do not rub; let the fragrance settle naturally on your skin</li>
           <li>Store away from direct sunlight and heat to preserve the composition</li>
           <li>Moisturized skin holds fragrance significantly longer</li>
@@ -99,11 +99,11 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
   }),
 
   SHIPPED: (order, orderRef) => ({
-    subject: `Your Fádé Order is On Its Way — #${orderRef}`,
+    subject: `Your Fádé Order is On Its Way: #${orderRef}`,
     html: baseLayout(`
       <h2 style="margin: 0 0 16px; font-size: 22px; font-weight: 600; color: ${BRAND_COLOR};">Your Order Has Shipped 🚚</h2>
       <p style="margin: 0 0 12px; color: #555;">Hello ${order.user.name || "there"},</p>
-      <p style="color: #555;">Wonderful news — your Fádé order is on its way to you. Estimated delivery is within <strong>2–5 business days</strong> depending on your location.</p>
+      <p style="color: #555;">Wonderful news: your Fádé order is on its way to you. Estimated delivery is within <strong>2–5 business days</strong> depending on your location.</p>
       ${orderBox(orderRef, order.totalNGN)}
 
       <!-- Delivery info -->
@@ -129,7 +129,7 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
       : `${siteUrl}/account/orders/${order.id}`
 
     return {
-      subject: `Your Fádé Order Has Arrived — How Are You Wearing It?`,
+      subject: `Your Fádé Order Has Arrived: How Are You Wearing It?`,
       html: baseLayout(`
         <h2 style="margin: 0 0 16px; font-size: 22px; font-weight: 600; color: ${BRAND_COLOR};">It's Arrived. Enjoy ✨</h2>
         <p style="margin: 0 0 12px; color: #555;">Hello ${order.user.name || "there"},</p>
@@ -140,7 +140,7 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
         <div style="margin: 24px 0; padding: 20px; border-left: 3px solid ${ACCENT_COLOR}; background: #fdfbf7;">
           <h3 style="margin: 0 0 12px; font-size: 15px; font-family: Georgia, serif; color: ${BRAND_COLOR};">How to Wear This</h3>
           <p style="margin: 0; color: #666; font-size: 13px; line-height: 1.8;">
-            Wear it close to the skin on your warmest pulse points. In Nigerian heat, one or two sprays is enough — the warmth of your body does the rest.
+            Wear it close to the skin on your warmest pulse points. In Nigerian heat, one or two sprays is enough. The warmth of your body does the rest.
             Let it breathe for 10 minutes before forming your full impression of the scent.
           </p>
         </div>

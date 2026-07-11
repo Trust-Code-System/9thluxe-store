@@ -68,7 +68,7 @@ interface SearchResult {
 }
 
 export function AdminHeader({ user }: AdminHeaderProps) {
-  const router = useRouter()
+  const _router = useRouter()
   const [notificationsOpen, setNotificationsOpen] = React.useState(false)
   const [notifications, setNotifications] = React.useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = React.useState(0)
@@ -201,7 +201,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-40 h-16 border-b border-border bg-card/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-[var(--z-nav)] h-16 border-b border-border bg-card/95 backdrop-blur-sm">
       <div className="flex items-center justify-between h-full px-6 lg:px-8">
         {/* Brand + search */}
         <div className="flex items-center gap-6 flex-1 min-w-0">

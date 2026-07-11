@@ -1,7 +1,7 @@
 // lib/migrate/checks.ts
 // PURE migration validation rules, extracted from scripts/migrate/validate.ts so they can be unit
 // tested without a database. Each returns structured issues; the script wraps these around live
-// queries. No data is mutated here — validation only.
+// queries. No data is mutated here; validation only.
 
 export type IssueLevel = 'BLOCK' | 'WARN'
 export interface CheckIssue {

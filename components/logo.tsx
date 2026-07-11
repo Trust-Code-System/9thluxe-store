@@ -10,7 +10,7 @@ interface LogoProps {
   compact?: boolean
 }
 
-/** The bottle mark on its own — reusable as an icon/avatar (e.g. the Concierge AI). */
+/** The bottle mark on its own, reusable as an icon/avatar (e.g. the Concierge AI). */
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg
@@ -18,7 +18,7 @@ export function LogoMark({ className }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={cn("text-foreground", className)}
-      strokeWidth={1.6}
+      strokeWidth={1.4}
       aria-hidden
     >
       <path
@@ -43,16 +43,16 @@ export function Logo({ className, href = "/", compact }: LogoProps) {
   const content = (
     <span
       className={cn(
-        "inline-flex items-center gap-2.5 font-serif font-bold tracking-tight text-foreground antialiased",
-        compact ? "text-xl" : "text-2xl",
+        "inline-flex items-baseline gap-2.5 font-serif font-light uppercase text-foreground antialiased",
+        compact ? "text-base tracking-[0.28em]" : "text-lg tracking-[0.32em]",
         className
       )}
       aria-label="Fádé – Luxury fragrances"
     >
-      <span className="relative flex shrink-0" aria-hidden>
-        <LogoMark className={cn(compact ? "h-6 w-[18px]" : "h-7 w-[21px]")} />
+      <span className="relative flex shrink-0 self-center" aria-hidden>
+        <LogoMark className={cn(compact ? "h-5 w-[15px]" : "h-6 w-[18px]")} />
       </span>
-      <span>Fádé</span>
+      <span className="translate-y-px">Fádé</span>
     </span>
   )
 
@@ -60,7 +60,7 @@ export function Logo({ className, href = "/", compact }: LogoProps) {
     return (
       <Link
         href={href}
-        className="hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded"
+        className="rounded-sm transition-opacity hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {content}
       </Link>

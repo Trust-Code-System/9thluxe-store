@@ -63,7 +63,7 @@ export function StickyPurchaseBar({ data }: { data: PdpData }) {
   return (
     <div
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur transition-transform duration-200 lg:hidden",
+        "fixed inset-x-0 bottom-0 z-[var(--z-sticky)] border-t border-border bg-background/95 backdrop-blur transition-transform duration-200 lg:hidden",
         "pb-[env(safe-area-inset-bottom)]",
         visible ? "translate-y-0" : "translate-y-full",
       )}

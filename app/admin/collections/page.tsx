@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   CollectionInUseError,
   createCollection,
@@ -136,19 +137,18 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
                 <form action={updateCollectionAction} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="id">Collection</Label>
-                    <select
-                      id="id"
-                      name="id"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                      required
-                    >
-                      <option value="">Select a collection</option>
-                      {collections.map((collection) => (
-                        <option key={collection.id} value={collection.id}>
-                          {collection.name} ({collection.slug})
-                        </option>
-                      ))}
-                    </select>
+                    <Select name="id" required>
+                      <SelectTrigger id="id" className="w-full" aria-label="Collection">
+                        <SelectValue placeholder="Select a collection" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {collections.map((collection) => (
+                          <SelectItem key={collection.id} value={collection.id}>
+                            {collection.name} ({collection.slug})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="new-name">New name</Label>

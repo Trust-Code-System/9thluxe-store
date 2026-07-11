@@ -1,7 +1,7 @@
 // lib/loyalty/points.ts
 // PURE loyalty points logic. Earning is deterministic; REDEMPTION (spending points for money) is a
 // financial action and stays disabled behind the `loyalty_rewards` feature flag until the business
-// approves the rules. This module never mutates state — routes/services persist LoyaltyLedger rows.
+// approves the rules. This module never mutates state; routes/services persist LoyaltyLedger rows.
 
 /** Policy: points earned per whole Naira spent. 1 point per ₦1,000. */
 export const POINTS_PER_NGN = 1 / 1000
@@ -22,7 +22,7 @@ export function computeBalance(entries: LedgerEntry[]): number {
 
 /**
  * Validate a redemption request. Returns the redeemable points (capped at balance) and whether it is
- * allowed. `enabled` reflects the feature flag — when false, redemption is refused regardless.
+ * allowed. `enabled` reflects the feature flag; when false, redemption is refused regardless.
  */
 export function validateRedemption(
   balance: number,

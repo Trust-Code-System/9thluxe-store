@@ -1,6 +1,6 @@
 // lib/quiz/definition.ts
 // Versioned Fragrance DNA quiz definition + PURE profile derivation. No sensitive personal
-// attributes are inferred — only fragrance preferences. Derivation is deterministic and testable.
+// attributes are inferred, only fragrance preferences. Derivation is deterministic and testable.
 import { z } from 'zod'
 
 export const QUIZ_VERSION = 'v1'

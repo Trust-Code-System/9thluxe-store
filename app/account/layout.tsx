@@ -32,19 +32,26 @@ export default async function AccountLayout({ children }: { children: React.Reac
 
     <MainLayout>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <section data-surface="day" className="min-h-[60vh] bg-background text-foreground">
+        <div className="container mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
 
-        <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-8">My Account</h1>
+          <div className="mb-10">
+            <span className="eyebrow">Your house account</span>
+            <h1 className="mt-3 font-serif text-4xl font-light tracking-[-0.01em] md:text-5xl">
+              My account
+            </h1>
+          </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
 
-          <AccountSidebar />
+            <AccountSidebar />
 
-          <div className="flex-1">{children}</div>
+            <div className="min-w-0 flex-1">{children}</div>
+
+          </div>
 
         </div>
-
-      </div>
+      </section>
 
     </MainLayout>
 

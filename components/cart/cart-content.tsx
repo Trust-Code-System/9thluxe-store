@@ -108,7 +108,7 @@ export function CartContent({ freeShippingThreshold, flatShippingFee }: CartCont
 
     return (
 
-      <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border bg-card/50 px-8 py-16 text-center">
+      <div className="mx-auto max-w-md border border-dashed border-border bg-card/60 px-8 py-16 text-center">
 
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/12">
 
@@ -116,7 +116,7 @@ export function CartContent({ freeShippingThreshold, flatShippingFee }: CartCont
 
         </div>
 
-        <h2 className="mb-2 font-serif text-2xl font-semibold">Your bag is empty</h2>
+        <h2 className="mb-2 font-serif text-2xl font-light text-foreground">Your bag is empty</h2>
 
         <p className="mb-8 text-muted-foreground">Discover a fragrance worth carrying home.</p>
 

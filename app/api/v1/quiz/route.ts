@@ -33,7 +33,7 @@ export const POST = route(async ({ req }) => {
     ? await prisma.user.findUnique({ where: { email }, select: { id: true } })
     : null
 
-  // Persist a quiz session (anonymous allowed). Best-effort — never blocks the response.
+  // Persist a quiz session (anonymous allowed). Best-effort; never blocks the response.
   await prisma.scentQuizSession
     .create({
       data: {

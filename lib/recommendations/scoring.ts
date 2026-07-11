@@ -28,7 +28,7 @@ export interface Constraints {
   intensity?: string | null
   longevity?: string | null
   preferSample?: boolean
-  /** Ids the customer already owns/tried — diversify away from these. */
+  /** Ids the customer already owns/tried; diversify away from these. */
   ownedIds?: string[]
 }
 
@@ -36,7 +36,7 @@ export interface ScoreBreakdown {
   id: string
   score: number
   reasons: string[]
-  /** True if a hard constraint is violated — such candidates must be excluded, not just ranked low. */
+  /** True if a hard constraint is violated; such candidates must be excluded, not just ranked low. */
   disqualified: boolean
   merchandisingApplied: boolean
 }

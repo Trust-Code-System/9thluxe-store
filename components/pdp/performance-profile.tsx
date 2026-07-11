@@ -5,7 +5,7 @@ import type { PdpPerformanceMetric } from "@/lib/pdp/types"
 /**
  * Performance profile driven ONLY by aggregated verified-customer ratings. Each bar shows the number
  * of reviews contributing (never a fabricated score). If no structured ratings exist yet, the whole
- * section is hidden by the caller. This is customer-aggregated opinion, clearly labelled — not a lab
+ * section is hidden by the caller. This is customer-aggregated opinion, clearly labelled, not a lab
  * measurement, and deliberately not a copy of any third-party voting UI.
  */
 export function PerformanceProfile({ metrics }: { metrics: PdpPerformanceMetric[] }) {

@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       await resend.emails.send({
         from: FROM_EMAIL,
         to: email,
-        subject: `We received your message — Fádé Essence`,
+        subject: `We received your message · Fádé Essence`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: #2f3e33; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         `,
       }).catch((err) => console.error("[CONTACT] Failed to send auto-reply:", err))
     } else {
-      console.log("[CONTACT] No RESEND_API_KEY — skipping email:", { name, email, subject })
+      console.log("[CONTACT] No RESEND_API_KEY, skipping email:", { name, email, subject })
     }
 
     return NextResponse.json(

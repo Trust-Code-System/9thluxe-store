@@ -1,8 +1,15 @@
-"use client"
+"use client";
 
-import { FaInstagram, FaXTwitter, FaWhatsapp, FaTiktok, FaFacebookF } from "react-icons/fa6"
+import {
+  FaInstagram,
+  FaXTwitter,
+  FaWhatsapp,
+  FaTiktok,
+  FaFacebookF,
+} from "react-icons/fa6";
 
-const iconClass = "w-5 h-5 text-[#6a5a4b] hover:text-[#2f3e33] transition-colors duration-150"
+const iconClass =
+  "h-5 w-5 text-muted-foreground transition-colors duration-150 hover:text-accent";
 
 export function SocialLinks() {
   return (
@@ -48,6 +55,5 @@ export function SocialLinks() {
         <FaFacebookF className={iconClass} />
       </a>
     </div>
-  )
+  );
 }
-

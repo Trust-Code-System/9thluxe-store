@@ -22,7 +22,7 @@ export interface LayeringAdvice {
   isGuidance: true
 }
 
-// Base "heaviness" — heavier families anchor the blend and go on first.
+// Base "heaviness": heavier families anchor the blend and go on first.
 const WEIGHT: Record<Family, number> = {
   ORIENTAL: 5,
   WOODY: 4,
@@ -53,21 +53,21 @@ export function evaluateLayering(a: LayerInput, b: LayerInput): LayeringAdvice {
 
   const warnings: string[] = []
   const bothBold = a.intensity === 'bold' && b.intensity === 'bold'
-  if (bothBold) warnings.push('Both are bold — apply the second fragrance lightly (1 spray) to avoid overwhelming the blend.')
+  if (bothBold) warnings.push('Both are bold, so apply the second fragrance lightly (1 spray) to avoid overwhelming the blend.')
 
   let compatibility: Compatibility = 'experimental'
-  let note = 'An experimental pairing — try it on a blotter or one wrist first.'
+  let note = 'An experimental pairing: try it on a blotter or one wrist first.'
   if (fa && fb) {
     const k = key(fa, fb)
     if (fa === fb) {
       compatibility = 'good'
-      note = 'Same family — reinforces the theme; expect a richer, deeper version.'
+      note = 'Same family: reinforces the theme; expect a richer, deeper version.'
     } else if (GREAT.has(k)) {
       compatibility = 'great'
       note = 'A complementary pairing that tends to bloom well together.'
     } else if (DISCOURAGED.has(k)) {
       compatibility = 'experimental'
-      warnings.push('These families can clash — go light and test before committing.')
+      warnings.push('These families can clash, so go light and test before committing.')
       note = 'A tricky pairing; the contrast can read as muddy on some skin.'
     } else {
       compatibility = 'good'

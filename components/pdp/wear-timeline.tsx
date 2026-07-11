@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import type { PdpTimelineStage } from "@/lib/pdp/types"
 
 /**
- * "How it wears" — an editorial progression across four stages, built only from the product's real
+ * "How it wears": an editorial progression across four stages, built only from the product's real
  * notes. It is explicitly guidance, not a guarantee, and says so. The intensity mini-curve animates
  * on view (width-only, no layout shift) and is instant under reduced motion.
  */
@@ -40,7 +40,7 @@ export function WearTimeline({ stages }: { stages: PdpTimelineStage[] }) {
       </ol>
       <p className="mt-4 text-xs italic text-muted-foreground">
         Editorial guidance only. How a fragrance actually wears depends on your skin chemistry, how much you apply,
-        clothing, and the weather — results vary from person to person.
+        clothing, and the weather. Results vary from person to person.
       </p>
     </div>
   )

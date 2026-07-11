@@ -1,29 +1,27 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 
 export function AnnouncementBar() {
   return (
     <div
-      className="w-full bg-espresso text-[13px] text-[color:var(--primary-foreground)]"
+      data-surface="fixed-dark"
+      className="w-full border-b border-border/60 bg-background text-foreground/70"
       role="complementary"
       aria-label="Promotion"
     >
-      <div className="container mx-auto flex items-center justify-center gap-2 px-4 py-2.5">
-        <span className="hidden sm:inline text-[color:var(--amber)]" aria-hidden>
-          ✦
-        </span>
-        <Link
-          href="/shop"
-          className="font-sans tracking-wide text-center transition-opacity hover:opacity-80"
-        >
+      <Link
+        href="/shop"
+        className="container mx-auto flex items-center justify-center gap-3 px-4 py-2 transition-colors hover:text-foreground"
+      >
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em]">
           Complimentary delivery on qualifying orders
-          <span className="mx-2 text-[color:var(--amber)]" aria-hidden>·</span>
-          <span className="underline underline-offset-4 decoration-[color:var(--amber)]/60">
-            Discover the collection
-          </span>
-        </Link>
-      </div>
+        </span>
+        <span className="hidden h-px w-6 bg-border sm:block" aria-hidden />
+        <span className="hidden font-mono text-[10px] uppercase tracking-[0.3em] sm:inline">
+          Discover the collection
+        </span>
+      </Link>
     </div>
-  )
+  );
 }

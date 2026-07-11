@@ -1,6 +1,6 @@
 // lib/config/commerce.ts
 // Central commerce policy configuration. NO policy value (shipping threshold, fees, currency,
-// loyalty tiers) may be hard-coded elsewhere — read it from here so the owner can change policy
+// loyalty tiers) may be hard-coded elsewhere; read it from here so the owner can change policy
 // without code edits, and so tests can override it.
 import { env } from '@/lib/env'
 

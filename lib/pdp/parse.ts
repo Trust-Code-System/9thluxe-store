@@ -1,5 +1,5 @@
 // lib/pdp/parse.ts
-// PURE, side-effect-free helpers for the PDP. No Prisma, no fetch — safe to unit-test in isolation.
+// PURE, side-effect-free helpers for the PDP. No Prisma, no fetch, safe to unit-test in isolation.
 // These convert loose backend strings (comma-separated notes/accords, size labels) into typed,
 // display-ready structures WITHOUT inventing any information.
 
@@ -47,7 +47,7 @@ export function toNotes(raw: string | null | undefined): PdpNote[] {
 
 /**
  * Rank accords by their listed order (backend lists strongest-first) and derive a *proportional*
- * strength for the bar widths. This is a visual ranking, NOT a fabricated lab percentage — the
+ * strength for the bar widths. This is a visual ranking, NOT a fabricated lab percentage, the
  * strongest accord is full width and each subsequent one steps down evenly.
  */
 export function toAccords(raw: string | null | undefined): PdpAccord[] {
@@ -104,7 +104,7 @@ export function discountPct(priceNGN: number, compareAtNGN: number | null | unde
 
 /**
  * Build the "How it wears" timeline from real note structure. This is clearly editorial guidance
- * (labelled as such in the UI). It reuses only the product's actual notes — it never invents notes.
+ * (labelled as such in the UI). It reuses only the product's actual notes; it never invents notes.
  * Returns [] when there is not enough note data to say anything meaningful.
  */
 export function buildTimeline(
@@ -121,7 +121,7 @@ export function buildTimeline(
       window: "0–15 min",
       notes: top.length ? top : heart,
       impression: top.length
-        ? "The opening — brightest and most volatile notes lead."
+        ? "The opening: brightest and most volatile notes lead."
         : "The opening as the heart lifts first.",
       intensity: 1,
     },
@@ -130,7 +130,7 @@ export function buildTimeline(
       label: "Settling",
       window: "15 min – 2 hrs",
       notes: heart.length ? heart : [...top, ...base].slice(0, 3),
-      impression: "Top notes fade and the heart takes over — the character you'll wear most.",
+      impression: "Top notes fade and the heart takes over, the character you'll wear most.",
       intensity: 0.8,
     },
     {
@@ -146,7 +146,7 @@ export function buildTimeline(
       label: "Dry-down",
       window: "6 hrs +",
       notes: base.length ? base : heart,
-      impression: "The lasting base — the signature that lingers on skin and fabric.",
+      impression: "The lasting base: the signature that lingers on skin and fabric.",
       intensity: 0.35,
     },
   ]

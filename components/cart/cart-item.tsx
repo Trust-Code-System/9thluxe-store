@@ -62,11 +62,11 @@ export function CartItem({ product, quantity, onUpdateQuantity, onRemove }: Cart
 
         <Link href={`/product/${product.slug}`} className="shrink-0">
 
-          <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden bg-muted">
+          <div className="relative h-24 w-24 overflow-hidden bg-muted sm:h-32 sm:w-32">
 
             <Image
 
-              src={product.image || "/placeholder.svg"}
+              src={product.image || "/placeholder-flacon.svg"}
 
               alt={product.name}
 
@@ -92,7 +92,7 @@ export function CartItem({ product, quantity, onUpdateQuantity, onRemove }: Cart
 
             <div>
 
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">{product.brand}</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{product.brand}</p>
 
               <Link href={`/product/${product.slug}`}>
 
@@ -106,7 +106,7 @@ export function CartItem({ product, quantity, onUpdateQuantity, onRemove }: Cart
 
             </div>
 
-            <p className="font-semibold whitespace-nowrap">{formatPrice(product.price * quantity)}</p>
+            <p className="whitespace-nowrap font-mono text-sm tracking-[0.04em]">{formatPrice(product.price * quantity)}</p>
 
           </div>
 

@@ -1,7 +1,5 @@
 import type { Metadata } from "next"
 
-import { redirect } from "next/navigation"
-
 import { MainLayout } from "@/components/layout/main-layout"
 
 import { CartContent } from "@/components/cart/cart-content"
@@ -24,7 +22,7 @@ export default async function CartPage() {
 
   // Check authentication - cart should be accessible to all users (guest or authenticated)
   // But we'll ensure the cart is user-scoped on the client side
-  const session = await auth()
+  await auth()
 
   const { shipping } = getCommerceConfig()
 
@@ -32,19 +30,23 @@ export default async function CartPage() {
 
     <MainLayout>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <section data-surface="day" className="min-h-[60vh] bg-background text-foreground">
+        <div className="container mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
 
-        <div className="mb-8">
-          <span className="eyebrow">Your selection</span>
-          <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight md:text-4xl">Shopping Bag</h1>
+          <div className="mb-10">
+            <span className="eyebrow">Your selection</span>
+            <h1 className="mt-3 font-serif text-4xl font-light tracking-[-0.01em] md:text-5xl">
+              The bag
+            </h1>
+          </div>
+
+          <CartContent
+            freeShippingThreshold={shipping.freeShippingThreshold}
+            flatShippingFee={shipping.flatShippingFee}
+          />
+
         </div>
-
-        <CartContent
-          freeShippingThreshold={shipping.freeShippingThreshold}
-          flatShippingFee={shipping.flatShippingFee}
-        />
-
-      </div>
+      </section>
 
     </MainLayout>
 

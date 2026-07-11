@@ -15,7 +15,7 @@ export interface GrantInput {
   expiresInDays?: number
 }
 
-/** Grant a sample credit to a customer. Administrative action — always audited. */
+/** Grant a sample credit to a customer. Administrative action, always audited. */
 export async function grantSampleCredit(input: GrantInput, actorId: string) {
   if (!Number.isInteger(input.amountNGN) || input.amountNGN <= 0) {
     throw new AppError('VALIDATION_ERROR', { message: 'amountNGN must be a positive integer.' })

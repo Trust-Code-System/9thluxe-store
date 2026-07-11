@@ -1,105 +1,58 @@
-import Image from "next/image"
+"use client"
 
 import Link from "next/link"
-
-import { Button } from "@/components/ui/button"
-
 import { ArrowRight } from "lucide-react"
 
+import { Reveal } from "@/components/motion"
 
-
+/**
+ * The house manifesto: a typographic story moment on a day surface.
+ * No stock photography: the words carry the room.
+ */
 export function BrandStorySection() {
-
   return (
+    <section data-surface="day" className="bg-background py-20 text-foreground lg:py-32">
+      <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <Reveal>
+          <p className="eyebrow mb-8 text-center">The house</p>
+        </Reveal>
+        <Reveal delay={0.08}>
+          <blockquote className="text-balance text-center font-serif text-3xl font-light leading-[1.2] tracking-[-0.01em] md:text-5xl">
+            “A fragrance is the only thing you wear that enters a room{" "}
+            <em className="text-accent">before</em> you, and stays{" "}
+            <em className="text-accent">after</em> you leave.”
+          </blockquote>
+        </Reveal>
 
-    <section className="py-16 lg:py-24">
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-
-          {/* Image */}
-
-          <div className="relative aspect-[4/3] lg:aspect-square rounded-xl overflow-hidden">
-
-            <Image
-
-              src="/fade-brand-story-atelier.jpg"
-
-              alt="The Fádé story"
-
-              fill
-
-              className="object-cover"
-
-              sizes="(max-width: 1024px) 100vw, 50vw"
-
-            />
-
+        <Reveal delay={0.16}>
+          <div className="mx-auto mt-12 grid max-w-2xl gap-8 text-sm leading-relaxed text-muted-foreground sm:grid-cols-2 md:text-base">
+            <p>
+              Fádé began in Lagos with a simple discipline: stock only what we
+              would wear ourselves, source every bottle from authorised
+              channels, and describe each scent honestly: its notes, its
+              sillage, how it behaves in our climate.
+            </p>
+            <p>
+              We are not a marketplace. We are a small house with a strong
+              nose: a considered edit of perfumes, guidance that listens
+              before it recommends, and delivery that treats a bottle like
+              the object it is.
+            </p>
           </div>
+        </Reveal>
 
-
-
-          {/* Content */}
-
-          <div className="max-w-lg">
-
-            <span className="eyebrow">Our House</span>
-
-            <h2 className="mb-6 mt-3 font-serif text-3xl font-semibold tracking-tight md:text-4xl">The Fádé Story</h2>
-
-            <div className="space-y-4 leading-relaxed text-muted-foreground">
-
-              <p>
-
-                Fádé is a Lagos house built on a simple belief — that a fragrance should feel
-
-                composed, not chosen at random. We curate rare and coveted perfumes from houses
-
-                we trust, and present them with the care they deserve.
-
-              </p>
-
-              <p>
-
-                Our name draws from Yoruba, a nod to bringing something worthwhile to those who
-
-                appreciate it: craftsmanship, provenance, and the quiet confidence of a scent that
-
-                lasts.
-
-              </p>
-
-              <p>
-
-                Every fragrance we carry is sourced deliberately and inspected on arrival, so what
-
-                reaches you is exactly what you expect.
-
-              </p>
-
-            </div>
-
-            <Button asChild variant="outline" className="mt-8 bg-transparent">
-
-              <Link href="/about">
-
-                Learn More About Us
-
-                <ArrowRight className="ml-2 h-4 w-4" />
-
-              </Link>
-
-            </Button>
-
+        <Reveal delay={0.22}>
+          <div className="mt-12 flex justify-center">
+            <Link
+              href="/about"
+              className="group flex items-center gap-2 border-b border-border pb-1 font-mono text-[11px] uppercase tracking-[0.24em] text-foreground transition-colors hover:border-accent hover:text-accent"
+            >
+              Read our story
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
-
-        </div>
-
+        </Reveal>
       </div>
-
     </section>
-
   )
-
 }

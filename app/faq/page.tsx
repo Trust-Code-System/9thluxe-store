@@ -53,33 +53,42 @@ const faqs = [
 export default function FAQPage() {
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight mb-3">
-            Frequently Asked Questions
+      <section data-surface="night" className="grain relative bg-background py-14 text-foreground lg:py-20">
+        <div className="container relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <span className="eyebrow">Help</span>
+          <h1 className="mt-4 font-serif text-4xl font-light tracking-[-0.01em] md:text-5xl">
+            Questions, <em className="text-accent">answered</em>
           </h1>
-          <p className="text-muted-foreground mb-10">
-            Can't find what you're looking for?{" "}
-            <a href="/help/contact" className="text-primary underline underline-offset-2 hover:opacity-80">
+          <p className="mb-12 mt-4 max-w-md leading-relaxed text-muted-foreground">
+            Can&apos;t find what you&apos;re looking for?{" "}
+            <a
+              href="/help/contact"
+              className="text-accent underline underline-offset-4 transition-opacity hover:opacity-80"
+            >
               Contact us
             </a>{" "}
-            and we'll be happy to help.
+            and we&apos;ll be happy to help.
           </p>
 
-          <Accordion type="single" collapsible className="space-y-2">
+          <Accordion type="single" collapsible className="border-t border-border">
             {faqs.map((faq, i) => (
-              <AccordionItem key={i} value={`item-${i}`} className="border border-border rounded-lg px-4">
-                <AccordionTrigger className="text-left font-medium hover:no-underline py-4">
-                  {faq.question}
+              <AccordionItem key={i} value={`item-${i}`} className="border-b border-border">
+                <AccordionTrigger className="gap-6 py-6 text-left font-serif text-lg font-light hover:no-underline hover:text-accent [&>svg]:text-muted-foreground">
+                  <span className="flex items-baseline gap-5">
+                    <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground/60">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {faq.question}
+                  </span>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-4">
+                <AccordionContent className="pb-6 pl-10 leading-relaxed text-muted-foreground">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </div>
-      </div>
+      </section>
     </MainLayout>
   )
 }

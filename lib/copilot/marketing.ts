@@ -1,5 +1,5 @@
 // lib/copilot/marketing.ts
-// Owner Copilot marketing assistant. Prepares DRAFTS only — campaign briefs, email/WhatsApp copy,
+// Owner Copilot marketing assistant. Prepares DRAFTS only: campaign briefs, email/WhatsApp copy,
 // launch plans, gift guides, journal outlines, SEO briefs, segments, offer proposals and
 // post-campaign summaries. It NEVER sends anything: any real send must go through the Approval
 // Centre (action: 'campaign') and the existing notification/newsletter pipeline.

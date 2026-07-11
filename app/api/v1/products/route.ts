@@ -1,5 +1,5 @@
 // app/api/v1/products/route.ts
-// GET /api/v1/products — envelope-wrapped, catalogue-provider-backed product listing.
+// GET /api/v1/products: envelope-wrapped, catalogue-provider-backed product listing.
 import { route } from '@/lib/http/handler'
 import { getCommerce } from '@/integrations/registry'
 import type { CatalogQuery } from '@/integrations/commerce/types'

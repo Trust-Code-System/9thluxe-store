@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Sparkles, ArrowRight } from "lucide-react"
 
 /**
- * Fragrance DNA invitation. Intentional CTA only — never an auto-opening modal. Placed low on the
+ * Fragrance DNA invitation. Intentional CTA only, never an auto-opening modal. Placed low on the
  * page after the customer has had a chance to browse.
  */
 export function DnaQuizPromo() {
@@ -16,7 +16,7 @@ export function DnaQuizPromo() {
           <h3 className="font-serif text-xl md:text-2xl">Not sure this is your scent?</h3>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Answer a few questions about the notes, intensity, occasions and climate you love. We&apos;ll build your
-            Fragrance DNA and match you to bottles — and samples — from our real catalogue.
+            Fragrance DNA and match you to bottles (and samples) from our real catalogue.
           </p>
         </div>
         <Link

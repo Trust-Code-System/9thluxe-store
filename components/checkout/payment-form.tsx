@@ -1,68 +1,91 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Lock, ArrowLeft, Loader2, Building2, CreditCard, Copy, CheckCheck } from "lucide-react"
-import { toast } from "sonner"
-import { useCheckoutStore } from "@/lib/stores/checkout-store"
-import { formatPrice } from "@/lib/format"
-import Link from "next/link"
-import { ClearCartOnSuccess } from "@/components/checkout/clear-cart-on-success"
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Lock,
+  ArrowLeft,
+  Loader2,
+  Building2,
+  CreditCard,
+  Copy,
+  CheckCheck,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useCheckoutStore } from "@/lib/stores/checkout-store";
+import { formatPrice } from "@/lib/format";
+import Link from "next/link";
+import { ClearCartOnSuccess } from "@/components/checkout/clear-cart-on-success";
 
 export interface OrderPayload {
-  items: { productId: string; quantity: number; priceNGN: number }[]
-  subtotalNGN: number
-  discountNGN: number
-  shippingNGN: number
-  totalNGN: number
-  couponId?: string | null
-  isGift?: boolean
-  giftMessage?: string
-  giftWrapping?: boolean
+  items: { productId: string; quantity: number; priceNGN: number }[];
+  subtotalNGN: number;
+  discountNGN: number;
+  shippingNGN: number;
+  totalNGN: number;
+  couponId?: string | null;
+  isGift?: boolean;
+  giftMessage?: string;
+  giftWrapping?: boolean;
 }
 
 interface PaymentFormProps {
-  onBack: () => void
-  onComplete: () => void
-  total: number
-  orderPayload: OrderPayload
+  onBack: () => void;
+  onComplete: () => void;
+  total: number;
+  orderPayload: OrderPayload;
 }
 
 const BANK_DETAILS = {
   accountName: "Fádé Essence Limited",
   bank: "Guaranty Trust Bank (GTBank)",
   accountNumber: "0123456789",
-}
+};
 
 function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = React.useState(false)
+  const [copied, setCopied] = React.useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(text).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
   return (
     <button
       type="button"
       onClick={handleCopy}
       className="ml-2 inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
     >
-      {copied ? <CheckCheck className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+      {copied ? (
+        <CheckCheck className="h-3.5 w-3.5" />
+      ) : (
+        <Copy className="h-3.5 w-3.5" />
+      )}
       {copied ? "Copied" : "Copy"}
     </button>
-  )
+  );
 }
 
-export function PaymentForm({ onBack, onComplete, total, orderPayload }: PaymentFormProps) {
-  const { formData } = useCheckoutStore()
-  const [isProcessing, setIsProcessing] = React.useState(false)
-  const [paymentMethod, setPaymentMethod] = React.useState<"CARD" | "BANK_TRANSFER">("CARD")
-  const [bankTransferOrder, setBankTransferOrder] = React.useState<{ orderId: string } | null>(null)
+export function PaymentForm({
+  onBack,
+  onComplete: _onComplete,
+  total,
+  orderPayload,
+}: PaymentFormProps) {
+  const { formData } = useCheckoutStore();
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const [paymentMethod, setPaymentMethod] = React.useState<
+    "CARD" | "BANK_TRANSFER"
+  >("CARD");
+  const [bankTransferOrder, setBankTransferOrder] = React.useState<{
+    orderId: string;
+  } | null>(null);
 
   const buildPayload = () => {
-    const addressLine1 = [formData.address, formData.address2].filter(Boolean).join(", ").trim() || formData.address
+    const addressLine1 =
+      [formData.address, formData.address2].filter(Boolean).join(", ").trim() ||
+      formData.address;
     return {
       addressLine1,
       city: formData.city,
@@ -77,24 +100,34 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
       isGift: orderPayload.isGift,
       giftMessage: orderPayload.giftMessage,
       giftWrapping: orderPayload.giftWrapping,
-    }
-  }
+    };
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!formData.email) {
-      toast.error("Email required", { description: "Please provide your email address in the shipping information." })
-      return
+      toast.error("Email required", {
+        description:
+          "Please provide your email address in the shipping information.",
+      });
+      return;
     }
 
-    const payload = buildPayload()
-    if (!payload.addressLine1 || !payload.city || !payload.state || !payload.phone) {
-      toast.error("Shipping required", { description: "Please complete shipping address and phone." })
-      return
+    const payload = buildPayload();
+    if (
+      !payload.addressLine1 ||
+      !payload.city ||
+      !payload.state ||
+      !payload.phone
+    ) {
+      toast.error("Shipping required", {
+        description: "Please complete shipping address and phone.",
+      });
+      return;
     }
 
-    setIsProcessing(true)
+    setIsProcessing(true);
 
     try {
       // 1) Create order (PENDING)
@@ -102,18 +135,19 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...payload, paymentMethod }),
-      })
+      });
 
-      const createData = await createRes.json()
-      if (!createRes.ok) throw new Error(createData.error || "Failed to create order")
+      const createData = await createRes.json();
+      if (!createRes.ok)
+        throw new Error(createData.error || "Failed to create order");
 
-      const orderId = createData.orderId as string
-      if (!orderId) throw new Error("No order ID returned")
+      const orderId = createData.orderId as string;
+      if (!orderId) throw new Error("No order ID returned");
 
       if (paymentMethod === "BANK_TRANSFER") {
         // Show bank details instead of redirecting to Paystack
-        setBankTransferOrder({ orderId })
-        return
+        setBankTransferOrder({ orderId });
+        return;
       }
 
       // 2) Card: Initialize Paystack
@@ -134,27 +168,28 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
             postalCode: formData.postalCode,
           },
         }),
-      })
+      });
 
-      const payData = await payRes.json()
+      const payData = await payRes.json();
       if (!payRes.ok || !payData.authorization_url) {
-        throw new Error(payData.error || "Failed to initialize payment")
+        throw new Error(payData.error || "Failed to initialize payment");
       }
 
-      window.location.href = payData.authorization_url
+      window.location.href = payData.authorization_url;
     } catch (error: unknown) {
-      setIsProcessing(false)
-      const message = error instanceof Error ? error.message : "Please try again later."
-      toast.error("Payment initialization failed", { description: message })
+      setIsProcessing(false);
+      const message =
+        error instanceof Error ? error.message : "Please try again later.";
+      toast.error("Payment initialization failed", { description: message });
     }
-  }
+  };
 
   // Bank Transfer Confirmation Screen
   if (bankTransferOrder) {
     return (
       <div className="space-y-6">
         <ClearCartOnSuccess />
-        <Card className="border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/20">
+        <Card className="border-success/40 bg-success/10">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Building2 className="h-5 w-5 text-green-600" />
@@ -163,27 +198,40 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Please transfer the exact amount below to complete your order. Your order will be confirmed once we verify the transfer.
+              Please transfer the exact amount below to complete your order.
+              Your order will be confirmed once we verify the transfer.
             </p>
 
             <div className="rounded-xl border border-border bg-background p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Amount</span>
-                <span className="font-bold text-lg text-primary">{formatPrice(total)}</span>
+                <span className="font-bold text-lg text-primary">
+                  {formatPrice(total)}
+                </span>
               </div>
               <div className="border-t border-border pt-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Bank</span>
-                  <span className="text-sm font-medium">{BANK_DETAILS.bank}</span>
+                  <span className="text-sm font-medium">
+                    {BANK_DETAILS.bank}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Account Name</span>
-                  <span className="text-sm font-medium">{BANK_DETAILS.accountName}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Account Name
+                  </span>
+                  <span className="text-sm font-medium">
+                    {BANK_DETAILS.accountName}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Account Number</span>
+                  <span className="text-sm text-muted-foreground">
+                    Account Number
+                  </span>
                   <div className="flex items-center">
-                    <span className="font-mono font-bold text-base">{BANK_DETAILS.accountNumber}</span>
+                    <span className="font-mono font-bold text-base">
+                      {BANK_DETAILS.accountNumber}
+                    </span>
                     <CopyButton text={BANK_DETAILS.accountNumber} />
                   </div>
                 </div>
@@ -192,7 +240,9 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
 
             <p className="text-xs text-muted-foreground">
               Use your order ID as the transfer narration:{" "}
-              <span className="font-mono text-foreground">{bankTransferOrder.orderId.slice(0, 12).toUpperCase()}</span>
+              <span className="font-mono text-foreground">
+                {bankTransferOrder.orderId.slice(0, 12).toUpperCase()}
+              </span>
             </p>
           </CardContent>
         </Card>
@@ -208,7 +258,7 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -238,7 +288,9 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
             <CreditCard className="h-5 w-5 text-primary shrink-0" />
             <div>
               <p className="font-medium text-sm">Card / Online Payment</p>
-              <p className="text-xs text-muted-foreground">Pay securely via Paystack (card, USSD, bank)</p>
+              <p className="text-xs text-muted-foreground">
+                Pay securely via Paystack (card, USSD, bank)
+              </p>
             </div>
           </label>
 
@@ -262,7 +314,8 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
             <div>
               <p className="font-medium text-sm">Bank Transfer</p>
               <p className="text-xs text-muted-foreground">
-                Transfer directly to our GTBank account. Order confirmed after verification.
+                Transfer directly to our GTBank account. Order confirmed after
+                verification.
               </p>
             </div>
           </label>
@@ -277,7 +330,13 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <Button type="button" variant="outline" onClick={onBack} className="flex-1 bg-transparent" disabled={isProcessing}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          className="flex-1 bg-transparent"
+          disabled={isProcessing}
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
@@ -290,7 +349,7 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
           ) : paymentMethod === "BANK_TRANSFER" ? (
             <>
               <Building2 className="h-4 w-4 mr-2" />
-              Place Order — Get Account Details
+              Place Order: Get Account Details
             </>
           ) : (
             <>
@@ -301,5 +360,5 @@ export function PaymentForm({ onBack, onComplete, total, orderPayload }: Payment
         </Button>
       </div>
     </form>
-  )
+  );
 }

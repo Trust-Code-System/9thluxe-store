@@ -2,7 +2,7 @@
 // POST /api/v1/layering -> editorial layering advice for two products + a best-effort AI tip.
 // Compatibility is decided by deterministic editorial rules; the AI only phrases the result.
 // Results are guidance, never guarantees. (Saving combinations is deferred until the migration is
-// applied — see docs/BACKEND_UPGRADE_TODO.md.)
+// applied. See docs/BACKEND_UPGRADE_TODO.md.)
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'
 import { getCommerce } from '@/integrations/registry'

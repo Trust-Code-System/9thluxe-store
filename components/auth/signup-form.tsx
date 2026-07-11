@@ -24,7 +24,7 @@ import { signUpAction } from "@/app/auth/signup/actions"
 
 export function SignUpForm() {
 
-  const router = useRouter()
+  const _router = useRouter()
 
   const [showPassword, setShowPassword] = React.useState(false)
 
