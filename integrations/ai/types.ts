@@ -25,7 +25,7 @@ export interface AiUsage {
 
 /** Low-level provider contract. Adapters implement this; the wrapper adds resilience. */
 export interface AiProvider {
-  readonly name: 'mock' | 'anthropic' | 'openai' | 'gemini'
+  readonly name: 'mock' | 'anthropic' | 'openai' | 'gemini' | 'xai'
   readonly model: string
   /** Return raw text completion for a system+user prompt. */
   complete(system: string, user: string, opts: AiCallOptions): Promise<{ text: string; usage: Partial<AiUsage> }>

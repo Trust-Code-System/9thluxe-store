@@ -37,7 +37,9 @@ const schema = z.object({
 
   // AI providers (default provider = mock). Model IDs are the current latest (2026-07) and are
   // env-overridable so they can be bumped without code changes.
-  AI_PROVIDER: z.enum(['mock', 'anthropic', 'openai', 'gemini']).default('mock'),
+  AI_PROVIDER: z.enum(['mock', 'anthropic', 'openai', 'gemini', 'xai']).default('mock'),
+  AI_PROVIDER_PRIORITY: z.string().default('openai,anthropic,gemini,xai'),
+  AI_DEMO_MODE: z.coerce.boolean().default(false),
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default('claude-haiku-4-5-20251001'),
   OPENAI_API_KEY: z.string().optional(),
@@ -66,6 +68,16 @@ const schema = z.object({
   // When absent, rate limiting degrades to an in-memory per-instance limiter (documented limitation).
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+  CONCIERGE_GUEST_QUESTIONS: z.coerce.number().int().min(0).max(10).default(1),
+  CONCIERGE_AUTH_PER_MINUTE: z.coerce.number().int().positive().default(12),
+  CONCIERGE_AUTH_DAILY: z.coerce.number().int().positive().default(100),
+  CONCIERGE_WEB_DAILY: z.coerce.number().int().positive().default(15),
+  CONCIERGE_MAX_TOOL_CALLS: z.coerce.number().int().min(1).max(30).default(8),
+  CONCIERGE_MAX_SEARCH_CALLS: z.coerce.number().int().min(0).max(10).default(3),
+  CONCIERGE_MAX_OUTPUT_TOKENS: z.coerce.number().int().min(128).max(8192).default(1400),
+  CONCIERGE_DAILY_SPEND_USD: z.coerce.number().nonnegative().default(25),
+  CONCIERGE_MONTHLY_SPEND_USD: z.coerce.number().nonnegative().default(300),
+  CONCIERGE_CATALOGUE_ONLY: z.coerce.boolean().default(false),
 })
 
 export type Env = z.infer<typeof schema>
@@ -118,7 +130,8 @@ export function integrationStatus() {
       e.AI_PROVIDER === 'mock' ||
       (e.AI_PROVIDER === 'anthropic' && Boolean(e.ANTHROPIC_API_KEY)) ||
       (e.AI_PROVIDER === 'openai' && Boolean(e.OPENAI_API_KEY)) ||
-      (e.AI_PROVIDER === 'gemini' && Boolean(e.GEMINI_API_KEY)),
+      (e.AI_PROVIDER === 'gemini' && Boolean(e.GEMINI_API_KEY)) ||
+      (e.AI_PROVIDER === 'xai' && Boolean(e.XAI_API_KEY)),
     whatsapp: Boolean(e.WHATSAPP_TOKEN && e.WHATSAPP_PHONE_ID),
     sms: Boolean(e.TWILIO_ACCOUNT_SID && e.TWILIO_AUTH_TOKEN),
   }

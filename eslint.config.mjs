@@ -9,6 +9,7 @@ export default [
       ".next/**",
       "public/**",
       "FRONTEND/**",
+      "e2e/**",
     ],
   },
   {

@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Package, ShoppingCart, Tags, Folder, ChevronLeft, Menu, LogOut, Mail, Warehouse } from "lucide-react"
+import { LayoutDashboard, Package, ShoppingCart, Tags, Folder, ChevronLeft, Menu, LogOut, Mail, Warehouse, Bot } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,7 @@ const navItems = [
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Inventory", href: "/admin/inventory", icon: Warehouse },
   { name: "Newsletter", href: "/admin/newsletter", icon: Mail },
+  { name: "Concierge V2", href: "/admin/concierge", icon: Bot },
 ]
 
 function SidebarContent() {

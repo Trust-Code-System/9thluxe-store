@@ -5,6 +5,7 @@ import { env } from '@/lib/env'
 export type FeatureFlag =
   | 'shopify_commerce' // route commerce reads/cart through Shopify instead of local Postgres
   | 'ai_concierge' // AI Scent Concierge endpoints
+  | 'concierge_v2' // Perfume Intelligence V2 endpoint and full-screen client
   | 'loyalty_rewards' // points redemption (financial): default OFF
   | 'referral_rewards' // referral payouts (financial): default OFF
   | 'sample_credits' // sample credit redemption: default OFF until priced
@@ -15,6 +16,7 @@ export type FeatureFlag =
 const DEFAULTS: Record<FeatureFlag, boolean> = {
   shopify_commerce: false,
   ai_concierge: true,
+  concierge_v2: true,
   loyalty_rewards: false,
   referral_rewards: false,
   sample_credits: false,

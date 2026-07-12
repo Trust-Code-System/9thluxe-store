@@ -50,6 +50,10 @@ export type ErrorCode =
   | 'AI_UNAVAILABLE'
   | 'AI_OUTPUT_INVALID'
   | 'AI_REQUEST_UNSUPPORTED'
+  | 'GUEST_ALLOWANCE_EXHAUSTED'
+  | 'DAILY_LIMIT_REACHED'
+  | 'WEB_SEARCH_LIMIT_REACHED'
+  | 'AI_BUDGET_REACHED'
   // Provider / integration
   | 'PROVIDER_ERROR'
   | 'PROVIDER_TIMEOUT'
@@ -102,6 +106,10 @@ export const ERROR_CATALOGUE: Record<ErrorCode, ErrorSpec> = {
   AI_UNAVAILABLE: { status: 503, message: 'The concierge is briefly unavailable. Please try again.' },
   AI_OUTPUT_INVALID: { status: 502, message: 'The concierge could not complete that request.' },
   AI_REQUEST_UNSUPPORTED: { status: 422, message: 'The concierge can only help with our fragrance catalogue.' },
+  GUEST_ALLOWANCE_EXHAUSTED: { status: 401, message: 'Your complimentary question is complete. Sign in to keep this conversation going.' },
+  DAILY_LIMIT_REACHED: { status: 429, message: 'You have reached today’s concierge allowance. Please try again tomorrow.' },
+  WEB_SEARCH_LIMIT_REACHED: { status: 429, message: 'Today’s web research allowance has been reached. You can still ask catalogue and general perfume questions.' },
+  AI_BUDGET_REACHED: { status: 503, message: 'The concierge has reached its current service budget. Please try again later.' },
 
   PROVIDER_ERROR: { status: 502, message: 'An upstream service returned an error. Please try again.' },
   PROVIDER_TIMEOUT: { status: 504, message: 'An upstream service timed out. Please try again.' },

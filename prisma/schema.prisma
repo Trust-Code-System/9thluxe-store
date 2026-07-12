@@ -48,15 +48,18 @@ model User {
   reviews   Review[]
   addresses Address[]
 
-  scentProfile    ScentProfile?
-  quizSessions    ScentQuizSession[]
-  consents        ConsentRecord[]
-  loyaltyEntries  LoyaltyLedger[]
-  referralsMade   Referral[]                @relation("referrer")
-  sampleCredits   SampleCredit[]
-  discoverySets   DiscoverySet[]
-  supportThreads  SupportConversation[]
-  backInStockSubs BackInStockSubscription[]
+  scentProfile           ScentProfile?
+  quizSessions           ScentQuizSession[]
+  consents               ConsentRecord[]
+  loyaltyEntries         LoyaltyLedger[]
+  referralsMade          Referral[]                @relation("referrer")
+  sampleCredits          SampleCredit[]
+  discoverySets          DiscoverySet[]
+  supportThreads         SupportConversation[]
+  backInStockSubs        BackInStockSubscription[]
+  conciergeConversations ConciergeConversation[]
+  conciergeUsage         ConciergeUsageEvent[]
+  conciergeFeedback      ConciergeFeedback[]
 }
 
 model Category {
@@ -734,4 +737,107 @@ model FeatureFlag {
   description String?
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
+}
+
+model ConciergeConversation {
+  id           String             @id @default(cuid())
+  userId       String?
+  user         User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestKeyHash String?
+  title        String?
+  state        Json?
+  summary      String?
+  archivedAt   DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  messages     ConciergeMessage[]
+
+  @@index([userId, updatedAt])
+  @@index([guestKeyHash, updatedAt])
+}
+
+model ConciergeMessage {
+  id             String                @id @default(cuid())
+  conversationId String
+  conversation   ConciergeConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  content        String
+  intent         String?
+  status         String                @default("COMPLETED")
+  sources        Json?
+  productRefs    Json?
+  createdAt      DateTime              @default(now())
+  feedback       ConciergeFeedback?
+
+  @@index([conversationId, createdAt])
+}
+
+model ConciergeGuestAllowance {
+  id            String    @id @default(cuid())
+  guestKeyHash  String    @unique
+  successCount  Int       @default(0)
+  lastSuccessAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model ConciergeUsageEvent {
+  id                  String   @id @default(cuid())
+  requestId           String   @unique
+  conversationId      String?
+  userId              String?
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestKeyHash        String?
+  intent              String
+  provider            String?
+  model               String?
+  promptVersion       String
+  toolCalls           Json?
+  searchCalls         Int      @default(0)
+  inputTokens         Int      @default(0)
+  outputTokens        Int      @default(0)
+  estimatedCostMicros Int      @default(0)
+  firstTokenLatencyMs Int?
+  totalLatencyMs      Int
+  cacheStatus         String?
+  completionStatus    String
+  errorCode           String?
+  citationsUsed       Boolean  @default(false)
+  createdAt           DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([guestKeyHash, createdAt])
+  @@index([createdAt])
+  @@index([intent, createdAt])
+}
+
+model ConciergeFeedback {
+  id           String           @id @default(cuid())
+  messageId    String           @unique
+  message      ConciergeMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestKeyHash String?
+  rating       String
+  reportReason String?
+  createdAt    DateTime         @default(now())
+}
+
+model PerfumeKnowledgeEntry {
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  title          String
+  content        String
+  summary        String?
+  category       String
+  sourceUrls     Json
+  sourceTitles   Json
+  approvalStatus ApprovalStatus @default(PENDING)
+  lastVerifiedAt DateTime?
+  createdBy      String?
+  approvedBy     String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([category, approvalStatus])
 }

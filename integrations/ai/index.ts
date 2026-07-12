@@ -19,6 +19,7 @@ import { mockAiProvider } from './mock'
 import { anthropicProvider } from './anthropic'
 import { openaiProvider } from './openai'
 import { geminiProvider } from './gemini'
+import { xaiProvider } from './xai'
 import { recordAiUsage } from './cost'
 
 function selectProvider(): AiProvider {
@@ -29,6 +30,8 @@ function selectProvider(): AiProvider {
       return env.OPENAI_API_KEY ? openaiProvider : mockAiProvider
     case 'gemini':
       return env.GEMINI_API_KEY ? geminiProvider : mockAiProvider
+    case 'xai':
+      return env.XAI_API_KEY ? xaiProvider : mockAiProvider
     default:
       return mockAiProvider
   }
@@ -89,6 +92,8 @@ export async function generateStructured<T>(
   opts: AiCallOptions,
 ): Promise<T> {
   const primary = selectProvider()
+  const mockAllowed = env.NODE_ENV !== 'production' || env.AI_DEMO_MODE
+  if (primary.name === 'mock' && !mockAllowed) throw new AppError('AI_UNAVAILABLE', { internal: 'mock provider prohibited in production' })
   const timeoutMs = opts.timeoutMs ?? 10_000
   const safeUser = scrubPrompt(user)
 
@@ -121,8 +126,9 @@ export async function generateStructured<T>(
     return schema.parse(parsed)
   }
 
-  // Try primary (with one retry), then mock fallback.
-  for (const provider of primary.name === 'mock' ? [primary] : [primary, primary, mockAiProvider]) {
+  // Try the configured provider once more for a transient failure. Mock is dev/test/demo only.
+  const attempts = primary.name === 'mock' ? [primary] : [primary, primary, ...(mockAllowed ? [mockAiProvider] : [])]
+  for (const provider of attempts) {
     try {
       const result = await attempt(provider)
       recordSuccess(provider.name)
