@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 /** Admin-only: send a test newsletter email. Recipient from body or env NEWSLETTER_TEST_EMAIL. */
 export async function POST(req: NextRequest) {
   try {
@@ -18,9 +16,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    if (!process.env.RESEND_API_KEY) {
+    const resendKey = process.env.RESEND_API_KEY
+    if (!resendKey) {
       return NextResponse.json({ error: 'RESEND_API_KEY not set', success: false }, { status: 400 })
     }
+    const resend = new Resend(resendKey)
 
     const body = await req.json().catch(() => ({}))
     const to = (body.to as string) || process.env.NEWSLETTER_TEST_EMAIL || email

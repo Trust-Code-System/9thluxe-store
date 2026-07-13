@@ -1,8 +1,6 @@
 import { Resend } from "resend"
 import { OrderStatus } from "@prisma/client"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 type OrderLike = {
   id: string
   reference: string | null
@@ -165,7 +163,8 @@ const statusContent: Record<OrderStatus, (order: OrderLike, orderRef: string) =>
 export async function sendOrderStatusUpdate(order: OrderLike, newStatus: OrderStatus) {
   const orderRef = order.reference || order.id.slice(0, 8).toUpperCase()
 
-  if (!process.env.RESEND_API_KEY) {
+  const resendKey = process.env.RESEND_API_KEY
+  if (!resendKey) {
     console.log("[EMAIL] Order status update (no API key):", {
       to: order.user.email,
       status: newStatus,
@@ -173,6 +172,7 @@ export async function sendOrderStatusUpdate(order: OrderLike, newStatus: OrderSt
     })
     return
   }
+  const resend = new Resend(resendKey)
 
   const { subject, html } = statusContent[newStatus](order, orderRef)
 

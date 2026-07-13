@@ -1,7 +1,5 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const BRAND_COLOR = "#1a1a1a"
 const ACCENT_COLOR = "#c9a96e"
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://fade.ng"
@@ -22,10 +20,12 @@ export async function sendPriceDropAlert(params: PriceDropAlertParams) {
   const savingsPct = Math.round((savings / oldPriceNGN) * 100)
   const productUrl = `${siteUrl}/product/${productSlug}`
 
-  if (!process.env.RESEND_API_KEY) {
+  const resendKey = process.env.RESEND_API_KEY
+  if (!resendKey) {
     console.log("[EMAIL] Price drop alert (no API key):", { to, productName, oldPriceNGN, newPriceNGN })
     return
   }
+  const resend = new Resend(resendKey)
 
   const html = `<!DOCTYPE html>
 <html>

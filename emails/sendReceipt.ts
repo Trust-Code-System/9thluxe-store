@@ -1,8 +1,6 @@
 // emails/sendReceipt.ts
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 type OrderLike = {
   id: string
   reference: string | null
@@ -16,7 +14,8 @@ type OrderLike = {
 }
 
 export async function sendReceipt(order: OrderLike) {
-  if (!process.env.RESEND_API_KEY) {
+  const resendKey = process.env.RESEND_API_KEY
+  if (!resendKey) {
     console.log('[EMAIL] Receipt (no API key):', {
       to: order.user.email,
       subject: `Fádé Order #${order.reference || order.id.slice(-6)} receipt`,
@@ -29,6 +28,7 @@ export async function sendReceipt(order: OrderLike) {
     })
     return
   }
+  const resend = new Resend(resendKey)
 
   const orderRef = order.reference || order.id.slice(0, 8)
   const itemsHtml = order.items
