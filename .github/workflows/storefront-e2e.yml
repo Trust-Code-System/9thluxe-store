@@ -13,11 +13,26 @@ jobs:
   playwright:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: fade_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d fade_e2e"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: e2e
     env:
       E2E_BASE_URL: http://127.0.0.1:3000
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/fade_e2e
 
     steps:
       - name: Checkout
@@ -36,6 +51,10 @@ jobs:
       - name: Install storefront dependencies
         working-directory: .
         run: npm ci
+
+      - name: Apply database migrations
+        working-directory: .
+        run: npx prisma migrate deploy
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium

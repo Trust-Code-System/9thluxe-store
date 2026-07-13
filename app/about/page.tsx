@@ -67,7 +67,7 @@ export default function AboutPage() {
                 key={principle.title}
                 className="grid gap-4 border-b border-border py-8 sm:grid-cols-[3rem_1fr]"
               >
-                <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground/60">
+                <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div>

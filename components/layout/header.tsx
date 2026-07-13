@@ -100,9 +100,10 @@ export function Header() {
               </SheetTrigger>
               <SheetContent
                 side="left"
+                closeLabel="Close menu"
                 className="grain !fixed flex w-full max-w-sm flex-col overflow-y-auto overscroll-contain border-border bg-background p-0"
               >
-                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetTitle className="sr-only">Navigation menu</SheetTitle>
                 <SheetDescription className="sr-only">
                   Browse the store and open account links.
                 </SheetDescription>

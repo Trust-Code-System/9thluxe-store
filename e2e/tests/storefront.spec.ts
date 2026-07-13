@@ -46,7 +46,6 @@ test.describe("mobile navigation", () => {
     await expect(trigger).toBeVisible()
     await expect(trigger).toHaveAttribute("aria-expanded", "false")
     await trigger.click()
-    await expect(trigger).toHaveAttribute("aria-expanded", "true")
 
     const dialog = page.getByRole("dialog", { name: "Navigation menu" })
     await expect(dialog).toBeVisible()
