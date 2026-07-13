@@ -11,7 +11,12 @@ import { getIngredient } from "@/lib/fragrance/ingredients"
 import type { NoteTier, ProminenceLabel } from "@/lib/fragrance/types"
 import { assetsForTier, isComingSoon, type HeroProductInput } from "./select"
 import type { HeroAvailability, HeroIngredientAsset } from "./types"
-import { ORBIT_SLIDES, type HomepagePerfumeSlide, type PedestalStyle } from "./orbit-config"
+import {
+  ORBIT_SLIDES,
+  type HomepagePerfumeSlide,
+  type OrbitSlideDisplay,
+  type PedestalStyle,
+} from "./orbit-config"
 
 /** Public perceived-prominence scale required by the creative brief. Qualitative only. */
 export type OrbitProminence = "Trace" | "Subtle" | "Noticeable" | "Prominent" | "Dominant"
@@ -44,6 +49,7 @@ export interface OrbitAnnotation {
 export interface OrbitSlideProduct {
   id: string
   name: string
+  /** Product page slug. Empty string for showcase slides (no product page). */
   slug: string
   brand: string
   alt: string
@@ -62,6 +68,11 @@ export interface OrbitSlideData {
   /** Transparent merchant-owned bottle cutout. */
   bottleAsset: string
   product: OrbitSlideProduct
+  /**
+   * Whether this slide is a real, buyable catalogue product. Showcase slides (false) render the
+   * bottle + editorial info with NO purchase action and no availability claim.
+   */
+  purchasable: boolean
   /** Active-slide ingredient visuals, tier order, capped at ORBIT_MAX_INGREDIENTS. */
   ingredients: HeroIngredientAsset[]
   annotations: OrbitAnnotation[]
@@ -82,30 +93,29 @@ function firstSentence(text: string): string {
   return (match ? match[0] : text).trim()
 }
 
-/**
- * Build one public slide, or null when the slide is not eligible. Eligibility requires an APPROVED,
- * enabled config entry with a real cutout asset AND a matching published, non-deleted product.
- */
-export function buildOrbitSlide(
-  config: HomepagePerfumeSlide,
-  product: OrbitProductInput | null | undefined,
-): OrbitSlideData | null {
-  if (!config.enabled || config.approvalStatus !== "APPROVED" || !config.bottleAsset) return null
-  if (!product || product.deletedAt || product.publishStatus !== "PUBLISHED") return null
-
+/** Shared: map a fragrance's three note tiers to capped ingredient visuals + approved annotations. */
+function resolveNotes(
+  slideId: string,
+  notesTop: string | null,
+  notesHeart: string | null,
+  notesBase: string | null,
+): {
+  tiers: HeroIngredientAsset[]
+  ingredients: HeroIngredientAsset[]
+  annotations: OrbitAnnotation[]
+} {
   const tiers = [
-    ...assetsForTier(product.notesTop, "top"),
-    ...assetsForTier(product.notesHeart, "heart"),
-    ...assetsForTier(product.notesBase, "base"),
+    ...assetsForTier(notesTop, "top"),
+    ...assetsForTier(notesHeart, "heart"),
+    ...assetsForTier(notesBase, "base"),
   ]
   const ingredients = tiers.slice(0, ORBIT_MAX_INGREDIENTS)
-
   const annotations: OrbitAnnotation[] = []
   for (const asset of ingredients) {
     const ing = getIngredient(asset.id)
     if (!ing || ing.approval !== "approved" || !ing.shortDescription) continue
     annotations.push({
-      id: `${config.id}_${asset.id}`,
+      id: `${slideId}_${asset.id}`,
       ingredientId: asset.id,
       name: asset.name,
       tier: asset.tier,
@@ -113,13 +123,40 @@ export function buildOrbitSlide(
       prominence: PROMINENCE_PUBLIC[asset.perceivedProminence],
     })
   }
+  return { tiers, ingredients, annotations }
+}
 
+/** True when a config entry has cleared its per-slide gates (approved, enabled, has an asset). */
+function slideEnabled(config: HomepagePerfumeSlide): config is HomepagePerfumeSlide & {
+  bottleAsset: string
+} {
+  return Boolean(config.enabled && config.approvalStatus === "APPROVED" && config.bottleAsset)
+}
+
+/**
+ * Build one PRODUCT slide (purchasable), or null when not eligible. Requires an APPROVED, enabled
+ * config with a cutout asset AND a matching published, non-deleted catalogue product.
+ */
+export function buildOrbitSlide(
+  config: HomepagePerfumeSlide,
+  product: OrbitProductInput | null | undefined,
+): OrbitSlideData | null {
+  if (!slideEnabled(config) || config.display) return null
+  if (!product || product.deletedAt || product.publishStatus !== "PUBLISHED") return null
+
+  const { tiers, ingredients, annotations } = resolveNotes(
+    config.id,
+    product.notesTop,
+    product.notesHeart,
+    product.notesBase,
+  )
   const brand = (product.brand ?? "").trim()
   return {
     id: config.id,
     displayOrder: config.displayOrder,
     pedestalStyle: config.pedestalStyle,
     bottleAsset: config.bottleAsset,
+    purchasable: true,
     product: {
       id: product.id,
       name: product.name,
@@ -137,9 +174,46 @@ export function buildOrbitSlide(
 }
 
 /**
- * Assemble the carousel payload from configs + fetched products. Returns null when fewer than two
- * slides are usable: a one-bottle "carousel" would be dishonest motion for nothing, so the homepage
- * keeps the Stage 1 hero instead (the brief's fallback ladder).
+ * Build one SHOWCASE slide (not purchasable) purely from config. No catalogue product, price or
+ * stock; the bottle image and notes are real, and no availability is claimed. Null when the config
+ * is not a showcase entry or has not cleared its gates.
+ */
+export function buildShowcaseSlide(config: HomepagePerfumeSlide): OrbitSlideData | null {
+  if (!slideEnabled(config) || !config.display) return null
+  const d: OrbitSlideDisplay = config.display
+  const brand = d.brand.trim()
+  const { tiers, ingredients, annotations } = resolveNotes(
+    config.id,
+    d.notesTop,
+    d.notesHeart,
+    d.notesBase,
+  )
+  return {
+    id: config.id,
+    displayOrder: config.displayOrder,
+    pedestalStyle: config.pedestalStyle,
+    bottleAsset: config.bottleAsset,
+    purchasable: false,
+    product: {
+      id: config.id,
+      name: d.name,
+      slug: "",
+      brand,
+      alt: `${d.name}${brand ? ` by ${brand}` : ""} perfume bottle`,
+      concentration: d.concentration?.trim() || null,
+      family: d.fragranceFamily?.trim() || null,
+      availability: "available",
+      keyNotes: tiers.map((a) => a.name),
+    },
+    ingredients,
+    annotations,
+  }
+}
+
+/**
+ * Assemble the carousel payload. PRODUCT slides need a matching published product; SHOWCASE slides
+ * render from config alone. Returns null when fewer than two slides are usable (a one-bottle
+ * "carousel" is dishonest motion), so the homepage keeps the Stage 1 hero (the brief's fallback).
  */
 export function buildOrbitData(
   configs: HomepagePerfumeSlide[],
@@ -148,32 +222,32 @@ export function buildOrbitData(
   const slides = configs
     .slice()
     .sort((a, b) => a.displayOrder - b.displayOrder)
-    .map((cfg) => buildOrbitSlide(cfg, productsBySlug.get(cfg.productSlug)))
+    .map((cfg) =>
+      cfg.display ? buildShowcaseSlide(cfg) : buildOrbitSlide(cfg, productsBySlug.get(cfg.productSlug)),
+    )
     .filter((s): s is OrbitSlideData => s !== null)
   if (slides.length < 2) return null
   return { slides, motion: ORBIT_MOTION }
 }
 
-/** Query the catalogue for the configured slides. Best-effort: any DB error yields null. */
+/**
+ * Resolve the carousel. Only PRODUCT slides need the catalogue; showcase slides render without it,
+ * so a DB hiccup degrades gracefully to the showcase slides rather than losing the whole carousel.
+ */
 export async function selectHeroOrbit(): Promise<OrbitData | null> {
-  const candidates = ORBIT_SLIDES.filter(
-    (s) => s.enabled && s.approvalStatus === "APPROVED" && s.bottleAsset,
-  )
+  const candidates = ORBIT_SLIDES.filter(slideEnabled)
   if (candidates.length < 2) return null
-  try {
-    const products = await prisma.product.findMany({
-      where: {
-        slug: { in: candidates.map((s) => s.productSlug) },
-        deletedAt: null,
-        publishStatus: "PUBLISHED",
-      },
-    })
-    const bySlug = new Map<string, OrbitProductInput>(
-      products.map((p) => [p.slug, p as unknown as OrbitProductInput]),
-    )
-    return buildOrbitData(ORBIT_SLIDES, bySlug)
-  } catch (err) {
-    console.error("[hero-orbit] failed to select slides", err)
-    return null
+  const productSlugs = candidates.filter((s) => !s.display).map((s) => s.productSlug)
+  let bySlug = new Map<string, OrbitProductInput>()
+  if (productSlugs.length > 0) {
+    try {
+      const products = await prisma.product.findMany({
+        where: { slug: { in: productSlugs }, deletedAt: null, publishStatus: "PUBLISHED" },
+      })
+      bySlug = new Map(products.map((p) => [p.slug, p as unknown as OrbitProductInput]))
+    } catch (err) {
+      console.error("[hero-orbit] failed to load product slides", err)
+    }
   }
+  return buildOrbitData(ORBIT_SLIDES, bySlug)
 }

@@ -9,6 +9,8 @@ export default [
       ".next/**",
       "public/**",
       "FRONTEND/**",
+      // Isolated Playwright harness: its own package.json/tsconfig, excluded from the root
+      // TypeScript project, so the typed root lint parser can't and shouldn't process it.
       "e2e/**",
     ],
   },

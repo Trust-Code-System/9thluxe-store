@@ -4,9 +4,10 @@ import {
   ORBIT_MAX_INGREDIENTS,
   buildOrbitData,
   buildOrbitSlide,
+  buildShowcaseSlide,
   type OrbitProductInput,
 } from "@/lib/hero/orbit"
-import type { HomepagePerfumeSlide } from "@/lib/hero/orbit-config"
+import type { HomepagePerfumeSlide, OrbitSlideDisplay } from "@/lib/hero/orbit-config"
 
 function slideConfig(overrides: Partial<HomepagePerfumeSlide> = {}): HomepagePerfumeSlide {
   return {
@@ -159,6 +160,70 @@ describe("buildOrbitData", () => {
     expect(data.motion.dwellMs).toBeLessThanOrEqual(6_000)
     expect(data.motion.transitionMs).toBeGreaterThanOrEqual(800)
     expect(data.motion.transitionMs).toBeLessThanOrEqual(1_200)
+  })
+
+  it("mixes showcase and product slides in display order", () => {
+    const showcase = slideConfig({
+      id: "slide_showcase",
+      productSlug: "tom-ford-oud-wood",
+      displayOrder: 3,
+      bottleAsset: "/hero/tom-ford-oud-wood-bottle.webp",
+      display: {
+        brand: "Tom Ford",
+        name: "Oud Wood Eau de Parfum",
+        fragranceFamily: "WOODY",
+        concentration: "EDP",
+        notesTop: "cardamom",
+        notesHeart: "oud, sandalwood",
+        notesBase: "tonka bean, vanilla, amber",
+      },
+    })
+    const products = new Map([
+      [product().slug, product()],
+      [vesper.slug, vesper],
+    ])
+    const data = buildOrbitData([slideConfig(), second, showcase], products)!
+    expect(data.slides.map((s) => s.id)).toEqual(["slide_test", "slide_two", "slide_showcase"])
+    const sc = data.slides.find((s) => s.id === "slide_showcase")!
+    expect(sc.purchasable).toBe(false)
+    expect(data.slides.find((s) => s.id === "slide_test")!.purchasable).toBe(true)
+  })
+
+  it("builds showcase slides from config with no catalogue product needed", () => {
+    const display: OrbitSlideDisplay = {
+      brand: "Dior",
+      name: "Sauvage Elixir",
+      fragranceFamily: "SPICY",
+      concentration: "Elixir",
+      notesTop: "cardamom",
+      notesHeart: "lavender",
+      notesBase: "sandalwood, amber, patchouli, vetiver",
+    }
+    const slide = buildShowcaseSlide(slideConfig({ id: "sc", display }))!
+    expect(slide).not.toBeNull()
+    expect(slide.purchasable).toBe(false)
+    expect(slide.product.slug).toBe("") // no product page
+    expect(slide.product.brand).toBe("Dior")
+    expect(slide.product.family).toBe("SPICY")
+    expect(slide.ingredients.length).toBeGreaterThan(0)
+    // No percentages ever leak into showcase annotations either.
+    for (const a of slide.annotations) expect(a.text).not.toMatch(/\d+\s*%/)
+  })
+
+  it("keeps showcase and product builders from crossing over", () => {
+    const display: OrbitSlideDisplay = {
+      brand: "Creed",
+      name: "Aventus",
+      fragranceFamily: "FRESH",
+      concentration: "EDP",
+      notesTop: "bergamot",
+      notesHeart: "patchouli, jasmine",
+      notesBase: "musk, vanilla",
+    }
+    // buildOrbitSlide must refuse a showcase config even with a product supplied.
+    expect(buildOrbitSlide(slideConfig({ display }), product())).toBeNull()
+    // buildShowcaseSlide must refuse a plain product config (no display).
+    expect(buildShowcaseSlide(slideConfig())).toBeNull()
   })
 
   it("excludes blocked slides (e.g. missing asset) without inventing data", () => {

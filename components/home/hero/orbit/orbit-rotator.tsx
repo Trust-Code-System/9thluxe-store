@@ -387,7 +387,7 @@ export function OrbitRotator({
         </p>
         <p className="mt-1 font-serif text-xl text-foreground">
           {slide.product.name}
-          {slide.product.availability === "coming_soon" && (
+          {slide.purchasable && slide.product.availability === "coming_soon" && (
             <span className="ml-3 align-middle font-mono text-[10px] uppercase tracking-[0.25em] text-accent">
               Coming soon
             </span>
@@ -398,23 +398,30 @@ export function OrbitRotator({
             {slide.product.keyNotes.join(" · ")}
           </p>
         )}
-        <div className="mt-3 flex items-center justify-center gap-5">
-          <Link
-            href={`/product/${slide.product.slug}`}
-            className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-foreground underline-offset-4 hover:text-accent hover:underline"
-          >
-            Explore the scent
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-          {slide.product.availability === "available" && (
+        {slide.purchasable ? (
+          <div className="mt-3 flex items-center justify-center gap-5">
             <Link
               href={`/product/${slide.product.slug}`}
-              className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground underline-offset-4 hover:text-accent hover:underline"
+              className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-foreground underline-offset-4 hover:text-accent hover:underline"
             >
-              Shop this fragrance
+              Explore the scent
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-          )}
-        </div>
+            {slide.product.availability === "available" && (
+              <Link
+                href={`/product/${slide.product.slug}`}
+                className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground underline-offset-4 hover:text-accent hover:underline"
+              >
+                Shop this fragrance
+              </Link>
+            )}
+          </div>
+        ) : (
+          // Showcase slide: recognisable fragrance shown as part of the house world, not for sale.
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground/80">
+            In the Fádé world
+          </p>
+        )}
       </div>
 
       {/* Accessible slide navigation */}

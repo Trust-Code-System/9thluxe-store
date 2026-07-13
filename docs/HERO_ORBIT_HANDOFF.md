@@ -67,7 +67,29 @@ supports and what is blocked).
   orbit active; home route sweep (fails on any console/hydration error) passes.
 - Flag OFF: full storefront + hero + a11y regression suites (see repo QA reports).
 
-## Expansion round status (2026-07-11, merchant-approved)
+## Showcase slides (2026-07-12, merchant-directed)
+
+Per the merchant, the three expansion fragrances (Tom Ford Oud Wood, Creed Aventus, Dior Sauvage
+Elixir) are **showcase-only**: recognisable bottles shown as part of the site's world, NOT sold
+through checkout. They are decoupled from the catalogue entirely.
+
+- A slide is now one of two kinds (`lib/hero/orbit-config.ts`): a PRODUCT slide (no `display`,
+  purchasable, requires a PUBLISHED catalogue product) or a SHOWCASE slide (`display` present:
+  brand/name/family/concentration/notes live in config; not purchasable).
+- Showcase slides render from config alone via `buildShowcaseSlide` - no price, stock, publish or DB
+  dependency. `selectHeroOrbit` only queries the catalogue for PRODUCT slides, so a DB hiccup
+  degrades to the showcase slides instead of losing the carousel.
+- In the UI, showcase slides show the bottle + editorial info + a subtle "In the Fádé world" label
+  and **no Explore/Shop actions and no availability claim** (honest: not for sale).
+- Notes were verified against official/public sources (2026-07-12); only notes in the approved
+  ingredient library become visuals/annotations, the rest are dropped (never invented).
+- The three DRAFT catalogue records created on 2026-07-11 are now unused by the carousel (showcase
+  is config-driven). They remain DRAFT (invisible everywhere) and can be deleted in admin; even if
+  later published, the slide stays showcase because its config carries `display`.
+- Verified live (flag on): 5 slides roll; Nocturne + Vesper keep Explore/Shop; the three showcase
+  slides show "In the Fádé world" with no buy button; zero horizontal overflow; no runtime errors.
+
+## Expansion round status (2026-07-11, superseded by Showcase slides above)
 
 Merchant approved adding Tom Ford Oud Wood, Creed Aventus and Dior Sauvage Elixir to the catalogue
 and carousel, with: real bottle photography later (slides stay DRAFT/hidden until photos are
