@@ -973,3 +973,10 @@
     visibility: hidden;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reduced-motion-safe] {
+    animation: none !important;
+    transition-duration: 0ms !important;
+  }
+}

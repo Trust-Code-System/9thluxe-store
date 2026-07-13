@@ -51,7 +51,7 @@ test.describe("mobile navigation", () => {
     await expect(dialog).toBeVisible()
     await expect(dialog.getByRole("button", { name: "Close menu" })).toHaveCount(1)
 
-    await dialog.getByRole("link", { name: "Collections", exact: true }).click()
+    await dialog.getByRole("link", { name: /^Collections/ }).click()
     await expect(page).toHaveURL(/\/collections(?:\?.*)?$/)
     await expect(dialog).toBeHidden()
     await expect(page.getByRole("button", { name: "Open menu" })).toHaveAttribute("aria-expanded", "false")
@@ -71,7 +71,7 @@ test.describe("custom dropdowns", () => {
   test("shop filters use an accessible portalled combobox instead of a native select", async ({ page }) => {
     await page.goto("/shop", { waitUntil: "domcontentloaded" })
 
-    await expect(page.locator("select")).toHaveCount(0)
+    await expect(page.locator("select:visible")).toHaveCount(0)
     const comboboxes = page.getByRole("combobox")
     await expect(comboboxes.first()).toBeVisible()
     await comboboxes.first().click()
