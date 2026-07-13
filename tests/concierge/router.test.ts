@@ -23,4 +23,13 @@ describe("Concierge V2 intent router", () => {
     expect(result.requiresCatalogue).toBe(false)
     expect(result.requiresLiveStock).toBe(false)
   })
+
+  it("uses saved products for cheaper and ordinal follow-ups", () => {
+    const state = { activeProductIds: ["one", "two"], externalPerfumes: [], preferredNotes: [], excludedNotes: [], preferredFamilies: [] }
+    const cheaper = routeConciergeIntent("What about something cheaper?", state)
+    expect(cheaper.primaryIntent).toBe("PRICE_CHECK")
+    expect(cheaper.requiresConversationContext).toBe(true)
+    expect(cheaper.requiresCatalogue).toBe(true)
+    expect(routeConciergeIntent("Can I sample the second one?", state).requiresConversationContext).toBe(true)
+  })
 })

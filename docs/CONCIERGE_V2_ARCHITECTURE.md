@@ -61,7 +61,7 @@ Providers advertise capabilities. A task requests capabilities and a priority-or
 - `done`: persisted message and completion state
 - `error`: stable safe error code and retryability
 
-The client aborts via `AbortController`. A disconnected request does not consume a guest success allowance. Provider streams are normalized when available; deterministic/dev answers are chunked through the same contract.
+The client aborts via `AbortController`. A disconnected request does not consume a guest success allowance. OpenAI/xAI Responses, Anthropic Messages, and Gemini content streams are normalized into the same delta contract. Deterministic dev answers use one delta. Web-research text is held until at least one safe source validates.
 
 ## Rollout
 

@@ -9,6 +9,15 @@ export function sanitizeConciergeText(text: string) {
     .slice(0, 12_000)
 }
 
+export function sanitizeConciergeDelta(text: string) {
+  return text.replace(/[\u2014\u2013]/g, ",")
+}
+
+export function ensureCitationMarkers(text: string, sources: ConciergeSource[]) {
+  if (!sources.length || /\[\d+\]/.test(text)) return text
+  return `${text}\n\nResearch sources: ${sources.map((_, index) => `[${index + 1}]`).join(" ")}`
+}
+
 export function validateSources(sources: ConciergeSource[]) {
   return sources.filter((source) => {
     try { const url = new URL(source.url); return url.protocol === "https:" && (url.hostname === source.domain || url.hostname.replace(/^www\./, "") === source.domain) }

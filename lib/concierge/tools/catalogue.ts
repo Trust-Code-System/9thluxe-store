@@ -9,6 +9,12 @@ const SearchInput = z.object({
   inStockOnly: z.boolean().default(false),
   sampleFirst: z.boolean().default(false),
   productIds: z.array(z.string()).max(20).default([]),
+  excludeProductIds: z.array(z.string()).max(20).default([]),
+  occasions: z.array(z.string().max(60)).max(8).default([]),
+  climates: z.array(z.string().max(60)).max(8).default([]),
+  families: z.array(z.string().max(60)).max(8).default([]),
+  excludeTerms: z.array(z.string().max(60)).max(12).default([]),
+  unisexOnly: z.boolean().default(false),
   limit: z.number().int().min(1).max(12).default(6),
 })
 
@@ -26,8 +32,25 @@ export async function searchFadeCatalogue(raw: z.input<typeof SearchInput>): Pro
   const input = SearchInput.parse(raw)
   const and: Record<string, unknown>[] = [{ deletedAt: null }, { publishStatus: "PUBLISHED" }]
   if (input.productIds.length) and.push({ id: { in: input.productIds } })
-  if (input.inStockOnly) and.push({ OR: [{ stock: { gt: 0 } }, { isPreorder: true }] })
+  if (input.excludeProductIds.length) and.push({ id: { notIn: input.excludeProductIds } })
+  if (input.inStockOnly) and.push({ OR: [{ stock: { gt: 0 } }, { variants: { some: { stock: { gt: 0 } } } }, { isPreorder: true }] })
   if (input.budgetMaxNGN) and.push({ priceNGN: { lte: input.budgetMaxNGN } })
+  if (input.occasions.length) and.push({ OR: input.occasions.map((value) => ({ occasion: { contains: value, mode: "insensitive" } })) })
+  if (input.climates.length) and.push({ OR: input.climates.map((value) => ({ climate: { contains: value, mode: "insensitive" } })) })
+  if (input.families.length) and.push({ OR: input.families.map((value) => ({ fragranceFamily: { contains: value, mode: "insensitive" } })) })
+  for (const term of input.excludeTerms) {
+    and.push({ NOT: { OR: [
+      { notesTop: { contains: term, mode: "insensitive" } },
+      { notesHeart: { contains: term, mode: "insensitive" } },
+      { notesBase: { contains: term, mode: "insensitive" } },
+      { mainAccords: { contains: term, mode: "insensitive" } },
+    ] } })
+  }
+  if (input.unisexOnly) and.push({ OR: [
+    { description: { contains: "unisex", mode: "insensitive" } },
+    { searchSynonyms: { contains: "unisex", mode: "insensitive" } },
+    { moodTags: { contains: "unisex", mode: "insensitive" } },
+  ] })
   if (input.notes.length) {
     and.push({
       OR: input.notes.flatMap((note) => [
@@ -59,22 +82,10 @@ export async function searchFadeCatalogue(raw: z.input<typeof SearchInput>): Pro
       variants: { where: { stock: { gt: 0 } }, select: { size: true, priceNGN: true, isSample: true, stock: true } },
     },
   })
-  if (!rows.length && !input.productIds.length && (input.notes.length || input.query)) {
-    rows = await prisma.product.findMany({
-      where: { deletedAt: null, publishStatus: "PUBLISHED", ...(input.inStockOnly ? { OR: [{ stock: { gt: 0 } }, { isPreorder: true }] } : {}) },
-      orderBy: [{ ratingAvg: "desc" }, { ratingCount: "desc" }], take: input.limit,
-      select: {
-        id: true, slug: true, name: true, brand: true, images: true, priceNGN: true,
-        stock: true, isPreorder: true, isWaitlist: true, notesTop: true, notesHeart: true,
-        notesBase: true, mainAccords: true, fragranceFamily: true, olfactoryDesc: true,
-        climate: true, occasion: true,
-        variants: { where: { stock: { gt: 0 } }, select: { size: true, priceNGN: true, isSample: true, stock: true } },
-      },
-    })
-  }
   const checkedAt = new Date().toISOString()
   const products = rows.map((row) => {
     const sample = row.variants.find((v) => v.isSample)
+    const hasAvailableVariant = row.variants.some((variant) => variant.stock > 0)
     const reasons = [
       row.mainAccords ? `Accords: ${row.mainAccords}` : null,
       row.olfactoryDesc ?? row.fragranceFamily,
@@ -82,8 +93,8 @@ export async function searchFadeCatalogue(raw: z.input<typeof SearchInput>): Pro
     return {
       id: row.id, slug: row.slug, name: row.name, brand: row.brand,
       image: imageFrom(row.images), priceNGN: sample && input.sampleFirst ? sample.priceNGN : row.priceNGN,
-      availability: row.stock > 0 ? "in_stock" as const : row.isPreorder ? "preorder" as const : row.isWaitlist ? "waitlist" as const : "out_of_stock" as const,
-      ...(sample?.size ? { variantLabel: sample.size } : {}), sampleAvailable: Boolean(sample), reasons,
+      availability: row.stock > 0 || hasAvailableVariant ? "in_stock" as const : row.isPreorder ? "preorder" as const : row.isWaitlist ? "waitlist" as const : "out_of_stock" as const,
+      ...(sample?.size && input.sampleFirst ? { variantLabel: sample.size } : {}), sampleAvailable: Boolean(sample), reasons,
       provenance: "Fádé catalogue" as const,
     }
   })
@@ -124,5 +135,6 @@ export async function getProductVariants(productId: string) {
 }
 
 export async function findSimilarCatalogueProducts(state: ConciergeConversationState, limit = 6) {
+  if (!state.preferredNotes.length && !state.preferredFamilies.length) return { products: [], evidence: [], checkedAt: new Date().toISOString() }
   return searchFadeCatalogue({ notes: state.preferredNotes, budgetMaxNGN: state.budgetMaxNGN, inStockOnly: true, sampleFirst: state.sampleFirst, limit })
 }

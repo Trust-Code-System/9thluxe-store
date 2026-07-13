@@ -109,7 +109,14 @@ export interface ConciergeTurnResult {
   evidenceScopes: EvidenceScope[]
   provider?: string
   model?: string
-  usage: { inputTokens: number; outputTokens: number; searchCalls: number; toolCalls: string[] }
+  usage: {
+    inputTokens: number
+    outputTokens: number
+    searchCalls: number
+    toolCalls: string[]
+    firstTokenLatencyMs?: number
+    providerLatencyMs?: number
+  }
   state: ConciergeConversationState
 }
 

@@ -4,6 +4,7 @@
 
 - Authenticated ownership uses the stable Prisma user ID resolved from the NextAuth session.
 - Guest ownership uses a random HttpOnly cookie and a server-side HMAC digest.
+- Production guest hashing requires `AUTH_SECRET` or `NEXTAUTH_SECRET`; the known development salt is prohibited in production.
 - Every conversation list, read, rename, archive, feedback, profile, wishlist, and past-recommendation query includes the current owner scope.
 - A missing or foreign conversation returns `NOT_FOUND`, avoiding an ownership oracle.
 
@@ -17,7 +18,7 @@
 ## Retrieval boundary
 
 - External pages and reviews are untrusted data. The system prompt forbids following instructions found in retrieved material.
-- Citation URLs must use HTTPS and cannot target local loopback hosts.
+- Citation URLs must use HTTPS. Credential-bearing URLs, loopback, link-local, RFC1918, and private IPv6 targets are rejected.
 - Source lists are shown only when web research returns validated sources.
 - Web claims are not used as Fádé stock or price evidence.
 - Community sources are labelled as community and may support anecdotal opinion only.
@@ -38,4 +39,4 @@
 
 ## Remaining security validation
 
-The database migration must be applied to a preview database before ownership and concurrent guest-claim integration tests can run. Provider-hosted search behavior must also be tested with deliberate prompt injection in retrieved pages on preview.
+The database migration was applied to the configured database on 2026-07-13. Ownership and concurrent guest-claim integration tests still need a deployed preview with multiple real sessions. Provider-hosted search behavior must also be tested with deliberate prompt injection in retrieved pages on preview.

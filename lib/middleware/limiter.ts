@@ -75,14 +75,14 @@ function store(): RateLimitStore {
  * Consume one request against a fixed-window limit. Fails OPEN (allows the request) if the durable
  * store errors, so a limiter outage never takes down the API; the error is logged.
  */
-export async function consumeRateLimit(identifier: string, limit: number, windowMs: number): Promise<RateLimitResult> {
+export async function consumeRateLimit(identifier: string, limit: number, windowMs: number, failOpen = true): Promise<RateLimitResult> {
   const key = `rl:${identifier}`
   try {
     const { count, resetMs } = await store().incr(key, windowMs)
     return { ok: count <= limit, remaining: Math.max(0, limit - count), limit, resetMs }
   } catch (e) {
     logger.warn('rate_limit_store_error', { store: store().name, internal: String(e) })
-    return { ok: true, remaining: limit, limit, resetMs: windowMs }
+    return { ok: failOpen, remaining: failOpen ? limit : 0, limit, resetMs: windowMs }
   }
 }
 

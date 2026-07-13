@@ -22,3 +22,13 @@ test("concierge has no automatic serious accessibility violations", async ({ pag
   const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()
   expect(result.violations.filter((violation) => violation.impact === "critical" || violation.impact === "serious")).toEqual([])
 })
+
+test("concierge renders without overflow in dark and light themes", async ({ page }) => {
+  await page.goto("/concierge")
+  for (const theme of ["dark", "light"] as const) {
+    await page.evaluate((value) => localStorage.setItem("fade-theme", value), theme)
+    await page.reload({ waitUntil: "domcontentloaded" })
+    await expect(page.locator("html")).toHaveClass(new RegExp(theme))
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false)
+  }
+})

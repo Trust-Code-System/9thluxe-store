@@ -9,9 +9,10 @@ export interface WebResearchProvider {
     maxSearches?: number
     freshness?: "CURRENT" | "RECENT" | "ANY"
     signal?: AbortSignal
+    onDelta?: (delta: string) => void
   }): Promise<{
     answerContext: string
     sources: ConciergeSource[]
-    usage: { provider: string; model: string; searches: number; inputTokens: number; outputTokens: number; latencyMs: number }
+    usage: { provider: string; model: string; searches: number; inputTokens: number; outputTokens: number; latencyMs: number; firstTokenLatencyMs?: number }
   }>
 }

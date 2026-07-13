@@ -9,9 +9,15 @@ import type { ConciergeIdentity, ConciergeConversationState, ConciergeSource } f
 
 export const GUEST_COOKIE = "fade_concierge_guest"
 
+export function guestCookieHeader(token: string) {
+  const secure = env.NODE_ENV === "production" ? "; Secure" : ""
+  return `${GUEST_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax${secure}`
+}
+
 function digestGuest(value: string) {
-  const secret = env.AUTH_SECRET || env.NEXTAUTH_SECRET || "development-only-concierge-salt"
-  return createHmac("sha256", secret).update(value).digest("hex")
+  const secret = env.AUTH_SECRET || env.NEXTAUTH_SECRET
+  if (!secret && env.NODE_ENV === "production") throw new AppError("SERVICE_UNAVAILABLE", { message: "The concierge is temporarily unavailable." })
+  return createHmac("sha256", secret || "development-only-concierge-salt").update(value).digest("hex")
 }
 
 export async function resolveConciergeIdentity(req: NextRequest): Promise<{ identity: ConciergeIdentity; newGuestToken?: string }> {

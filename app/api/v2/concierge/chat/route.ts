@@ -29,20 +29,29 @@ export async function POST(req: NextRequest) {
   const startedAt = Date.now()
   const stream = new ReadableStream({
     async start(controller) {
+      let closed = false
+      const send = (value: unknown) => {
+        if (closed || req.signal.aborted) return false
+        try { controller.enqueue(encode(value)); return true }
+        catch { closed = true; return false }
+      }
       try {
-        controller.enqueue(encode({ type: "status", requestId, message: "Starting perfume intelligence" }))
-        const result = await orchestrateConciergeTurn({ requestId, identity: resolved.identity, ...body, signal: req.signal, onStatus: (message) => controller.enqueue(encode({ type: "status", message })) })
-        const chunks = result.answer.match(/.{1,80}(?:\s|$)/g) ?? [result.answer]
-        for (const delta of chunks) { if (req.signal.aborted) throw new AppError("SERVICE_UNAVAILABLE", { message: "Generation was cancelled." }); controller.enqueue(encode({ type: "delta", delta })) }
-        if (result.products.length) controller.enqueue(encode({ type: "products", products: result.products }))
-        if (result.sources.length) controller.enqueue(encode({ type: "sources", sources: result.sources }))
-        controller.enqueue(encode({ type: "done", result: { ...result, answer: undefined } }))
+        send({ type: "status", requestId, message: "Starting perfume intelligence" })
+        const result = await orchestrateConciergeTurn({
+          requestId, identity: resolved.identity, ...body, signal: req.signal,
+          onStatus: (message) => send({ type: "status", message }),
+          onDelta: (delta) => { if (!send({ type: "delta", delta })) throw new AppError("SERVICE_UNAVAILABLE", { message: "Generation was cancelled." }) },
+        })
+        if (req.signal.aborted || closed) throw new AppError("SERVICE_UNAVAILABLE", { message: "Generation was cancelled." })
+        if (result.products.length) send({ type: "products", products: result.products })
+        if (result.sources.length) send({ type: "sources", sources: result.sources })
+        send({ type: "done", result: { ...result, answer: undefined } })
         await recordConciergeUsage({ requestId, identity: resolved.identity, result, startedAt, completionStatus: "SUCCESS" })
       } catch (error) {
         const appError = isAppError(error) ? error : new AppError("INTERNAL_ERROR", { internal: error })
-        controller.enqueue(encode({ type: "error", error: { code: appError.code, message: appError.safeMessage, retryable: appError.status >= 500 } }))
+        send({ type: "error", error: { code: appError.code, message: appError.safeMessage, retryable: appError.status >= 500 } })
         await recordConciergeUsage({ requestId, identity: resolved.identity, startedAt, completionStatus: req.signal.aborted ? "CANCELLED" : "FAILED", errorCode: appError.code })
-      } finally { controller.close() }
+      } finally { if (!closed) { try { controller.close() } catch { /* Client disconnected. */ } } }
     },
   })
   const response = new NextResponse(stream, { status: 200, headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store", "x-request-id": requestId, "x-content-type-options": "nosniff" } })

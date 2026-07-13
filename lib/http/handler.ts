@@ -23,14 +23,17 @@ export interface Ctx {
   req: NextRequest
 }
 
-type Handler<T> = (ctx: Ctx) => Promise<{ data: T; meta?: Record<string, unknown>; status?: number }>
+type Handler<T> = (ctx: Ctx) => Promise<{ data: T; meta?: Record<string, unknown>; status?: number; headers?: HeadersInit }>
 
 const MAX_BODY_BYTES = 1_000_000 // 1 MB default cap for JSON APIs
 
-export function jsonResponse<T>(env: Envelope<T>, status: number): NextResponse {
+export function jsonResponse<T>(env: Envelope<T>, status: number, headers?: HeadersInit): NextResponse {
+  const extraHeaders: Record<string, string> = {}
+  new Headers(headers).forEach((value, key) => { extraHeaders[key] = value })
   return NextResponse.json(env, {
     status,
     headers: {
+      ...extraHeaders,
       'x-request-id': env.requestId,
       'x-content-type-options': 'nosniff',
       'cache-control': 'no-store',
@@ -64,8 +67,8 @@ export function route<T>(handler: Handler<T>) {
     const routePath = new URL(req.url).pathname
     try {
       assertBodySize(req)
-      const { data, meta, status } = await handler({ requestId, req })
-      return jsonResponse(ok(data, meta ?? {}, requestId), status ?? 200)
+      const { data, meta, status, headers } = await handler({ requestId, req })
+      return jsonResponse(ok(data, meta ?? {}, requestId), status ?? 200, headers)
     } catch (err) {
       const appErr = isAppError(err)
         ? err

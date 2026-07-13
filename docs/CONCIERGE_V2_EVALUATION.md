@@ -27,6 +27,12 @@ The repeatable case list lives in `lib/concierge/evaluation.ts`; router and poli
 - HTML and visible em dash sanitization
 - V2 source regression check for the V1 fixed catalogue opening
 - Browser empty-state and 320px overflow cases
+- Real upstream Responses streaming and no provider switch after partial output
+- Provider fallback before output, production mock prohibition, and first-class xAI routing
+- No unrelated catalogue fallback after a failed scent match
+- Variant stock and sample-label revalidation
+- Conversation ownership and atomic guest-claim race behavior
+- Verified default-model cost estimation
 
 ## Manual preview script
 

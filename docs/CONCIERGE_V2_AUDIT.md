@@ -1,83 +1,82 @@
 # Concierge V2 verified audit
 
-Audit date: 2026-07-11  
-Branch: `main` at `6365199`  
-Runtime inspected: Next.js 16.0.7, React 19.2, Prisma 6.19, NextAuth 5 beta
+Audit refreshed: 2026-07-12
+
+Branch: `feat/concierge-v2` at `8a2866c` plus the current uncommitted repair
+
+Runtime: Next.js 16.0.7, React 19.2, Prisma 6.19.2, NextAuth 5 beta
 
 ## Repository state
 
-- The worktree was already dirty before this work. Existing hero changes in `components/home/hero/*`, `lib/hero/orbit-config.ts`, two hero documents, and `scripts/tmp-add-expansion-products.ts` are user-owned and must be preserved.
+- The branch tracks `origin/feat/concierge-v2`. Its head is a WIP Concierge V2 commit and must not be merged as production-ready.
+- Before this repair, the only untracked file was `tests/concierge/answer-differentiation.test.ts`. It is preserved and now participates in validation.
 - The only open pull request is draft PR 4, `Install Vercel Web Analytics`.
-- Unmerged branches include `upgrade/backend-claude`, `upgrade/frontend-atelier`, `upgrade/frontend-sol`, `upgrade/pdp-discovery-sol`, `continuation/codex-ui`, and `agent/mobile-verification-harness`. The last two were already merged into `main`; remote feature branches remain.
-- Existing handoffs and TODOs were read, especially `BACKEND_HANDOFF.md`, `BACKEND_UPGRADE_TODO.md`, `CONTINUATION_HANDOFF_2026-07-11.md`, `SCENT_INTELLIGENCE.md`, and the PDP/hero handoffs.
-- The attachment directory contains only the 46,507-byte text brief. No concierge screenshot was attached. Fresh desktop and mobile screenshots were captured from the local app instead.
+- Unfinished branches include `upgrade/backend-claude`, `upgrade/frontend-atelier`, `upgrade/frontend-sol`, and `upgrade/pdp-discovery-sol`. The continuation and mobile-verification branches have already been merged into the ancestry of this branch.
+- Existing backend, PDP, Scent Intelligence, continuation, hero, and Concierge handoff/TODO documents were inspected.
+- The attachment directory contains only `pasted-text.txt`. No concierge screenshot was attached. The existing WIP audit used fresh local desktop/mobile captures instead.
+- Deployment guidance is Vercel-oriented. There is no checked-in `vercel.json`. The Concierge migration was applied to the configured database on 2026-07-13.
 
-## Reproduction
+## Fresh reproduction
 
-The local app was run on `http://localhost:3000`. Two requests were sent to `POST /api/v1/concierge`:
+On 2026-07-12 the real local V1 route was started and called twice:
 
 1. `What is an accord?`
 2. `What happens when grape and wood are combined?`
 
-Both returned the exact customer message `Here are catalogue matches for your request.`, the exact mock explanation `These fragrances match your requested notes and stay within your stated preferences.`, and three product cards. This deterministically reproduces the reported defect.
+Both returned the exact customer message `Here are catalogue matches for your request.`, the exact explanation `These fragrances match your requested notes and stay within your stated preferences.`, and three product cards. This proves the reported behavior is deterministic.
 
-## Confirmed root causes
+## Verified V1 root causes
 
-1. `app/api/v1/concierge/route.ts` unconditionally calls `recommend()` for every accepted message. There is no knowledge-answering, research, support, comparison, or safety route before catalogue retrieval.
-2. `lib/recommendations/engine.ts` is correctly designed as a commerce recommender, not a perfume assistant. Thin retrieval deliberately falls back to a filtered catalogue listing, so weak or absent intent extraction still produces products.
-3. The endpoint overwrites every successful answer with one fixed sentence. It does not use the generated `result.explanation` as the answer.
-4. `components/concierge/concierge-client.tsx` never renders the returned `explanation` field. Only `data.message`, product items, and the disclaimer are used.
-5. The AI intent contract has only eight shopping-oriented intents. It cannot represent perfume knowledge, notes, ingredients, climate education, history, current research, price, availability, medical sensitivity, or out-of-scope distinctions.
-6. The model is used only for structured shopping intent, short recommendation explanation, support, review summary, marketing drafts, and owner briefs. There is no long-form fragrance answer generator.
-7. Conversation turns exist only in local React state. The request contains no conversation ID, prior messages, summary, constraints, or referenced products.
-8. There are no concierge conversation/message tables, ownership checks, archive/search APIs, or durable citations.
-9. `AI_PROVIDER` selects exactly one provider. The provider interface has no capability metadata, task routing, or provider fallback chain.
-10. xAI keys and model configuration exist in `.env` and `.env.example`, but xAI is absent from the validated `AI_PROVIDER` enum, provider type, registry, and adapters.
-11. Missing keys and provider failures silently fall back to deterministic mock output, including production. The customer is not told that the answer is synthetic.
-12. Circuit breaking is keyed only by provider name, not capability. The retry chain repeats the same provider twice and then uses mock rather than a second configured provider.
-13. The OpenAI adapter uses Chat Completions even though current official guidance recommends Responses for multi-turn reasoning, tools, streaming, and hosted web search.
-14. No provider supports streamed text in the application contract. The frontend shows bouncing dots until a complete JSON response arrives and cannot cancel a request.
-15. There is no web research interface, domain policy, source validation, citation model, citation rendering, or search allowance.
-16. The existing search provider is Postgres substring search. Its `accord`, `mood`, `climate`, `concentration`, and `sampleAvailable` filter fields are declared but not implemented.
-17. Catalogue reads exclude deleted records but do not require `publishStatus=PUBLISHED`. Existing migration notes state that pre-existing products defaulted to `DRAFT`, yet they remain public.
-18. Stock filtering happens during initial recommendation retrieval for most requests. This prevents useful off-catalogue or out-of-stock knowledge from being discussed.
-19. Product loading revalidates existence and stock once, but public commerce DTO reads do not consistently enforce publication status. Variant stock is not selected for the returned availability label.
-20. The rate limit is one IP-scoped `20/minute` counter. It does not distinguish guests, authenticated users, daily usage, successful completions, or web searches.
-21. Durable rate limiting uses Upstash when configured, but fails open on store errors. There is no exactly-once guest entitlement or atomic post-success consumption.
-22. AI usage aggregation is in-process only. It records calls and tokens but no durable spend, request/conversation IDs, first-token latency, tool calls, completion status, cache status, or feedback.
-23. The admin status endpoint shows only the selected AI provider. It does not expose all configured providers, capabilities, health, circuit state, limits, spend, or concierge metrics.
-24. Scent intelligence is stored primarily on `Product` and in a code-owned ingredient library. Ingredient entries have approval metadata and public normalization rejects unapproved entries. Scent Story generation creates a reviewable rule-based draft and does not write or publish automatically.
-25. There is no dedicated approved perfume knowledge table. There is no separate Scent Atlas approval object, source URL record, verifier, or merchant-approved educational content workflow.
-26. Review APIs and models exist, including verified purchase and moderation fields, but the concierge has no review retrieval tool and does not separate Fádé reviews from external review research.
-27. Wishlist and Scent Profile data exist, but there are no concierge tools for wishlist, profile, or past recommendations.
-28. The page is constrained to `max-w-2xl`. Desktop has large unused side areas, no history rail, and no optional context panel. Mobile is usable but remains a narrow recommendation form with no history, sources, cancellation, feedback, or saved conversations.
-29. The empty state explicitly says it only recommends genuinely stocked fragrances, contradicting the perfume-intelligence vision.
-30. The metadata description repeats the same in-stock-only positioning.
-31. The composer does not auto-resize, preserve drafts across navigation, cancel, edit/resend, regenerate, or display guest allowance.
-32. The current response renderer supports only one paragraph, cards, and a disclaimer. It has no safe Markdown/typed-block support, tables, note pyramids, citations, sources, copy, feedback, or report action.
-33. Existing Playwright and axe infrastructure covers route loading and broad accessibility, not concierge semantics, streaming, history, citations, guest conversion, or 320px overflow.
-34. Environment validation marks most integrations optional and defaults AI to mock. It has no V2 limits, budgets, provider priority, web research controls, or production prohibition for mock.
-35. Deployment is Vercel. There is no checked-in `vercel.json`; deployment guidance uses `prisma migrate deploy`, and CI has storefront/continuation workflows rather than concierge evaluation.
+1. `app/api/v1/concierge/route.ts` calls `recommend()` for every message. There is no perfume-knowledge, research, history, safety, support, comparison, or off-catalogue route.
+2. `lib/recommendations/engine.ts` is a commerce recommender. When intent retrieval is weak, it deliberately broadens to catalogue products. It cannot act as a general perfume assistant.
+3. The V1 route replaces every successful response with one fixed sentence instead of using the generated explanation as the answer.
+4. The V1 client does not render the returned explanation as conversational text.
+5. The legacy intent model contains only shopping-oriented intents. It cannot represent the required perfume intelligence tasks.
+6. Stock and catalogue retrieval happen before the system knows whether commerce data is relevant.
+7. V1 has no off-catalogue perfume representation, external-availability label, evidence scope, or citations.
+8. Conversation turns live only in React state. V1 sends no conversation ID, history, constraints, summary, or referenced products.
+9. `AI_PROVIDER` selects one legacy adapter. Legacy structured services retry that adapter rather than routing by task and capability.
+10. The old layer can silently use deterministic mock output outside production and previously allowed it to disguise missing configuration.
+11. V1 has no hosted web-research path or cited-source interface.
+12. The old interface is a narrow chat column with no history, sources, cancellation, saved conversation, or contextual product rail.
+13. V1 applies one IP-based per-minute limit. It has no guest success entitlement, authenticated daily allowance, search allowance, or spend gate.
+14. Existing AI usage aggregation is process-local and does not provide durable per-turn Concierge observability.
+15. Existing search is database substring search, not current web research. Several declared fragrance filters are not implemented in the legacy search route.
 
-## Verified points from the reported failure list
+## Additional defects found in the first V2 WIP
 
-All fifteen reported points are confirmed. The only qualification is that the recommendation engine allows explicit preorder/waitlist behavior when sample-first logic is active; it still applies availability far too early for a general perfume assistant.
+The first WIP corrected the V1 entry point but was not acceptance-ready:
 
-## Security and privacy findings
+1. The API waited for the complete provider response and then split the finished answer into 80-character chunks. This was simulated transport streaming, not upstream token streaming.
+2. The provider registry declared every capability for every provider without adapter-level verification. The default models are compatible, but arbitrary environment overrides are not automatically proven compatible.
+3. Catalogue retrieval still replaced a failed note/query match with unrelated top-rated products. That could present a weak match as a recommendation and recreate the original product-first failure.
+4. A product with zero base stock but an available variant was labelled out of stock. Sample labels could appear even when sample-first was not selected.
+5. `Which is cheaper?`, ordinal references such as `the second one`, unisex filtering, and exclusions such as `not too sweet` were not reliably translated into catalogue constraints.
+6. Saved assistant messages retained product IDs but the history API did not revalidate and hydrate product cards when reopening a conversation.
+7. Source cards existed, but answer markers were not normalized into clickable inline citations.
+8. OpenAI/xAI source extraction did not cover every Responses citation shape. URL validation blocked loopback but not all private-network or credential-bearing URLs.
+9. `allowedDomains`, `blockedDomains`, and `maxSearches` were described in the web-provider interface but were not passed through to supported provider tool schemas.
+10. Cost was always stored as zero, so daily and monthly spend limits could never trip.
+11. First-token latency existed in the schema but was never recorded.
+12. Global spend gates were skipped for guests because the entitlement function returned before checking them.
+13. Authenticated per-minute limiting failed open on durable-store errors. Production could also use a per-instance in-memory limiter without surfacing that durability was missing.
+14. Guest-cookie hashing used a known development fallback secret even in production when auth secrets were absent.
+15. Conversation summaries were never updated. Intensity and sample-first follow-ups were not preserved reliably.
+16. Provider, ownership, guest-race, xAI, production-mock, real-streaming, cost, and no-broad-fallback regression tests were missing.
+17. The admin page is currently a secure status dashboard, not a runtime configuration editor. Environment changes and redeployment are still required for provider priority, limits, and kill switches.
+18. The approved perfume knowledge table has no merchant-approved seed content yet. Stable general answers therefore depend on the configured model or narrow deterministic safety guidance.
+19. The Prisma migration is valid and was deployed to the configured database on 2026-07-13. Database-backed history and allowance endpoints were rechecked after deployment; authenticated and concurrent multi-session preview coverage remains outstanding.
+20. Real-provider citation quality and the preview deployment remain external validation gates.
 
-- NextAuth uses JWT sessions with a credentials provider. The session exposes email/name and server code re-loads the stable user ID from Prisma.
-- There is no guest identity cookie dedicated to the concierge.
-- Existing prompt scrubbing covers basic email, card-like digits, and phone patterns, but raw private conversation persistence/logging policy does not exist.
-- External content is not retrieved today, so prompt-injection handling for web pages has not been implemented.
-- Product DTO boundaries protect cost/supplier/internal authenticity fields, but V2 tools must select explicit public fields rather than pass raw Prisma records.
+## Security and data-source findings
 
-## Baseline visual evidence
+- Product existence, publication, price, stock, variants, reviews, and product links must remain server-tool facts. The model must never create them.
+- Public product tools must require `deletedAt=null` and `publishStatus=PUBLISHED` and must omit cost price, supplier fields, internal authenticity notes, and private order data.
+- Approved Scent Atlas evidence currently combines merchant-published product fields with the code-owned approved ingredient library. Unapproved ingredient matches are excluded. Perceived prominence is explicitly not a formulation percentage.
+- Fádé review tools require approved moderation and separate verified-purchase counts. External review claims require current cited research.
+- Authenticated conversation reads use the database user ID; guest reads use a keyed cookie digest. A missing owned record returns `NOT_FOUND`, preventing cross-user enumeration.
+- The feature remains additive and isolated from cart, checkout, payments, orders, inventory mutation, and admin commerce actions.
 
-- Desktop: 1440 x 1000 screenshot captured at `%TEMP%/fade-concierge-v1-desktop.png`.
-- Mobile: 375 x 812 screenshot captured at `%TEMP%/fade-concierge-v1-mobile.png`.
-- Both show the in-stock-only empty-state copy. Desktop leaves most horizontal space unused. Mobile has no horizontal overflow in the empty state.
-- The gstack browser daemon could not start its bundled server on this Windows host. The installed Playwright CLI produced the screenshots successfully.
+## Root-cause conclusion
 
-## Root cause conclusion
-
-The repeated answer is not a prompt-quality bug. It is an architectural routing bug: a commerce recommendation endpoint is being presented as a general assistant. Fixing the sentence or expanding the existing intent prompt would preserve the same failure mode. V2 needs a separate conversation orchestrator that routes knowledge, research, commerce, safety, and support tasks before selecting evidence and generating an answer.
+The repeated answer was caused by routing every question into a catalogue recommender and then discarding the only generated explanation. The correct fix is a separate orchestration path that answers the perfume question first, invokes commerce tools only for commerce facts, retains owned conversation context, validates evidence, and streams the provider response. Prompt wording alone cannot repair the V1 architecture.

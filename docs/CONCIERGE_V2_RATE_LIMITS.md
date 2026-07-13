@@ -20,8 +20,14 @@ A random HttpOnly, SameSite=Lax cookie identifies a guest. Only its HMAC digest 
 
 ## Authenticated rule
 
-The per-minute limit uses the existing durable limiter keyed by stable user ID. Daily turn and web-search limits use `ConciergeUsageEvent`. Conversation ownership never uses IP. If Upstash is unavailable, the existing per-minute limiter fails open, but daily database limits still apply.
+The per-minute limit uses the existing limiter keyed by stable user ID. Daily turn and web-search limits use `ConciergeUsageEvent`. Conversation ownership never uses IP. Authenticated production generation requires Upstash; a missing durable backend or a durable-store error fails closed.
 
 ## Cost gates
 
-Durable usage rows include token and estimated-cost fields. Cost is currently recorded as zero until a merchant-approved pricing table is configured. The gates and admin display are wired, but they cannot enforce real currency spend until that pricing table is populated. This limitation is intentional: stale remembered provider prices must not be treated as current billing truth.
+Durable usage rows include token, search, latency, and estimated-cost fields. Default-model estimates use the public prices in `lib/concierge/cost.ts`, verified 2026-07-12. Unknown model overrides deliberately record zero until their current pricing is reviewed and added.
+
+## Runtime requirements
+
+Authenticated per-minute limits require Upstash in production. If `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are absent, V2 fails closed for authenticated generation instead of pretending a per-instance memory counter is durable. Guest success allowance remains database-backed and atomic.
+
+Daily and monthly spend gates are global and apply before both guest and authenticated generation. Default-model token and hosted-search estimates come from `lib/concierge/cost.ts`, verified 2026-07-12. Any custom model must receive a reviewed price entry before rollout.

@@ -4,6 +4,7 @@ const NOTE_TERMS = [
   "aldehyde", "amber", "bergamot", "cedar", "citrus", "grape", "guaiac", "jasmine",
   "musk", "oud", "rose", "saffron", "sandalwood", "tobacco", "vanilla", "vetiver", "wood",
 ]
+const ACCORD_TERMS = ["ambery", "aquatic", "aromatic", "earthy", "fruity", "green", "marine", "powdery", "smoky", "spicy", "sweet", "woody"]
 const FAMILIES = ["amber", "aromatic", "chypre", "citrus", "floral", "fresh", "gourmand", "leather", "woody"]
 const OCCASIONS = ["office", "work", "wedding", "evening", "night", "formal", "casual", "gift"]
 const CLIMATES = ["hot", "humid", "rainy", "cold", "warm", "dry"]
@@ -18,6 +19,7 @@ function pickIntent(text: string): ConciergeIntent {
   if (/(store perfume|perfume be stored|keep perfume|storage|expire|shelf life)/i.test(text)) return "STORAGE_AND_CARE"
   if (/(order|delivery|refund|return|payment|store|contact|shipping)/i.test(text)) return "ORDER_OR_STORE_SUPPORT"
   if (/(in stock|available(?: now| perfume| fragrance)?|availability|which one is available)/i.test(text)) return "AVAILABILITY_CHECK"
+  if (/(cheaper|less expensive|lower budget|more affordable)/i.test(text) && !/alternative/i.test(text)) return "PRICE_CHECK"
   if (/(price|cost|how much|under\s*[₦n]?\s*\d|budget)/i.test(text)) return "PRICE_CHECK"
   if (includesAny(text, NOTE_TERMS) && /(what happens|what does|what kind|how (?:does|do).*(?:smell|interact)|smells? like)/i.test(text)) return "NOTE_EXPLANATION"
   if (/(layer|mix together|pair with|work together)/i.test(text)) return "LAYERING"
@@ -45,13 +47,14 @@ export function routeConciergeIntent(message: string, state?: ConciergeConversat
   const text = message.trim().toLowerCase()
   const comparison = message.trim().match(/compare\s+(.+?)\s+(?:and|versus|vs\.?)\s+(.+?)[?.!]?$/i)
   let primaryIntent = pickIntent(text)
-  const followUp = /^(which|what about|does it|does that|show me|only|remove|can i|would it|and |the second|that one)/i.test(text)
+  const followUp = /^(which|what about|does it|does that|show me|only|remove|can i|would it|and |the (?:first|second|third)|that one)/i.test(text)
+    || /\b(?:that|those|them|it|one|ones|first|second|third|cheaper|alternative)\b/i.test(text)
   if (followUp && state?.lastIntent && primaryIntent === "OUT_OF_SCOPE") primaryIntent = state.lastIntent
   const notes = NOTE_TERMS.filter((term) => new RegExp(`\\b${term}s?\\b`, "i").test(text))
   const budget = text.match(/(?:₦|ngn|n)?\s*([0-9][0-9,]{3,})/i)?.[1]
   const explicitFade = /fádé|fade|catalogue|in stock|available|show me|which product/i.test(text)
   const requiresLiveStock = ["AVAILABILITY_CHECK", "CATALOGUE_RECOMMENDATION"].includes(primaryIntent) || /in stock|available now/i.test(text)
-  const requiresCatalogue = explicitFade || requiresLiveStock || ["PRICE_CHECK", "PRODUCT_LOOKUP"].includes(primaryIntent)
+  const requiresCatalogue = explicitFade || requiresLiveStock || ["PRICE_CHECK", "PRODUCT_LOOKUP"].includes(primaryIntent) || Boolean(followUp && state?.activeProductIds.length)
   const currentResearch = ["REVIEW_RESEARCH", "PERFUME_HISTORY", "BRAND_OR_PERFUMER_RESEARCH"].includes(primaryIntent) || /current|latest|recent|reformulat|who created/i.test(text)
   const requiresWebResearch = currentResearch && !requiresCatalogue
   const secondaryIntents: ConciergeIntent[] = []
@@ -67,7 +70,8 @@ export function routeConciergeIntent(message: string, state?: ConciergeConversat
     requiresConversationContext: followUp,
     requiresClarification: false,
     entities: {
-      perfumeNames: comparison ? [comparison[1].trim(), comparison[2].trim()] : [], brands: [], notes, accords: [],
+      perfumeNames: comparison ? [comparison[1].trim(), comparison[2].trim()] : [], brands: [], notes,
+      accords: ACCORD_TERMS.filter((term) => new RegExp(`\\b${term}\\b`, "i").test(text)),
       families: FAMILIES.filter((x) => text.includes(x)),
       occasions: OCCASIONS.filter((x) => text.includes(x)),
       climates: CLIMATES.filter((x) => text.includes(x)),
