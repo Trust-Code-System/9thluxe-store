@@ -25,6 +25,7 @@ import { useCartStore } from "@/lib/stores/cart-store"
 import { useWishlistStore } from "@/lib/stores/wishlist-store"
 import { useCompareStore, MAX_COMPARE } from "@/lib/stores/compare-store"
 import { trackPdp } from "@/lib/analytics/pdp-events"
+import { ensureSignedIn } from "@/lib/client-auth"
 import type { PdpData, PdpVariant, PdpCard } from "@/lib/pdp/types"
 
 interface PurchasePanelProps {
@@ -124,7 +125,9 @@ export function PurchasePanel({ data, policyShipping, policyReturns }: PurchaseP
     }
   }
 
-  const handleWishlist = () => {
+  const handleWishlist = async () => {
+    const allowed = await ensureSignedIn(`/product/${data.slug}`)
+    if (!allowed) return
     toggleWishlist({
       id: data.id,
       slug: data.slug,

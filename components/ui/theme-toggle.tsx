@@ -20,7 +20,7 @@ export function ThemeToggle() {
       type="button"
       variant="ghost"
       size="icon"
-      className="relative h-11 w-11 rounded-sm border border-border/70 bg-background/70 text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="relative h-11 w-11 rounded-sm text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       onClick={() => setTheme(nextTheme.toLowerCase())}
       disabled={!mounted}
       aria-label={`Switch to ${nextTheme} theme. Current theme: ${currentTheme}`}

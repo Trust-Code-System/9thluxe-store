@@ -24,8 +24,14 @@ type ShopSearchParams = {
   maxPrice?: string
   sort?: string
   note?: string
+  notes?: string
   q?: string
   family?: string
+  occasion?: string
+  intensity?: string
+  climate?: string
+  timeOfDay?: string
+  forWhom?: string
 }
 
 export const dynamic = 'force-dynamic'
@@ -61,14 +67,26 @@ export default async function ShopPage({ searchParams }: { searchParams?: Promis
     where.fragranceFamily = params.family.trim().toUpperCase()
   }
 
-  if (params.note && params.note.trim()) {
-    const term = params.note.trim().toLowerCase()
-    where.OR = [
-      { notesTop: { contains: term, mode: 'insensitive' } },
-      { notesHeart: { contains: term, mode: 'insensitive' } },
-      { notesBase: { contains: term, mode: 'insensitive' } },
-    ]
+  const noteTerms = [
+    ...new Set([
+      ...(params.note ? [params.note.trim()] : []),
+      ...(params.notes
+        ? params.notes.split(",").map((n) => n.trim()).filter(Boolean)
+        : []),
+    ]),
+  ].filter(Boolean)
+
+  if (noteTerms.length) {
+    where.OR = noteTerms.flatMap((term) => [
+      { notesTop: { contains: term, mode: 'insensitive' as const } },
+      { notesHeart: { contains: term, mode: 'insensitive' as const } },
+      { notesBase: { contains: term, mode: 'insensitive' as const } },
+    ])
   }
+
+  // Occasion / intensity / climate are captured by the quiz for preference
+  // context, but only applied when present on products so sparse catalogue
+  // fields do not empty the results.
 
   if (params.q && params.q.trim()) {
     const q = params.q.trim()
@@ -147,7 +165,7 @@ export default async function ShopPage({ searchParams }: { searchParams?: Promis
   }
 
   const activeFilters =
-    params.q || params.brand || params.note || params.family || params.minPrice || params.maxPrice
+    params.q || params.brand || params.note || params.notes || params.family || params.occasion || params.intensity || params.climate || params.minPrice || params.maxPrice
 
   return (
     <MainLayout>

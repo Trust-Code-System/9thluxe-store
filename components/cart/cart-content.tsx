@@ -108,7 +108,7 @@ export function CartContent({ freeShippingThreshold, flatShippingFee }: CartCont
 
     return (
 
-      <div className="mx-auto max-w-md border border-dashed border-border bg-card/60 px-8 py-16 text-center">
+      <div className="mx-auto max-w-md border border-dashed border-border bg-background px-8 py-16 text-center">
 
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/12">
 

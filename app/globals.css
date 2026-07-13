@@ -543,7 +543,7 @@
 
 /* Mono eyebrow: the data voice of the brand */
 .eyebrow {
-  @apply inline-block font-mono text-[11px] font-medium uppercase tracking-[0.32em] text-accent;
+  @apply block font-mono text-[11px] font-medium uppercase tracking-[0.32em] text-accent;
 }
 
 /* Mono data text (prices, sizes, counts) */
@@ -979,4 +979,70 @@
     animation: none !important;
     transition-duration: 0ms !important;
   }
+}
+/* Permanent two-fragrance hero: one compositor-friendly entrance, then fully static. */
+.permanent-drop-scene { isolation: isolate; }
+.drop-ambient { position: absolute; inset: 10% 5% 12%; border-radius: 50%; background: radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--champagne) 15%, transparent), transparent 62%); filter: blur(24px); }
+.drop-pedestal { position: absolute; bottom: 68px; height: 38px; border: 1px solid color-mix(in srgb, var(--champagne) 24%, transparent); border-radius: 50%; background: radial-gradient(ellipse at 50% 25%, color-mix(in srgb, var(--champagne) 17%, transparent), color-mix(in srgb, var(--background) 88%, black)); box-shadow: 0 22px 40px rgba(0,0,0,.42), inset 0 2px 4px rgba(255,255,255,.06); }
+.drop-pedestal-left { left: 8%; width: 43%; transform: rotate(-2deg); }
+.drop-pedestal-right { right: 7%; width: 40%; transform: rotate(2deg); }
+.drop-bottle { position: absolute; bottom: 82px; z-index: 20; transform-origin: 50% 100%; animation: permanent-bottle-land 1.25s cubic-bezier(.2,.8,.2,1) both; }
+.drop-bottle-aventus { left: 11%; width: 42%; height: 70%; --land-rotate: -2deg; animation-delay: 80ms; }
+.drop-bottle-oud { right: 11%; width: 37%; height: 66%; --land-rotate: 2deg; animation-delay: 300ms; }
+.drop-ingredient { position: absolute; z-index: 28; width: 19%; height: auto; object-fit: contain; filter: drop-shadow(0 16px 14px rgba(0,0,0,.38)); transform-origin: 50% 100%; animation: permanent-ingredient-land 1s cubic-bezier(.22,.8,.2,1) both; }
+.drop-pineapple { left: -1%; bottom: 78px; --item-rotate: -17deg; animation-delay: 520ms; }
+.drop-apple { left: 30%; bottom: 58px; width: 15%; --item-rotate: 13deg; animation-delay: 720ms; }
+.drop-blackcurrant { left: 41%; bottom: 105px; width: 14%; --item-rotate: -8deg; animation-delay: 900ms; }
+.drop-sandalwood { right: -1%; bottom: 72px; width: 21%; --item-rotate: 12deg; animation-delay: 640ms; }
+.drop-cardamom { right: 31%; bottom: 55px; width: 14%; --item-rotate: -12deg; animation-delay: 840ms; }
+.drop-vanilla { right: 39%; bottom: 112px; width: 16%; --item-rotate: 18deg; animation-delay: 1.02s; }
+.drop-impact { position: absolute; z-index: 25; bottom: 66px; height: 18px; border: 1px solid color-mix(in srgb, var(--champagne) 58%, transparent); border-radius: 50%; opacity: 0; animation: permanent-impact .75s ease-out both; }
+.drop-impact-left { left: 13%; width: 34%; animation-delay: .95s; }
+.drop-impact-right { right: 12%; width: 31%; animation-delay: 1.18s; }
+.drop-caption { position: absolute; bottom: 2px; z-index: 35; width: 45%; text-align: center; opacity: 0; animation: permanent-caption-in .6s ease-out 1.45s forwards; }
+.drop-caption-left { left: 3%; }
+.drop-caption-right { right: 1%; }
+.drop-caption p { font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--foreground); }
+.drop-caption span { display: block; margin-top: 5px; font-size: 10px; color: var(--muted-foreground); }
+
+@keyframes permanent-bottle-land {
+  0% { opacity: 0; transform: translate3d(0,-70vh,0) rotate(calc(var(--land-rotate) * -2)) scale(.92); }
+  62% { opacity: 1; transform: translate3d(0,10px,0) rotate(var(--land-rotate)) scaleY(.96); }
+  77% { transform: translate3d(0,-18px,0) rotate(var(--land-rotate)) scaleY(1.01); }
+  100% { opacity: 1; transform: translate3d(0,0,0) rotate(var(--land-rotate)) scale(1); }
+}
+@keyframes permanent-ingredient-land {
+  0% { opacity: 0; transform: translate3d(0,-58vh,0) rotate(calc(var(--item-rotate) - 70deg)) scale(.72); }
+  66% { opacity: 1; transform: translate3d(0,9px,0) rotate(calc(var(--item-rotate) + 4deg)) scale(.96,1.04); }
+  82% { transform: translate3d(0,-12px,0) rotate(calc(var(--item-rotate) - 2deg)) scale(1); }
+  100% { opacity: 1; transform: translate3d(0,0,0) rotate(var(--item-rotate)) scale(1); }
+}
+@keyframes permanent-impact { 0%,35% { opacity: 0; transform: scale(.2); } 45% { opacity: .7; } 100% { opacity: 0; transform: scale(1.45); } }
+@keyframes permanent-caption-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 639px) {
+  .drop-bottle { bottom: 72px; }
+  .drop-bottle-aventus { left: 8%; width: 45%; height: 67%; }
+  .drop-bottle-oud { right: 8%; width: 39%; height: 63%; }
+  .drop-pedestal { bottom: 59px; }
+  .drop-ingredient { width: 18%; }
+  .drop-pineapple { left: -2%; bottom: 67px; width: 21%; }
+  .drop-apple { left: 30%; bottom: 52px; width: 15%; }
+  .drop-blackcurrant { left: 42%; bottom: 91px; width: 13%; }
+  .drop-sandalwood { right: -2%; bottom: 65px; width: 21%; }
+  .drop-cardamom { right: 30%; bottom: 49px; width: 14%; }
+  .drop-vanilla { right: 39%; bottom: 96px; width: 15%; }
+  .drop-impact { bottom: 58px; }
+  .drop-caption { width: 49%; }
+  .drop-caption-left { left: 0; }
+  .drop-caption-right { right: 0; }
+  .drop-caption p { font-size: 9px; letter-spacing: .13em; }
+  .drop-caption span { font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drop-bottle, .drop-ingredient, .drop-impact, .drop-caption { animation: none !important; opacity: 1; }
+  .drop-bottle { transform: rotate(var(--land-rotate)); }
+  .drop-ingredient { transform: rotate(var(--item-rotate)); }
+  .drop-impact { display: none; }
 }

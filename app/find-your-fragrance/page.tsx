@@ -13,24 +13,71 @@ const OCCASIONS = [
   { value: "evening", label: "Evening / special occasions" },
   { value: "work", label: "Office / professional" },
   { value: "date", label: "Date night" },
+  { value: "weekend", label: "Weekend / casual" },
+  { value: "wedding", label: "Wedding / celebration" },
+  { value: "travel", label: "Travel / holiday" },
+  { value: "religious", label: "Religious / festive" },
 ]
 
 const NOTES = [
   { value: "citrus", label: "Citrus" },
+  { value: "bergamot", label: "Bergamot" },
   { value: "rose", label: "Rose" },
+  { value: "jasmine", label: "Jasmine" },
   { value: "oud", label: "Oud" },
   { value: "vanilla", label: "Vanilla" },
   { value: "woody", label: "Woody" },
-  { value: "amber", label: "Amber" },
   { value: "sandalwood", label: "Sandalwood" },
-  { value: "bergamot", label: "Bergamot" },
+  { value: "cedar", label: "Cedar" },
+  { value: "vetiver", label: "Vetiver" },
+  { value: "amber", label: "Amber" },
+  { value: "musk", label: "Musk" },
+  { value: "leather", label: "Leather" },
+  { value: "incense", label: "Incense" },
   { value: "patchouli", label: "Patchouli" },
+  { value: "tonka", label: "Tonka" },
+  { value: "saffron", label: "Saffron" },
+  { value: "lavender", label: "Lavender" },
+  { value: "iris", label: "Iris" },
+  { value: "coconut", label: "Coconut" },
+]
+
+const FAMILIES = [
+  { value: "CITRUS", label: "Citrus" },
+  { value: "FLORAL", label: "Floral" },
+  { value: "WOODY", label: "Woody" },
+  { value: "ORIENTAL", label: "Oriental / amber" },
+  { value: "FRESH", label: "Fresh / aquatic" },
+  { value: "SPICY", label: "Spicy" },
+  { value: "GOURMAND", label: "Gourmand / sweet" },
+]
+
+const CLIMATES = [
+  { value: "hot-humid", label: "Hot & humid (Lagos heat)" },
+  { value: "ac-office", label: "Air-conditioned spaces" },
+  { value: "rainy", label: "Rainy season" },
+  { value: "harmattan", label: "Harmattan / dry air" },
+  { value: "evening-cool", label: "Cooler evenings" },
 ]
 
 const INTENSITY = [
+  { value: "skin", label: "Skin scent — close & intimate" },
   { value: "light", label: "Light & fresh" },
-  { value: "medium", label: "Moderate" },
+  { value: "medium", label: "Moderate projection" },
   { value: "bold", label: "Bold & long-lasting" },
+  { value: "beast", label: "Strong trail / statement" },
+]
+
+const TIME_OF_DAY = [
+  { value: "day", label: "Daytime" },
+  { value: "night", label: "Night" },
+  { value: "both", label: "Day & night" },
+]
+
+const FOR_WHOM = [
+  { value: "self", label: "For myself" },
+  { value: "gift", label: "As a gift" },
+  { value: "shared", label: "Shared / unisex" },
 ]
 
 function Chip({
@@ -93,7 +140,11 @@ export default function FindYourFragrancePage() {
   const router = useRouter()
   const [occasion, setOccasion] = useState<string>("")
   const [notes, setNotes] = useState<string[]>([])
+  const [family, setFamily] = useState<string>("")
+  const [climate, setClimate] = useState<string>("")
   const [intensity, setIntensity] = useState<string>("")
+  const [timeOfDay, setTimeOfDay] = useState<string>("")
+  const [forWhom, setForWhom] = useState<string>("")
 
   const toggleNote = (value: string) => {
     setNotes((prev) =>
@@ -106,7 +157,12 @@ export default function FindYourFragrancePage() {
     const params = new URLSearchParams()
     if (occasion) params.set("occasion", occasion)
     if (notes.length) params.set("note", notes[0])
+    if (notes.length > 1) params.set("notes", notes.join(","))
+    if (family) params.set("family", family)
+    if (climate) params.set("climate", climate)
     if (intensity) params.set("intensity", intensity)
+    if (timeOfDay) params.set("timeOfDay", timeOfDay)
+    if (forWhom) params.set("forWhom", forWhom)
     router.push(`/shop?${params.toString()}`)
   }
 
@@ -124,7 +180,8 @@ export default function FindYourFragrancePage() {
                 Compose your <em className="text-accent">profile</em>.
               </h1>
               <p className="mt-4 max-w-md leading-relaxed text-muted-foreground">
-                Three questions, no wrong answers. Prefer to talk it through?{" "}
+                A few preferences, no wrong answers. Skip what does not matter.
+                Prefer to talk it through?{" "}
                 <a
                   href="/concierge"
                   className="text-accent underline underline-offset-4 transition-opacity hover:opacity-80"
@@ -166,12 +223,68 @@ export default function FindYourFragrancePage() {
                 ))}
               </QuestionBlock>
 
-              <QuestionBlock index={3} title="How loud should it speak?">
+              <QuestionBlock
+                index={3}
+                title="Which fragrance family feels right?"
+                hint="Optional — skip if you are unsure."
+              >
+                {FAMILIES.map((opt) => (
+                  <Chip
+                    key={opt.value}
+                    selected={family === opt.value}
+                    onClick={() => setFamily(family === opt.value ? "" : opt.value)}
+                  >
+                    {opt.label}
+                  </Chip>
+                ))}
+              </QuestionBlock>
+
+              <QuestionBlock
+                index={4}
+                title="Where will it live?"
+                hint="Nigerian climate shapes how a scent wears."
+              >
+                {CLIMATES.map((opt) => (
+                  <Chip
+                    key={opt.value}
+                    selected={climate === opt.value}
+                    onClick={() => setClimate(climate === opt.value ? "" : opt.value)}
+                  >
+                    {opt.label}
+                  </Chip>
+                ))}
+              </QuestionBlock>
+
+              <QuestionBlock index={5} title="How loud should it speak?">
                 {INTENSITY.map((opt) => (
                   <Chip
                     key={opt.value}
                     selected={intensity === opt.value}
                     onClick={() => setIntensity(opt.value)}
+                  >
+                    {opt.label}
+                  </Chip>
+                ))}
+              </QuestionBlock>
+
+              <QuestionBlock index={6} title="Day or night?">
+                {TIME_OF_DAY.map((opt) => (
+                  <Chip
+                    key={opt.value}
+                    selected={timeOfDay === opt.value}
+                    onClick={() => setTimeOfDay(timeOfDay === opt.value ? "" : opt.value)}
+                  >
+                    {opt.label}
+                  </Chip>
+                ))}
+              </QuestionBlock>
+
+              <QuestionBlock index={7} title="Who is this for?">
+                {FOR_WHOM.map((opt) => (
+                  <Chip
+                    key={opt.value}
+                    selected={forWhom === opt.value}
+                    onClick={() => setForWhom(forWhom === opt.value ? "" : opt.value)}
                   >
                     {opt.label}
                   </Chip>

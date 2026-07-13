@@ -18,6 +18,7 @@ const NOTE_OPTIONS = [
   { value: EMPTY, label: "Any note" },
   { value: "oud", label: "Oud" },
   { value: "rose", label: "Rose" },
+  { value: "jasmine", label: "Jasmine" },
   { value: "citrus", label: "Citrus" },
   { value: "vanilla", label: "Vanilla" },
   { value: "woody", label: "Woody" },
@@ -25,6 +26,11 @@ const NOTE_OPTIONS = [
   { value: "sandalwood", label: "Sandalwood" },
   { value: "bergamot", label: "Bergamot" },
   { value: "patchouli", label: "Patchouli" },
+  { value: "musk", label: "Musk" },
+  { value: "leather", label: "Leather" },
+  { value: "vetiver", label: "Vetiver" },
+  { value: "saffron", label: "Saffron" },
+  { value: "lavender", label: "Lavender" },
 ];
 
 const SORT_OPTIONS = [

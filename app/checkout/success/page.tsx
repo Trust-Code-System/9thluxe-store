@@ -104,10 +104,7 @@ export default async function SuccessPage({ searchParams }: PageProps) {
 
   return (
     <MainLayout>
-      <section
-        data-surface="day"
-        className="min-h-[60vh] bg-background py-16 text-foreground lg:py-24"
-      >
+      <section className="min-h-[60vh] bg-background py-16 text-foreground lg:py-24">
         <div className="container mx-auto max-w-xl px-4 sm:px-6">
           {(reference || isMock) && <ClearCartOnSuccess />}
 

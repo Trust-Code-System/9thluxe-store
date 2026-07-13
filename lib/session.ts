@@ -14,12 +14,11 @@ export type SessionUser = {
  * Require an authenticated user. If not signed in, redirect to /auth/signin.
  * Returns the user from your DB (so you have a stable id).
  */
-export async function requireUser(): Promise<SessionUser> {
+export async function requireUser(callbackUrl = '/account'): Promise<SessionUser> {
   const session = await auth()
   const email = session?.user?.email
   if (!email) {
-    // send them to signin and come back to /account after login
-    redirect('/auth/signin?callbackUrl=/account')
+    redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`)
   }
 
   const user = await prisma.user.findUnique({
@@ -28,7 +27,7 @@ export async function requireUser(): Promise<SessionUser> {
   })
 
   if (!user) {
-    redirect('/auth/signin?callbackUrl=/account')
+    redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`)
   }
 
   return user!

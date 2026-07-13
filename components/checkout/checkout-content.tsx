@@ -174,7 +174,6 @@ export function CheckoutContent({
   if (!hasHydrated || items.length === 0) {
     return (
       <section
-        data-surface="day"
         className="flex min-h-[50vh] items-center justify-center bg-background px-4 py-16 text-center text-foreground"
         aria-live="polite"
         aria-busy={!hasHydrated}
@@ -195,7 +194,7 @@ export function CheckoutContent({
   }
 
   return (
-    <div data-surface="day" className="bg-background text-foreground">
+    <div className="bg-background text-foreground">
       <div className="container mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
         <div className="mb-10">
           <span className="eyebrow">Almost yours</span>

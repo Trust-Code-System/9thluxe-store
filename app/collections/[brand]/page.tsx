@@ -69,14 +69,16 @@ export default async function BrandCollectionPage({ params }: BrandPageProps) {
       {/* Night header */}
       <section data-surface="night" className="grain relative bg-background text-foreground">
         <div className="container relative z-10 mx-auto max-w-[1200px] px-4 pb-12 pt-14 sm:px-6 lg:px-8 lg:pb-16 lg:pt-20">
-          <Link
-            href="/collections"
-            className="mb-8 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-accent"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            All collections
-          </Link>
-          <p className="eyebrow">The house of</p>
+          <div className="mb-8">
+            <Link
+              href="/collections"
+              className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-accent"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              All collections
+            </Link>
+          </div>
+          <p className="eyebrow block">The house of</p>
           <h1 className="mt-3 font-serif text-4xl font-light tracking-[-0.01em] md:text-6xl">
             {brandName}
           </h1>

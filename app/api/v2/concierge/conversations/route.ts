@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic"
 
 export const GET = route(async ({ req }) => {
   const { identity } = await resolveConciergeIdentity(req)
+  if (!identity.isAuthenticated) return { data: { conversations: [] } }
   const conversations = await listOwnedConversations(identity, req.nextUrl.searchParams.get("q") ?? undefined)
   return { data: { conversations } }
 })

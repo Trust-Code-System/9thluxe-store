@@ -12,6 +12,7 @@ import { useWishlistStore } from "@/lib/stores/wishlist-store"
 import { useCompareStore, MAX_COMPARE } from "@/lib/stores/compare-store"
 import { useCartStore } from "@/lib/stores/cart-store"
 import { trackPdp } from "@/lib/analytics/pdp-events"
+import { ensureSignedIn } from "@/lib/client-auth"
 import type { PdpCard } from "@/lib/pdp/types"
 
 const AVAILABILITY_LABEL: Record<PdpCard["availability"], string> = {
@@ -47,8 +48,10 @@ export function SmartProductCard({ card, className }: { card: PdpCard; className
     category: "perfumes" as const,
   }
 
-  const handleWishlist = (e: React.MouseEvent) => {
+  const handleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault()
+    const allowed = await ensureSignedIn(`/product/${card.slug}`)
+    if (!allowed) return
     toggleWishlist(asProduct)
     trackPdp("wishlist_changed", { productId: card.id, added: !inWishlist })
   }

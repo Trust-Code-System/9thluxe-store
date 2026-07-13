@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { CartHydrator } from "@/components/cart/cart-hydrator";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ScrollToTop } from "@/components/scroll-to-top";
+import { Suspense } from "react";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -126,6 +128,9 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         <ThemeProvider>
+          <Suspense fallback={null}>
+            <ScrollToTop />
+          </Suspense>
           <CartHydrator />
           {children}
           <Toaster position="top-center" />

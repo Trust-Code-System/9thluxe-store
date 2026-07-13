@@ -73,6 +73,7 @@ export function FragranceFamilies() {
             <StaggerItem key={family.key} role="listitem">
               <Link
                 href={`/shop?family=${family.key}`}
+                scroll
                 className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-x-5 border-b border-border py-6 transition-colors duration-300 hover:bg-secondary/40 sm:grid-cols-[3rem_1fr_1fr_auto] sm:gap-x-8 md:py-7"
               >
                 <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground/60">

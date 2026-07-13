@@ -30,7 +30,7 @@ export default async function CartPage() {
 
     <MainLayout>
 
-      <section data-surface="day" className="min-h-[60vh] bg-background text-foreground">
+      <section className="min-h-[60vh] bg-background text-foreground">
         <div className="container mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
 
           <div className="mb-10">

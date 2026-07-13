@@ -28,6 +28,8 @@ import { useCartStore } from "@/lib/stores/cart-store";
 
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 
+import { ensureSignedIn } from "@/lib/client-auth";
+
 import { cn } from "@/lib/utils";
 
 import type { Product } from "@/components/ui/product-card";
@@ -117,7 +119,10 @@ export function ProductInfo({ product }: ProductInfoProps) {
     }
   };
 
-  const handleAddToWishlist = () => {
+  const handleAddToWishlist = async () => {
+    const allowed = await ensureSignedIn(`/product/${product.slug}`);
+    if (!allowed) return;
+
     const wasInWishlist = isInWishlist;
 
     toggleWishlist(product);

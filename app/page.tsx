@@ -1,6 +1,6 @@
 import { MainLayout } from "@/components/layout/main-layout"
 
-import { EditorialHeroSection } from "@/components/home/hero/editorial/editorial-hero-section"
+import { PermanentHeroSection } from "@/components/home/hero/permanent/permanent-hero-section"
 
 import { FeaturedProductsSection } from "@/components/home/featured-products-section"
 
@@ -78,7 +78,7 @@ export default async function HomePage() {
 
     <MainLayout>
 
-      <EditorialHeroSection />
+      <PermanentHeroSection />
 
       <FeaturedProductsSection products={featuredProducts} />
 
