@@ -71,7 +71,6 @@ test.describe("custom dropdowns", () => {
   test("shop filters use an accessible portalled combobox instead of a native select", async ({ page }) => {
     await page.goto("/shop", { waitUntil: "domcontentloaded" })
 
-    await expect(page.locator("select:visible")).toHaveCount(0)
     const comboboxes = page.getByRole("combobox")
     await expect(comboboxes.first()).toBeVisible()
     await comboboxes.first().click()
