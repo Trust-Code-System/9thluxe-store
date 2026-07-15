@@ -1022,12 +1022,16 @@
 .drop-bottle-aventus { left: 7%; width: 91%; height: 70%; --land-rotate: -2deg; animation-delay: 80ms; }
 .drop-bottle-oud { right: 8%; width: 81%; height: 66%; --land-rotate: 2deg; animation-delay: 300ms; }
 .drop-ingredient { position: absolute; z-index: 28; width: 40%; height: auto; object-fit: contain; filter: drop-shadow(0 16px 14px rgba(0,0,0,.38)); transform-origin: 50% 100%; animation: permanent-ingredient-land 1s cubic-bezier(.22,.8,.2,1) both; }
-.drop-pineapple { left: -3%; bottom: 78px; --item-rotate: -17deg; animation-delay: 520ms; }
-.drop-apple { right: 2%; bottom: 58px; width: 32%; --item-rotate: 13deg; animation-delay: 720ms; }
-.drop-blackcurrant { right: 10%; bottom: 105px; width: 30%; --item-rotate: -8deg; animation-delay: 900ms; }
-.drop-sandalwood { right: -3%; bottom: 72px; width: 44%; --item-rotate: 12deg; animation-delay: 640ms; }
-.drop-cardamom { left: 4%; bottom: 55px; width: 30%; --item-rotate: -12deg; animation-delay: 840ms; }
-.drop-vanilla { left: 10%; bottom: 112px; width: 34%; --item-rotate: 18deg; animation-delay: 1.02s; }
+/* All ingredients share one ground line (bottom: 62px) so they rest on the same
+   surface instead of floating at different heights. transform-origin: 50% 100%
+   keeps each item's base anchored to this baseline. Only horizontal placement,
+   size and rotation vary. */
+.drop-pineapple { left: -3%; bottom: 62px; --item-rotate: -17deg; animation-delay: 520ms; }
+.drop-apple { right: 2%; bottom: 62px; width: 32%; --item-rotate: 13deg; animation-delay: 720ms; }
+.drop-blackcurrant { right: 10%; bottom: 62px; width: 30%; --item-rotate: -8deg; animation-delay: 900ms; }
+.drop-sandalwood { right: -3%; bottom: 62px; width: 44%; --item-rotate: 12deg; animation-delay: 640ms; }
+.drop-cardamom { left: 4%; bottom: 62px; width: 30%; --item-rotate: -12deg; animation-delay: 840ms; }
+.drop-vanilla { left: 10%; bottom: 62px; width: 34%; --item-rotate: 18deg; animation-delay: 1.02s; }
 .drop-impact { position: absolute; z-index: 25; bottom: 66px; left: 15%; width: 70%; height: 18px; border: 1px solid color-mix(in srgb, var(--champagne) 58%, transparent); border-radius: 50%; opacity: 0; animation: permanent-impact .75s ease-out both; }
 .drop-perfume-zone-left .drop-impact { animation-delay: .95s; }
 .drop-perfume-zone-right .drop-impact { animation-delay: 1.18s; }
@@ -1055,12 +1059,12 @@
   .drop-bottle-aventus { left: 2%; width: 98%; height: 67%; }
   .drop-bottle-oud { right: 3%; width: 88%; height: 63%; }
   .drop-pedestal { bottom: 59px; }
-  .drop-pineapple { left: -3%; bottom: 67px; width: 43%; }
-  .drop-apple { right: 2%; bottom: 52px; width: 31%; }
-  .drop-blackcurrant { right: 10%; bottom: 91px; width: 28%; }
-  .drop-sandalwood { right: -3%; bottom: 65px; width: 44%; }
-  .drop-cardamom { left: 3%; bottom: 49px; width: 29%; }
-  .drop-vanilla { left: 9%; bottom: 96px; width: 31%; }
+  .drop-pineapple { left: -3%; bottom: 54px; width: 43%; }
+  .drop-apple { right: 2%; bottom: 54px; width: 31%; }
+  .drop-blackcurrant { right: 10%; bottom: 54px; width: 28%; }
+  .drop-sandalwood { right: -3%; bottom: 54px; width: 44%; }
+  .drop-cardamom { left: 3%; bottom: 54px; width: 29%; }
+  .drop-vanilla { left: 9%; bottom: 54px; width: 31%; }
   .drop-impact { bottom: 58px; }
   .drop-caption p { font-size: 9px; letter-spacing: .13em; }
   .drop-caption span { font-size: 9px; }
