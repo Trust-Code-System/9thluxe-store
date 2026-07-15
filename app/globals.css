@@ -1028,10 +1028,12 @@
    size and rotation vary. */
 .drop-pineapple { left: -3%; bottom: 62px; --item-rotate: -17deg; animation-delay: 520ms; }
 .drop-apple { right: 2%; bottom: 62px; width: 32%; --item-rotate: 13deg; animation-delay: 720ms; }
-.drop-blackcurrant { right: 10%; bottom: 62px; width: 30%; --item-rotate: -8deg; animation-delay: 900ms; }
+/* Blackcurrant sits in the centre gap between pineapple (left) and apple (right). */
+.drop-blackcurrant { left: 36%; bottom: 62px; width: 30%; --item-rotate: -8deg; animation-delay: 900ms; }
 .drop-sandalwood { right: -3%; bottom: 62px; width: 44%; --item-rotate: 12deg; animation-delay: 640ms; }
 .drop-cardamom { left: 4%; bottom: 62px; width: 30%; --item-rotate: -12deg; animation-delay: 840ms; }
-.drop-vanilla { left: 10%; bottom: 62px; width: 34%; --item-rotate: 18deg; animation-delay: 1.02s; }
+/* Tonka/vanilla mirrors the blackcurrant: centred between cardamom (left) and sandalwood (right). */
+.drop-vanilla { left: 29%; bottom: 62px; width: 34%; --item-rotate: 18deg; animation-delay: 1.02s; }
 .drop-impact { position: absolute; z-index: 25; bottom: 66px; left: 15%; width: 70%; height: 18px; border: 1px solid color-mix(in srgb, var(--champagne) 58%, transparent); border-radius: 50%; opacity: 0; animation: permanent-impact .75s ease-out both; }
 .drop-perfume-zone-left .drop-impact { animation-delay: .95s; }
 .drop-perfume-zone-right .drop-impact { animation-delay: 1.18s; }
@@ -1061,10 +1063,10 @@
   .drop-pedestal { bottom: 59px; }
   .drop-pineapple { left: -3%; bottom: 54px; width: 43%; }
   .drop-apple { right: 2%; bottom: 54px; width: 31%; }
-  .drop-blackcurrant { right: 10%; bottom: 54px; width: 28%; }
+  .drop-blackcurrant { left: 40%; bottom: 54px; width: 28%; }
   .drop-sandalwood { right: -3%; bottom: 54px; width: 44%; }
   .drop-cardamom { left: 3%; bottom: 54px; width: 29%; }
-  .drop-vanilla { left: 9%; bottom: 54px; width: 31%; }
+  .drop-vanilla { left: 30%; bottom: 54px; width: 31%; }
   .drop-impact { bottom: 58px; }
   .drop-caption p { font-size: 9px; letter-spacing: .13em; }
   .drop-caption span { font-size: 9px; }
