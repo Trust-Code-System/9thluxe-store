@@ -51,7 +51,7 @@ function SidebarContent({ capabilities }: { capabilities: string[] }) {
         <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Admin</span>
       </div>
 
-      {/* Navigation — scrolls independently when items exceed the viewport */}
+      {/* Navigation: scrolls independently when items exceed the viewport */}
       <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain p-4">
         {visibleItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href))

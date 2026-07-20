@@ -20,7 +20,7 @@ export function TrustBadges() {
     {
       icon: CreditCard,
       title: 'Trusted Platform',
-      note: 'Paystack & Bank Transfer',
+      note: 'Powered by Paystack',
     },
     {
       icon: BadgeCheck,

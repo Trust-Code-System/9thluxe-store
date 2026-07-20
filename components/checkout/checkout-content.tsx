@@ -48,20 +48,12 @@ export function CheckoutContent({
   const [currentStep, setCurrentStep] = React.useState(1);
 
   // Checkout steps swap in place (no URL change), so the shared ScrollToTop never fires between
-  // them. Without this you land wherever the previous step's button was — usually the bottom of the
-  // page — and have to scroll up to see the next step. Return to the top on every step change.
+  // them. Without this you land wherever the previous step's button was (usually the bottom of the
+  // page) and have to scroll up to see the next step. Return to the top on every step change.
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentStep]);
-  const [orderPlaced, setOrderPlaced] = React.useState(false);
-  const [placedSnapshot, setPlacedSnapshot] = React.useState<{
-    items: OrderItem[];
-    subtotal: number;
-    shipping: number;
-    total: number;
-    discount: number;
-  } | null>(null);
 
   const couponCode = useCartStore((state) => state.couponCode);
 
@@ -163,21 +155,18 @@ export function CheckoutContent({
     flatShippingFee,
   ]);
 
-  // Redirect to cart only once hydrated and empty — never after an order is placed
-  // (bank transfer clears the cart while still showing transfer details on this page).
+  // Redirect to cart only once the server cart has hydrated and is truly empty.
   React.useEffect(() => {
-    if (hasHydrated && items.length === 0 && !orderPlaced) {
+    if (hasHydrated && items.length === 0) {
       router.replace("/cart");
     }
-  }, [hasHydrated, items.length, orderPlaced, router]);
+  }, [hasHydrated, items.length, router]);
 
-  const subtotal = placedSnapshot?.subtotal ?? orderPayload.subtotalNGN;
+  const subtotal = orderPayload.subtotalNGN;
 
-  const shipping = placedSnapshot?.shipping ?? orderPayload.shippingNGN;
+  const shipping = orderPayload.shippingNGN;
 
-  const currentDiscount = placedSnapshot?.discount ?? orderPayload.discountNGN;
-
-  const summaryItems = placedSnapshot?.items ?? items;
+  const currentDiscount = orderPayload.discountNGN;
 
   // Update store discount if it changed (hook must run unconditionally, before any early return)
 
@@ -187,22 +176,9 @@ export function CheckoutContent({
     }
   }, [currentDiscount, couponCode, discount]);
 
-  const total = placedSnapshot?.total ?? orderPayload.totalNGN;
+  const total = orderPayload.totalNGN;
 
-  const markOrderPlaced = React.useCallback(() => {
-    setPlacedSnapshot({
-      items,
-      subtotal: orderPayload.subtotalNGN,
-      shipping: orderPayload.shippingNGN,
-      total: orderPayload.totalNGN,
-      discount: orderPayload.discountNGN,
-    });
-    setOrderPlaced(true);
-    // Advance past payment so the summary CTA doesn't keep offering Paystack.
-    setCurrentStep(3);
-  }, [items, orderPayload]);
-
-  if (!hasHydrated || (items.length === 0 && !orderPlaced)) {
+  if (!hasHydrated || items.length === 0) {
     return (
       <section
         className="flex min-h-[50vh] items-center justify-center bg-background px-4 py-16 text-center text-foreground"
@@ -258,11 +234,10 @@ export function CheckoutContent({
               />
             )}
 
-            {(currentStep === 2 || orderPlaced) && (
+            {currentStep === 2 && (
               <PaymentForm
                 onBack={() => setCurrentStep(1)}
                 onComplete={() => setCurrentStep(3)}
-                onOrderCreated={markOrderPlaced}
                 total={total}
                 orderPayload={orderPayload}
               />
@@ -273,7 +248,7 @@ export function CheckoutContent({
 
           <div className="lg:col-span-1">
             <OrderSummary
-              items={summaryItems}
+              items={items}
               subtotal={subtotal}
               shipping={shipping}
               total={total}
@@ -282,19 +257,15 @@ export function CheckoutContent({
               couponCode={couponCode}
               applyCoupon={applyCoupon}
               removeCoupon={removeCoupon}
-              onPaymentClick={
-                orderPlaced
-                  ? undefined
-                  : () => {
-                      const form = document.querySelector(
-                        "form[data-payment-form]",
-                      ) as HTMLFormElement;
+              onPaymentClick={() => {
+                const form = document.querySelector(
+                  "form[data-payment-form]",
+                ) as HTMLFormElement;
 
-                      if (form) {
-                        form.requestSubmit();
-                      }
-                    }
-              }
+                if (form) {
+                  form.requestSubmit();
+                }
+              }}
             />
           </div>
         </div>

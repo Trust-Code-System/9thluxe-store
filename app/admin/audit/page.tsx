@@ -51,7 +51,7 @@ function formatWhen(value: Date): string {
 }
 
 function metadataPreview(metadata: unknown): string {
-  if (metadata == null) return "—"
+  if (metadata == null) return "–"
   try {
     if (typeof metadata === "object" && !Array.isArray(metadata)) {
       const parts = Object.entries(metadata as Record<string, unknown>).map(([key, value]) => {
@@ -67,7 +67,7 @@ function metadataPreview(metadata: unknown): string {
     }
     return JSON.stringify(metadata)
   } catch {
-    return "—"
+    return "–"
   }
 }
 
