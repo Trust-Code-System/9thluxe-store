@@ -42,9 +42,9 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <AdminSidebar capabilities={capabilities} />
-      <div className="flex flex-1 flex-col lg:ml-64">
+      <div className="flex min-w-0 flex-1 flex-col lg:ml-64">
         <AdminHeader user={{ ...user, roleLabel: role ? ROLE_LABELS[role] : null }} />
-        <main className="flex-1 p-6 lg:p-8">{children}</main>
+        <main className="min-w-0 flex-1 overflow-x-hidden p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

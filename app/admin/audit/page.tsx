@@ -51,13 +51,29 @@ function formatWhen(value: Date): string {
 }
 
 function metadataPreview(metadata: unknown): string {
-  if (metadata == null) return ""
+  if (metadata == null) return "—"
   try {
-    const s = JSON.stringify(metadata)
-    return s.length > 160 ? `${s.slice(0, 157)}...` : s
+    if (typeof metadata === "object" && !Array.isArray(metadata)) {
+      const parts = Object.entries(metadata as Record<string, unknown>).map(([key, value]) => {
+        const rendered =
+          value == null
+            ? "null"
+            : typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+              ? String(value)
+              : JSON.stringify(value)
+        return `${key}: ${rendered}`
+      })
+      if (parts.length > 0) return parts.join(" · ")
+    }
+    return JSON.stringify(metadata)
   } catch {
-    return ""
+    return "—"
   }
+}
+
+function shortId(id: string): string {
+  if (id.length <= 14) return id
+  return `${id.slice(0, 8)}…${id.slice(-4)}`
 }
 
 export default async function AdminAuditPage({ searchParams }: AdminAuditPageProps) {
@@ -154,7 +170,7 @@ export default async function AdminAuditPage({ searchParams }: AdminAuditPagePro
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="overflow-hidden">
           <CardContent className="pt-6">
             <div className="mb-3 flex items-center justify-between text-sm text-muted-foreground">
               <span>
@@ -164,13 +180,13 @@ export default async function AdminAuditPage({ searchParams }: AdminAuditPagePro
                 Page {currentPage} of {totalPages}
               </span>
             </div>
-            <Table>
+            <Table className="table-fixed">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="whitespace-nowrap">When (UTC)</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Target</TableHead>
-                  <TableHead>Actor</TableHead>
+                  <TableHead className="w-[9.5rem]">When (UTC)</TableHead>
+                  <TableHead className="w-[8.5rem]">Action</TableHead>
+                  <TableHead className="w-[18%]">Target</TableHead>
+                  <TableHead className="w-[16%]">Actor</TableHead>
                   <TableHead>Details</TableHead>
                 </TableRow>
               </TableHeader>
@@ -182,41 +198,57 @@ export default async function AdminAuditPage({ searchParams }: AdminAuditPagePro
                     </TableCell>
                   </TableRow>
                 ) : (
-                  entries.map((entry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">
-                        {formatWhen(entry.createdAt)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{entry.action}</Badge>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        <span className="font-medium">{entry.targetType}</span>
-                        {entry.targetId ? (
-                          <span className="block font-mono text-xs text-muted-foreground">
-                            {entry.targetId}
+                  entries.map((entry) => {
+                    const details = metadataPreview(entry.metadata)
+                    return (
+                      <TableRow key={entry.id}>
+                        <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+                          {formatWhen(entry.createdAt)}
+                        </TableCell>
+                        <TableCell className="min-w-0">
+                          <Badge variant="secondary" className="max-w-full truncate font-normal">
+                            {entry.action}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="min-w-0 text-sm">
+                          <span className="block truncate font-medium" title={entry.targetType}>
+                            {entry.targetType}
                           </span>
-                        ) : null}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {entry.actorRole ? (
-                          <span className="block">{entry.actorRole}</span>
-                        ) : (
-                          <span className="text-muted-foreground">system</span>
-                        )}
-                        {entry.actorId ? (
-                          <span className="block font-mono text-xs text-muted-foreground">
-                            {entry.actorId}
+                          {entry.targetId ? (
+                            <span
+                              className="block truncate font-mono text-xs text-muted-foreground"
+                              title={entry.targetId}
+                            >
+                              {shortId(entry.targetId)}
+                            </span>
+                          ) : null}
+                        </TableCell>
+                        <TableCell className="min-w-0 text-sm">
+                          {entry.actorRole ? (
+                            <span className="block truncate">{entry.actorRole}</span>
+                          ) : (
+                            <span className="text-muted-foreground">system</span>
+                          )}
+                          {entry.actorId ? (
+                            <span
+                              className="block truncate font-mono text-xs text-muted-foreground"
+                              title={entry.actorId}
+                            >
+                              {shortId(entry.actorId)}
+                            </span>
+                          ) : null}
+                        </TableCell>
+                        <TableCell className="min-w-0">
+                          <span
+                            className="line-clamp-2 break-all font-mono text-xs text-muted-foreground"
+                            title={details}
+                          >
+                            {details}
                           </span>
-                        ) : null}
-                      </TableCell>
-                      <TableCell className="max-w-xs">
-                        <span className="block truncate font-mono text-xs text-muted-foreground">
-                          {metadataPreview(entry.metadata)}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
                 )}
               </TableBody>
             </Table>
