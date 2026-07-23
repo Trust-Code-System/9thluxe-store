@@ -50,18 +50,23 @@ Completed in the first hardening milestone:
 - successful payment finalizes the reservation without decrementing stock twice, while legacy
   pending orders retain a safe conditional-decrement path;
 - concurrent database tests prove only one checkout can claim the final available units;
+- the payment transaction now writes separate durable outbox events for receipts, admin
+  notifications, and referral qualification;
+- the protected outbox worker claims work safely, recovers stale locks, retries with exponential
+  backoff, and retains exhausted events in a failed state;
+- receipt delivery uses provider idempotency, admin notifications use a database deduplication key,
+  and customer-controlled receipt fields are HTML escaped;
 - payment-matching, checkout-idempotency, publication, origin, and shipping-policy regression tests
   were added;
-- Prisma schema validation, TypeScript, lint, 331 unit/integration tests, and the production build
+- Prisma schema validation, TypeScript, lint, 337 unit/integration tests, and the production build
   pass on this branch; all staging migrations are applied with zero schema drift.
 
 Still required before launch:
 
-- a transactional outbox and background worker;
 - payment reconciliation and complete refund/order state handling;
 - complete password-reset flow and broader authentication abuse protection;
 - dependency remediation, full database integration tests, and production staging certification;
-- scheduler configuration for the reservation-expiry endpoint;
+- scheduler configuration for the reservation-expiry and outbox-worker endpoints;
 - owner-supplied provider credentials, business details, brand assets, and approved policies.
 
 ## Audit findings

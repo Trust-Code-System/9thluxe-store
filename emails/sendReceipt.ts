@@ -1,5 +1,7 @@
 // emails/sendReceipt.ts
 import { Resend } from "resend"
+import { escapeHtml } from "@/lib/security/html"
+import { logger } from "@/lib/observability/logger"
 
 type OrderLike = {
   id: string
@@ -13,29 +15,26 @@ type OrderLike = {
   coupon?: { code: string } | null
 }
 
-export async function sendReceipt(order: OrderLike) {
+export async function sendReceipt(order: OrderLike, idempotencyKey?: string) {
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) {
-    console.log('[EMAIL] Receipt (no API key):', {
-      to: order.user.email,
-      subject: `Fádé Order #${order.reference || order.id.slice(-6)} receipt`,
-      summary: {
-        subtotal: order.subtotalNGN,
-        discount: order.discountNGN,
-        total: order.totalNGN,
-        items: order.items.map(i => `${i.quantity} × ${i.product.name}`)
-      }
+    logger.warn("receipt_email_skipped", {
+      orderId: order.id,
+      reason: "RESEND_API_KEY missing",
     })
     return
   }
   const resend = new Resend(resendKey)
 
   const orderRef = order.reference || order.id.slice(0, 8)
+  const safeOrderRef = escapeHtml(orderRef)
+  const safeCustomerName = escapeHtml(order.user.name || "Customer")
+  const safeCouponCode = order.coupon ? escapeHtml(order.coupon.code) : null
   const itemsHtml = order.items
     .map(
       (item) => `
       <tr>
-        <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.quantity} × ${item.product.name}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.quantity} × ${escapeHtml(item.product.name)}</td>
         <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₦${item.product.priceNGN.toLocaleString()}</td>
         <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₦${(item.quantity * item.product.priceNGN).toLocaleString()}</td>
       </tr>
@@ -56,11 +55,11 @@ export async function sendReceipt(order: OrderLike) {
         </div>
         <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
           <h2 style="color: #2f3e33; margin-top: 0;">Order Confirmation</h2>
-          <p>Hello ${order.user.name || "Customer"},</p>
+          <p>Hello ${safeCustomerName},</p>
           <p>Thank you for your order! We've received your payment and your order is being processed.</p>
           
           <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0 0 10px 0;"><strong>Order Reference:</strong> ${orderRef}</p>
+            <p style="margin: 0 0 10px 0;"><strong>Order Reference:</strong> ${safeOrderRef}</p>
             <p style="margin: 0 0 10px 0;"><strong>Order Date:</strong> ${order.createdAt.toLocaleDateString()}</p>
             
             <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
@@ -83,7 +82,7 @@ export async function sendReceipt(order: OrderLike) {
               </div>
               ${order.discountNGN > 0 ? `
               <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #28a745;">
-                <span>Discount${order.coupon ? ` (${order.coupon.code})` : ""}:</span>
+                <span>Discount${safeCouponCode ? ` (${safeCouponCode})` : ""}:</span>
                 <span>-₦${order.discountNGN.toLocaleString()}</span>
               </div>
               ` : ""}
@@ -111,10 +110,13 @@ export async function sendReceipt(order: OrderLike) {
       to: order.user.email,
       subject: `Order Confirmation - Order #${orderRef}`,
       html,
-    })
-    console.log("[EMAIL] Receipt sent:", order.user.email)
+    }, idempotencyKey ? { idempotencyKey } : undefined)
+    logger.info("receipt_email_sent", { orderId: order.id })
   } catch (error) {
-    console.error("[EMAIL] Failed to send receipt:", error)
+    logger.error("receipt_email_failed", {
+      orderId: order.id,
+      internal: String(error),
+    })
     throw error
   }
 }

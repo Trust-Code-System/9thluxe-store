@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 
-import { sendReceipt } from "@/emails/sendReceipt"
 import { getPayments } from "@/integrations/registry"
 import { resolveLoyaltyTier } from "@/lib/config/commerce"
 import { pointsForOrder } from "@/lib/loyalty/points"
 import { reversePointsForOrder } from "@/lib/loyalty/service"
+import { enqueueOrderPaidEvents } from "@/lib/jobs/outbox"
 import { logger } from "@/lib/observability/logger"
 import { matchesExpectedPayment } from "@/lib/payments/match"
 import { prisma } from "@/lib/prisma"
-import { qualifyReferral } from "@/lib/referrals/service"
 import { recordWebhookOnce } from "@/lib/webhooks/idempotency"
 import { finalizeInventoryForOrder } from "@/lib/inventory/reservations"
 
@@ -198,6 +197,7 @@ export async function POST(req: NextRequest) {
           })
         }
 
+        await enqueueOrderPaidEvents(tx, paidOrder.id)
         return { order: paidOrder, alreadyPaid: false, paidReference: reference }
       })
 
@@ -212,33 +212,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true, duplicate: true })
       }
 
-      await sendReceipt(result.order).catch((error) => {
-        logger.error("order_receipt_failed", {
-          orderId: result.order!.id,
-          internal: String(error),
-        })
-      })
-      await qualifyReferral(result.order.userId, result.order.id).catch((error) => {
-        logger.error("referral_qualification_failed", {
-          orderId: result.order!.id,
-          internal: String(error),
-        })
-      })
-      await prisma.notification
-        .create({
-          data: {
-            type: "ORDER_PAID",
-            title: "New Order Payment",
-            message: `Order #${result.order.reference || result.order.id.slice(0, 8)} has been paid. Total: NGN ${result.order.totalNGN.toLocaleString()}`,
-            orderId: result.order.id,
-          },
-        })
-        .catch((error) => {
-          logger.error("order_notification_failed", {
-            orderId: result.order!.id,
-            internal: String(error),
-          })
-        })
     } catch (error) {
       if ((error as { code?: string })?.code === "P2002") {
         return NextResponse.json({ ok: true, duplicate: true })
