@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 import { NIGERIAN_STATES } from "@/lib/constants/nigerian-states"
+import { consumeRateLimit } from "@/lib/middleware/limiter"
+import { hasTrustedOrigin } from "@/lib/security/origin"
 
 const addressSchema = z.object({
   name: z.string().min(1, "Full name is required").max(200),
@@ -33,7 +35,6 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 401 })
     }
-
     const { id } = await params
     const address = await prisma.address.findFirst({
       where: { id, userId: user.id },
@@ -67,6 +68,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!hasTrustedOrigin(req)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
     const session = await auth()
     const email = session?.user?.email
     if (!email) {
@@ -79,6 +83,14 @@ export async function PATCH(
     })
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 401 })
+    }
+    const limit = await consumeRateLimit(
+      `account:address:${user.id}`,
+      30,
+      60 * 60 * 1000,
+    )
+    if (!limit.ok) {
+      return NextResponse.json({ error: "Too many address changes" }, { status: 429 })
     }
 
     const { id } = await params
@@ -99,24 +111,28 @@ export async function PATCH(
     const { name, line1, address: addressLine, city, state, postalCode, phone, isDefault } = parsed.data
     const line1Value = line1 ?? addressLine
 
-    if (isDefault === true) {
-      await prisma.address.updateMany({
-        where: { userId: user.id },
-        data: { isDefault: false },
+    const address = await prisma.$transaction(async (tx) => {
+      if (isDefault === true) {
+        await tx.address.updateMany({
+          where: { userId: user.id },
+          data: { isDefault: false },
+        })
+      }
+      return tx.address.update({
+        where: { id },
+        data: {
+          ...(name !== undefined && { name: name || null }),
+          ...(line1Value !== undefined &&
+            line1Value !== "" && { line1: line1Value }),
+          ...(city !== undefined && { city }),
+          ...(state !== undefined && { state }),
+          ...(postalCode !== undefined && {
+            postalCode: postalCode || null,
+          }),
+          ...(phone !== undefined && { phone }),
+          ...(isDefault !== undefined && { isDefault }),
+        },
       })
-    }
-
-    const address = await prisma.address.update({
-      where: { id },
-      data: {
-        ...(name !== undefined && { name: name || null }),
-        ...(line1Value !== undefined && line1Value !== "" && { line1: line1Value }),
-        ...(city !== undefined && { city }),
-        ...(state !== undefined && { state }),
-        ...(postalCode !== undefined && { postalCode: postalCode || null }),
-        ...(phone !== undefined && { phone }),
-        ...(isDefault !== undefined && { isDefault }),
-      } as Parameters<typeof prisma.address.update>[0]["data"],
     })
 
     const a = address as typeof address & { name?: string | null; postalCode?: string | null }
@@ -140,10 +156,13 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!hasTrustedOrigin(req)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
     const session = await auth()
     const email = session?.user?.email
     if (!email) {
@@ -156,6 +175,14 @@ export async function DELETE(
     })
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 401 })
+    }
+    const limit = await consumeRateLimit(
+      `account:address:${user.id}`,
+      30,
+      60 * 60 * 1000,
+    )
+    if (!limit.ok) {
+      return NextResponse.json({ error: "Too many address changes" }, { status: 429 })
     }
 
     const { id } = await params

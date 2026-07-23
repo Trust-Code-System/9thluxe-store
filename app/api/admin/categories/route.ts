@@ -14,17 +14,20 @@ export async function GET() {
       orderBy: { name: "asc" },
     })
 
-    const results = await Promise.all(
-      categories.map(async (category) => {
-        let productCount = 0
-        if (category.enumKey) {
-          productCount = await prisma.product.count({
-            where: { category: category.enumKey },
-          })
-        }
-        return { ...category, productCount }
-      })
+    const counts = await prisma.product.groupBy({
+      by: ["category"],
+      where: { deletedAt: null },
+      _count: { _all: true },
+    })
+    const countByCategory = new Map(
+      counts.map((row) => [row.category, row._count._all]),
     )
+    const results = categories.map((category) => ({
+      ...category,
+      productCount: category.enumKey
+        ? (countByCategory.get(category.enumKey) ?? 0)
+        : 0,
+    }))
 
     return NextResponse.json({ categories: results })
   } catch (error) {
@@ -62,4 +65,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to create category" }, { status: 500 })
   }
 }
-

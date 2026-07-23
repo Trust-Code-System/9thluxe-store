@@ -25,9 +25,13 @@ function parse(raw?: string | null): CartItem[] {
     return json
       .map((i: any) => ({
         productId: String(i?.productId || ''),
-        quantity: Math.max(1, Number.isFinite(+i?.quantity) ? +i.quantity : 1),
+        quantity: Math.min(
+          99,
+          Math.max(1, Number.isFinite(+i?.quantity) ? +i.quantity : 1),
+        ),
       }))
       .filter((i) => i.productId)
+      .slice(0, 100)
   } catch {
     return []
   }
@@ -45,9 +49,10 @@ async function writeCart(items: CartItem[]) {
   const safe = items
     .map((i) => ({
       productId: String(i.productId),
-      quantity: Math.max(1, Math.floor(i.quantity || 1)),
+      quantity: Math.min(99, Math.max(1, Math.floor(i.quantity || 1))),
     }))
     .filter((i) => i.productId)
+    .slice(0, 100)
 
   const value = encodeURIComponent(JSON.stringify(safe))
   const cookieStore = await cookies()
@@ -65,9 +70,9 @@ export async function addToCart(productId: string, qty = 1) {
   'use server'
   const cart = await getCart()
   const idx = cart.findIndex((x) => x.productId === productId)
-  const addQty = Math.max(1, Math.floor(qty || 1))
+  const addQty = Math.min(99, Math.max(1, Math.floor(qty || 1)))
 
-  if (idx >= 0) cart[idx].quantity += addQty
+  if (idx >= 0) cart[idx].quantity = Math.min(99, cart[idx].quantity + addQty)
   else cart.push({ productId, quantity: addQty })
 
   await writeCart(cart)
@@ -83,7 +88,9 @@ export async function updateCartItem(productId: string, qty: number) {
     newQty <= 0
       ? cart.filter((i) => i.productId !== productId)
       : cart.map((i) =>
-          i.productId === productId ? { ...i, quantity: Math.max(1, newQty) } : i
+          i.productId === productId
+            ? { ...i, quantity: Math.min(99, Math.max(1, newQty)) }
+            : i
         )
 
   await writeCart(next)

@@ -37,8 +37,12 @@ export type AdminOrder = Prisma.OrderGetPayload<{
 export async function getAdminOrders(params: {
   search?: string
   status?: OrderStatus | "all"
+  page?: number
+  pageSize?: number
 } = {}): Promise<AdminOrder[]> {
   const { search, status } = params
+  const page = Math.max(params.page ?? 1, 1)
+  const pageSize = Math.min(Math.max(params.pageSize ?? 50, 1), 100)
 
   const where: Prisma.OrderWhereInput = {
     AND: [
@@ -57,6 +61,8 @@ export async function getAdminOrders(params: {
   return prisma.order.findMany({
     where,
     orderBy: { createdAt: "desc" },
+    skip: (page - 1) * pageSize,
+    take: pageSize,
     include: {
       user: {
         select: { id: true, name: true, email: true },
@@ -71,6 +77,28 @@ export async function getAdminOrders(params: {
       coupon: {
         select: { code: true },
       },
+    },
+  })
+}
+
+export async function countAdminOrders(params: {
+  search?: string
+  status?: OrderStatus | "all"
+} = {}) {
+  const { search, status } = params
+  return prisma.order.count({
+    where: {
+      AND: [
+        status && status !== "all" ? { status } : {},
+        search
+          ? {
+              OR: [
+                { reference: { contains: search } },
+                { user: { email: { contains: search } } },
+              ],
+            }
+          : {},
+      ],
     },
   })
 }

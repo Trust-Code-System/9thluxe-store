@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 import { NIGERIAN_STATES } from "@/lib/constants/nigerian-states"
+import { consumeRateLimit } from "@/lib/middleware/limiter"
+import { hasTrustedOrigin } from "@/lib/security/origin"
 
 const addressSchema = z.object({
   name: z.string().min(1, "Full name is required").max(200),
@@ -58,6 +60,9 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!hasTrustedOrigin(req)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
     const session = await auth()
     const email = session?.user?.email
     if (!email) {
@@ -71,6 +76,17 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
+    const limit = await consumeRateLimit(
+      `account:address:${user.id}`,
+      30,
+      60 * 60 * 1000,
+    )
+    if (!limit.ok) {
+      return NextResponse.json(
+        { error: "Too many address changes. Please try again later." },
+        { status: 429 },
+      )
+    }
 
     const body = await req.json()
     const parsed = addressSchema.safeParse(body)
@@ -82,24 +98,25 @@ export async function POST(req: NextRequest) {
     const { name, line1, address: addressLine, city, state, postalCode, phone, isDefault } = parsed.data
     const line1Value = line1 ?? addressLine ?? ""
 
-    if (isDefault) {
-      await prisma.address.updateMany({
-        where: { userId: user.id },
-        data: { isDefault: false },
+    const address = await prisma.$transaction(async (tx) => {
+      if (isDefault) {
+        await tx.address.updateMany({
+          where: { userId: user.id },
+          data: { isDefault: false },
+        })
+      }
+      return tx.address.create({
+        data: {
+          userId: user.id,
+          name: name || null,
+          line1: line1Value,
+          city,
+          state,
+          postalCode: postalCode || null,
+          phone,
+          isDefault: isDefault ?? false,
+        },
       })
-    }
-
-    const address = await prisma.address.create({
-      data: {
-        userId: user.id,
-        name: name || null,
-        line1: line1Value,
-        city,
-        state,
-        postalCode: postalCode || null,
-        phone,
-        isDefault: isDefault ?? false,
-      } as Parameters<typeof prisma.address.create>[0]["data"],
     })
 
     const a = address as typeof address & { name?: string | null; postalCode?: string | null }

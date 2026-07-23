@@ -1,28 +1,44 @@
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/admin'
 import { User, Mail, Calendar } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ page?: string }>
+}) {
   await requireAdmin()
 
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      createdAt: true,
-      _count: {
-        select: {
-          orders: true,
+  const params = await searchParams
+  const requestedPage = Number.parseInt(params?.page ?? '1', 10)
+  const page = Number.isFinite(requestedPage) && requestedPage > 0
+    ? requestedPage
+    : 1
+  const pageSize = 50
+  const [users, totalUsers] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        _count: {
+          select: {
+            orders: true,
+          },
         },
       },
-    },
-  })
-
-  const totalUsers = await prisma.user.count()
+    }),
+    prisma.user.count(),
+  ])
+  const totalPages = Math.max(1, Math.ceil(totalUsers / pageSize))
 
   return (
     <div className="space-y-6">
@@ -86,10 +102,28 @@ export default async function AdminUsersPage() {
               </tbody>
             </table>
           </div>
+          {totalPages > 1 && (
+            <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
+              <p className="text-sm text-muted-foreground">
+                Page {Math.min(page, totalPages)} of {totalPages}
+              </p>
+              <div className="flex gap-2">
+                {page > 1 && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/users?page=${page - 1}`}>Previous</Link>
+                  </Button>
+                )}
+                {page < totalPages && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/users?page=${page + 1}`}>Next</Link>
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
   )
 }
-
 

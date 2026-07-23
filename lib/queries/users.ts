@@ -25,6 +25,7 @@ export async function getUserById(userId: string) {
 export async function getAllUsers() {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
+    take: 100,
     include: {
       orders: {
         select: {
@@ -46,4 +47,3 @@ export async function getAllUsers() {
     }
   })
 }
-

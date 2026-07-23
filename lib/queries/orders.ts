@@ -4,6 +4,7 @@ export async function getOrdersByUserId(userId: string) {
   const orders = await prisma.order.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    take: 100,
     include: {
       items: {
         include: {
@@ -27,6 +28,7 @@ export async function getOrdersByUserId(userId: string) {
 export async function getAllOrders() {
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
+    take: 100,
     include: {
       user: {
         select: {
@@ -41,4 +43,3 @@ export async function getAllOrders() {
 
   return orders
 }
-

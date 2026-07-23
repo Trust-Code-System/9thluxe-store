@@ -25,26 +25,44 @@ const statusColors: Record<string, string> = {
 
 export const dynamic = "force-dynamic";
 
-export default async function OrdersPage() {
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ page?: string }>;
+}) {
   // Require authentication - will redirect if not signed in
 
   const user = await requireUser();
+  const params = await searchParams;
+  const requestedPage = Number.parseInt(params?.page ?? "1", 10);
+  const page = Number.isFinite(requestedPage) && requestedPage > 0
+    ? requestedPage
+    : 1;
+  const pageSize = 10;
 
   // Fetch orders from database for the current user
 
-  const orders = await prisma.order.findMany({
-    where: { userId: user.id },
+  const [orders, totalOrders] = await Promise.all([
+    prisma.order.findMany({
+      where: { userId: user.id },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
 
     include: {
       items: {
         include: {
-          product: true,
+          product: {
+            select: { id: true, name: true, images: true },
+          },
         },
       },
     },
 
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.order.count({ where: { userId: user.id } }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalOrders / pageSize));
 
   // Helper to get first product image
   const getProductImage = (product: any): string => {
@@ -172,6 +190,25 @@ export default async function OrdersPage() {
           </CardContent>
         </Card>
       ))}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-2">
+          <p className="text-sm text-muted-foreground">
+            Page {Math.min(page, totalPages)} of {totalPages}
+          </p>
+          <div className="flex gap-2">
+            {page > 1 && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/account/orders?page=${page - 1}`}>Previous</Link>
+              </Button>
+            )}
+            {page < totalPages && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/account/orders?page=${page + 1}`}>Next</Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
