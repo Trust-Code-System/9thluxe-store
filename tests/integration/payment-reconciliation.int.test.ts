@@ -38,6 +38,14 @@ describe.skipIf(!hasDb)("payment reconciliation settlement (DB)", () => {
         paidAt: new Date().toISOString(),
       }
     },
+    async refund(input) {
+      return {
+        providerRefundId: `refund_${input.reference}`,
+        status: "processing",
+        amountNGN: input.amountNGN,
+        currency: input.currency,
+      }
+    },
     verifyWebhook() {
       return { valid: false }
     },

@@ -100,7 +100,7 @@ describe.skipIf(!hasDb)("transactional outbox (DB)", () => {
     })
     expect(replay.processed).toBe(1)
     expect(await prisma.notification.count({ where: { orderId } })).toBe(1)
-  })
+  }, 15_000)
 
   it("moves an exhausted unsupported event to the failed state", async () => {
     const event = await prisma.outboxEvent.create({

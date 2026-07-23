@@ -57,6 +57,11 @@ Completed in the first hardening milestone:
 - order fulfilment now follows a conditional state machine instead of arbitrary admin updates;
   pending cancellation atomically releases inventory and abandons unresolved payments, while every
   admin transition requires fresh authorization, a reason, and an audit record;
+- full refund initiation now creates a durable, one-per-order refund record before calling the
+  provider, requires admin authorization, reason, rate limiting, origin validation, and an
+  idempotency key, and moves the order to refund-pending only after provider acceptance;
+- refund initiation fails to manual review when Paystack accepted the request but the local commit
+  is uncertain, preventing an automatic retry from issuing a second refund;
 - the protected outbox worker claims work safely, recovers stale locks, retries with exponential
   backoff, and retains exhausted events in a failed state;
 - receipt delivery uses provider idempotency, admin notifications use a database deduplication key,
@@ -85,7 +90,7 @@ Completed in the first hardening milestone:
 
 Still required before launch:
 
-- complete refund/order state handling;
+- complete refund webhook processing and provider-status reconciliation;
 - browser/Paystack integration tests and production staging certification;
 - scheduler configuration for reservation expiry, outbox delivery, and payment reconciliation;
 - owner-supplied provider credentials, business details, brand assets, and approved policies.

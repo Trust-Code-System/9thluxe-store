@@ -11,6 +11,7 @@ import type {
   VerifyPaymentResult,
   WebhookVerification,
   PaymentStatus,
+  ProviderRefundStatus,
 } from '../types'
 
 const PAYSTACK_BASE = 'https://api.paystack.co'
@@ -64,6 +65,23 @@ function statusFromPaystack(s: string | undefined): PaymentStatus {
   }
 }
 
+function refundStatusFromPaystack(
+  status: string | undefined,
+): ProviderRefundStatus {
+  switch (status) {
+    case 'processing':
+      return 'processing'
+    case 'needs-attention':
+      return 'needs_attention'
+    case 'processed':
+      return 'processed'
+    case 'failed':
+      return 'failed'
+    default:
+      return 'pending'
+  }
+}
+
 export const paystackProvider: PaymentProvider = {
   name: 'paystack',
 
@@ -110,6 +128,42 @@ export const paystackProvider: PaymentProvider = {
       currency,
       paidAt: data.paid_at ?? null,
       amountMatches,
+    }
+  },
+
+  async refund(input) {
+    if (!isSupportedCurrency(input.currency)) {
+      throw new AppError('CURRENCY_INVALID')
+    }
+    if (!Number.isInteger(input.amountNGN) || input.amountNGN <= 0) {
+      throw new AppError('VALIDATION_ERROR', {
+        message: 'Invalid refund amount.',
+      })
+    }
+    const body = await paystackFetch('/refund', {
+      method: 'POST',
+      body: JSON.stringify({
+        transaction: input.reference,
+        amount: input.amountNGN * 100,
+        currency: input.currency,
+        customer_note: input.customerNote,
+        merchant_note: input.merchantNote,
+      }),
+    })
+    const data = body?.data
+    if (data?.id == null) {
+      throw new AppError('PROVIDER_ERROR', {
+        internal: 'Paystack refund response missing id',
+      })
+    }
+    return {
+      providerRefundId: String(data.id),
+      status: refundStatusFromPaystack(data.status),
+      amountNGN:
+        typeof data.amount === 'number'
+          ? Math.round(data.amount / 100)
+          : input.amountNGN,
+      currency: data.currency ?? input.currency,
     }
   },
 

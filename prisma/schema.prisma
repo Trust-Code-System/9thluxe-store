@@ -32,6 +32,15 @@ enum PaymentAttemptStatus {
   REFUNDED
 }
 
+enum RefundStatus {
+  REQUESTED
+  PENDING
+  PROCESSING
+  NEEDS_ATTENTION
+  PROCESSED
+  FAILED
+}
+
 enum InventoryReservationStatus {
   RESERVED
   SOLD
@@ -334,6 +343,7 @@ model Order {
   paymentAttempts       PaymentAttempt[]
   checkoutAttempt       CheckoutAttempt?
   inventoryReservations InventoryReservation[]
+  refund                Refund?
 
   // Shipping/contact snapshot
   addressLine1 String
@@ -385,9 +395,36 @@ model PaymentAttempt {
   createdAt             DateTime             @default(now())
   updatedAt             DateTime             @updatedAt
 
-  order Order @relation(fields: [orderId], references: [id])
+  order  Order   @relation(fields: [orderId], references: [id])
+  refund Refund?
 
   @@index([orderId, status])
+  @@index([status, createdAt])
+}
+
+model Refund {
+  id                  String       @id @default(cuid())
+  orderId             String       @unique
+  paymentAttemptId    String       @unique
+  provider            String       @default("paystack")
+  providerRefundId    String?      @unique
+  idempotencyKey      String       @unique
+  amountNGN           Int
+  currency            String
+  reason              String
+  previousOrderStatus OrderStatus
+  restock             Boolean      @default(false)
+  status              RefundStatus @default(REQUESTED)
+  initiatedBy         String?
+  failureCode         String?
+  requestedAt         DateTime     @default(now())
+  processedAt         DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  order          Order          @relation(fields: [orderId], references: [id])
+  paymentAttempt PaymentAttempt @relation(fields: [paymentAttemptId], references: [id])
+
   @@index([status, createdAt])
 }
 
