@@ -1,37 +1,80 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
-import { toSafeAuthErrorMessage } from '@/lib/prisma-error'
-import { generateReferralCode } from '@/lib/referrals/code'
-import { attributeReferral } from '@/lib/referrals/service'
+import bcrypt from "bcryptjs"
+import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+
+import { newPasswordSchema } from "@/lib/auth/password-reset"
+import { consumeRateLimit, clientIp } from "@/lib/middleware/limiter"
+import { logger } from "@/lib/observability/logger"
+import { prisma } from "@/lib/prisma"
+import { toSafeAuthErrorMessage } from "@/lib/prisma-error"
+import { generateReferralCode } from "@/lib/referrals/code"
+import { attributeReferral } from "@/lib/referrals/service"
+import { hasTrustedOrigin } from "@/lib/security/origin"
+
+const RegisterSchema = z.object({
+  email: z.string().trim().email().max(254),
+  password: newPasswordSchema,
+  name: z.string().trim().max(120).optional(),
+  referredBy: z.string().trim().max(100).optional(),
+}).strict()
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, name, referredBy } = await req.json()
-    if (!email || !password) return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
-    const exists = await prisma.user.findUnique({ where: { email } })
-    if (exists) return NextResponse.json({ error: 'Email already registered' }, { status: 400 })
-    const hash = await bcrypt.hash(password, 10)
+    if (!hasTrustedOrigin(req)) {
+      return NextResponse.json({ error: "Request origin could not be verified" }, { status: 403 })
+    }
+    const limit = await consumeRateLimit(
+      `signup:ip:${clientIp(req)}`,
+      5,
+      60 * 60 * 1000,
+    )
+    if (!limit.ok) {
+      return NextResponse.json(
+        { error: "Too many signup attempts. Please wait and try again." },
+        { status: 429 },
+      )
+    }
+    const parsed = RegisterSchema.safeParse(await req.json())
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Valid email and a password of at least 8 characters are required" },
+        { status: 400 },
+      )
+    }
+    const email = parsed.data.email.toLowerCase()
+    const exists = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+      select: { id: true },
+    })
+    if (exists) {
+      return NextResponse.json({ error: "Email already registered" }, { status: 400 })
+    }
+    const hash = await bcrypt.hash(parsed.data.password, 12)
 
-    // Generate unique referral code for the new user
     let referralCode = generateReferralCode()
-    let attempts = 0
-    while (attempts < 5) {
+    for (let attempts = 0; attempts < 5; attempts += 1) {
       const existing = await prisma.user.findUnique({ where: { referralCode } })
       if (!existing) break
       referralCode = generateReferralCode()
-      attempts++
     }
 
-    const user = await prisma.user.create({ data: { email, name, passwordHash: hash, referralCode } })
-
-    // Attribute the referral (creates a Referral row + fraud guards). Best-effort: never blocks signup.
-    if (referredBy) {
-      await attributeReferral(user.id, String(referredBy)).catch(() => null)
+    const user = await prisma.user.create({
+      data: {
+        email,
+        name: parsed.data.name || null,
+        passwordHash: hash,
+        referralCode,
+      },
+    })
+    if (parsed.data.referredBy) {
+      await attributeReferral(user.id, parsed.data.referredBy).catch(() => null)
     }
     return NextResponse.json({ ok: true })
   } catch (error) {
-    console.error('Register API error:', error)
-    return NextResponse.json({ error: toSafeAuthErrorMessage(error) }, { status: 500 })
+    logger.error("registration_failed", { internal: String(error) })
+    return NextResponse.json(
+      { error: toSafeAuthErrorMessage(error) },
+      { status: 500 },
+    )
   }
 }

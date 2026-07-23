@@ -46,19 +46,17 @@ enum InventoryMovementReason {
 }
 
 model User {
-  id               String    @id @default(cuid())
+  id               String   @id @default(cuid())
   name             String?
-  email            String    @unique
+  email            String   @unique
   passwordHash     String
-  role             Role      @default(USER)
-  marketingEmails  Boolean   @default(true)
-  smsNotifications Boolean   @default(false)
-  orderUpdates     Boolean   @default(true)
-  wishlistAlerts   Boolean   @default(false)
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  role             Role     @default(USER)
+  marketingEmails  Boolean  @default(true)
+  smsNotifications Boolean  @default(false)
+  orderUpdates     Boolean  @default(true)
+  wishlistAlerts   Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Loyalty & referral
   loyaltyTier        String  @default("STANDARD") // STANDARD | OBSIDIAN | GOLD | PLATINUM
@@ -84,6 +82,7 @@ model User {
   backInStockSubs        BackInStockSubscription[]
   conciergeConversations ConciergeConversation[]
   conciergeUsage         ConciergeUsageEvent[]
+  passwordResetTokens    PasswordResetToken[]
   conciergeFeedback      ConciergeFeedback[]
   checkoutAttempts       CheckoutAttempt[]
 }
@@ -494,6 +493,19 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt, usedAt])
 }
 
 enum Role {

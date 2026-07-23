@@ -4,11 +4,14 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { signIn } from "@/lib/auth"
 import { toSafeAuthErrorMessage } from "@/lib/prisma-error"
+import { headers } from "next/headers"
+import { clientIp, consumeRateLimit } from "@/lib/middleware/limiter"
+import { newPasswordSchema } from "@/lib/auth/password-reset"
 
 export async function signUpAction(formData: FormData) {
   const firstName = formData.get("firstName") as string
   const lastName = formData.get("lastName") as string
-  const email = formData.get("email") as string
+  const email = String(formData.get("email") ?? "").trim().toLowerCase()
   const password = formData.get("password") as string
 
   // Validate inputs
@@ -16,19 +19,30 @@ export async function signUpAction(formData: FormData) {
     return { error: "All fields are required" }
   }
 
-  if (password.length < 8) {
+  if (!newPasswordSchema.safeParse(password).success) {
     return { error: "Password must be at least 8 characters" }
   }
 
   try {
+    const requestHeaders = await headers()
+    const limit = await consumeRateLimit(
+      `signup:ip:${clientIp({ headers: requestHeaders })}`,
+      5,
+      60 * 60 * 1000,
+    )
+    if (!limit.ok) {
+      return { error: "Too many signup attempts. Please wait and try again." }
+    }
     // Check if user already exists
-    const exists = await prisma.user.findUnique({ where: { email } })
+    const exists = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+    })
     if (exists) {
       return { error: "Email already registered" }
     }
 
     // Hash password and create user
-    const hash = await bcrypt.hash(password, 10)
+    const hash = await bcrypt.hash(password, 12)
     const name = `${firstName} ${lastName}`.trim()
 
     await prisma.user.create({
@@ -63,4 +77,3 @@ export async function signUpAction(formData: FormData) {
     return { error: toSafeAuthErrorMessage(error) }
   }
 }
-

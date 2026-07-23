@@ -56,16 +56,21 @@ Completed in the first hardening milestone:
   backoff, and retains exhausted events in a failed state;
 - receipt delivery uses provider idempotency, admin notifications use a database deduplication key,
   and customer-controlled receipt fields are HTML escaped;
+- password reset now uses hashed, single-use, one-hour tokens with one active token per customer;
+- the reset request and confirmation flows validate origin, normalize email, and apply IP/email
+  rate limits without exposing whether an account exists;
+- signup and credential login now apply abuse limits, normalize email case, and share the eight
+  character minimum password policy;
+- process-global session-duration state was removed in favor of a deterministic 24-hour session;
 - payment-matching, checkout-idempotency, publication, origin, and shipping-policy regression tests
   were added;
-- Prisma schema validation, TypeScript, lint, 337 unit/integration tests, and the production build
+- Prisma schema validation, TypeScript, lint, 342 unit/integration tests, and the production build
   pass on this branch; all staging migrations are applied with zero schema drift.
 
 Still required before launch:
 
 - payment reconciliation and complete refund/order state handling;
-- complete password-reset flow and broader authentication abuse protection;
-- dependency remediation, full database integration tests, and production staging certification;
+- dependency remediation, browser/Paystack integration tests, and production staging certification;
 - scheduler configuration for the reservation-expiry and outbox-worker endpoints;
 - owner-supplied provider credentials, business details, brand assets, and approved policies.
 
@@ -84,8 +89,8 @@ This is the original audit list. Items completed on `codex/production-readiness`
    paid amount and currency with the stored order and payment attempt.
 4. **Resolved on branch:** the checkout success page previously mutated payment state during a GET
    request.
-5. Password-reset emails point to a reset route that does not exist, and there is no endpoint that
-   applies a new password.
+5. **Resolved on branch:** password-reset emails pointed to a reset route that did not exist, and
+   there was no endpoint that applied a new password.
 6. Bank transfer displays the placeholder account number `0123456789`.
 7. The production dependency audit reports seven high and four moderate vulnerabilities.
 
@@ -96,7 +101,9 @@ This is the original audit list. Items completed on `codex/production-readiness`
 2. **Resolved on branch:** public catalogue queries did not consistently require
    `publishStatus = PUBLISHED`.
 3. Custom state-changing endpoints do not consistently validate request origin or CSRF protections.
-4. Signup, password reset, order creation, and payment initialization lack durable abuse controls.
+4. **Partially resolved on branch:** signup, password reset, order creation, payment initialization,
+   and credential login now use the rate-limiter abstraction; production still requires the
+   configured Redis backend for cross-instance durability.
 5. Contact-form values are interpolated into HTML emails without HTML escaping.
 6. Required production configuration does not fail fast at startup.
 7. Missing favicon, PWA icons, and Open Graph image cause broken metadata assets.

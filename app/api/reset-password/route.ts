@@ -1,87 +1,119 @@
-import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
-import { prisma } from '@/lib/prisma'
-import crypto from 'crypto'
+import crypto from "crypto"
+import { NextResponse } from "next/server"
+import { Resend } from "resend"
+import { z } from "zod"
 
-const FROM_EMAIL = process.env.NEWSLETTER_FROM_EMAIL || 'Fádé Essence <onboarding@resend.dev>'
+import {
+  generatePasswordResetToken,
+  passwordResetExpiry,
+  passwordResetTokenHash,
+} from "@/lib/auth/password-reset"
+import { env } from "@/lib/env"
+import { consumeRateLimit, clientIp } from "@/lib/middleware/limiter"
+import { logger } from "@/lib/observability/logger"
+import { prisma } from "@/lib/prisma"
+import { hasTrustedOrigin } from "@/lib/security/origin"
+import { escapeHtml } from "@/lib/security/html"
+
+export const runtime = "nodejs"
+
+const RequestSchema = z.object({
+  email: z.string().trim().email().max(254),
+}).strict()
+
+const GENERIC_MESSAGE =
+  "If an account exists for this email, a reset link has been sent."
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json()
-
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+    if (!hasTrustedOrigin(request)) {
+      return NextResponse.json({ error: "Request origin could not be verified" }, { status: 403 })
+    }
+    const parsed = RequestSchema.safeParse(await request.json())
+    if (!parsed.success) {
+      return NextResponse.json({ error: "A valid email address is required" }, { status: 400 })
     }
 
-    const normalizedEmail = String(email).toLowerCase().trim()
+    const normalizedEmail = parsed.data.email.toLowerCase()
+    const emailHash = crypto.createHash("sha256").update(normalizedEmail).digest("hex")
+    const [ipLimit, emailLimit] = await Promise.all([
+      consumeRateLimit(`password-reset:ip:${clientIp(request)}`, 5, 60 * 60 * 1000),
+      consumeRateLimit(`password-reset:email:${emailHash}`, 3, 60 * 60 * 1000),
+    ])
+    if (!ipLimit.ok || !emailLimit.ok) {
+      return NextResponse.json({ message: GENERIC_MESSAGE })
+    }
 
-    // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
-      select: { id: true, name: true },
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+      select: { id: true, email: true, name: true },
     })
-
-    // Always return success to prevent email enumeration
     if (!user) {
-      return NextResponse.json({
-        message: 'If an account exists for this email, a reset link has been sent.',
-      })
+      return NextResponse.json({ message: GENERIC_MESSAGE })
     }
 
-    // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString('hex')
-    const resetTokenExpiry = new Date(Date.now() + 3600000) // 1 hour
-
-    // Store token in database (resetToken and resetTokenExpiry exist in User model)
-    await prisma.user.update({
-      where: { email: normalizedEmail },
-      data: { resetToken, resetTokenExpiry },
+    const token = generatePasswordResetToken()
+    const tokenHash = passwordResetTokenHash(token)
+    const resetRecord = await prisma.passwordResetToken.upsert({
+      where: { userId: user.id },
+      update: {
+        tokenHash,
+        expiresAt: passwordResetExpiry(),
+        usedAt: null,
+        createdAt: new Date(),
+      },
+      create: {
+        userId: user.id,
+        tokenHash,
+        expiresAt: passwordResetExpiry(),
+      },
+      select: { id: true },
     })
 
-    const base = process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000'
-    const resetUrl = `${base}/auth/reset/${resetToken}`
-
-    if (process.env.RESEND_API_KEY) {
-      const resend = new Resend(process.env.RESEND_API_KEY)
-      await resend.emails.send({
-        from: FROM_EMAIL,
-        to: normalizedEmail,
-        subject: 'Reset your Fádé Essence password',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: #2f3e33; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-              <h1 style="margin: 0; font-family: serif;">Fádé Essence</h1>
-            </div>
-            <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
-              <h2 style="color: #2f3e33; margin-top: 0;">Password Reset Request</h2>
-              <p>Hello${user.name ? ` ${user.name}` : ''},</p>
-              <p>We received a request to reset your password. Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${resetUrl}" style="background: #2f3e33; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-                  Reset Password
-                </a>
+    const resetUrl = `${env.APP_URL.replace(/\/$/, "")}/auth/reset?token=${encodeURIComponent(token)}`
+    if (env.RESEND_API_KEY) {
+      const resend = new Resend(env.RESEND_API_KEY)
+      const safeName = escapeHtml(user.name || "Customer")
+      const safeUrl = escapeHtml(resetUrl)
+      await resend.emails
+        .send(
+          {
+            from:
+              env.NEWSLETTER_FROM_EMAIL ||
+              "Fádé Essence <onboarding@resend.dev>",
+            to: user.email,
+            subject: "Reset your Fádé Essence password",
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2>Password reset request</h2>
+                <p>Hello ${safeName},</p>
+                <p>Use the link below to set a new password. It expires in one hour and can only be used once.</p>
+                <p><a href="${safeUrl}">Reset password</a></p>
+                <p>If you did not request this change, you can ignore this email.</p>
               </div>
-              <p style="color: #666; font-size: 13px;">If you did not request a password reset, please ignore this email. Your password will remain unchanged.</p>
-              <p style="color: #999; font-size: 12px; margin-top: 20px;">
-                Or copy this link into your browser:<br>
-                <span style="color: #2f3e33; word-break: break-all;">${resetUrl}</span>
-              </p>
-            </div>
-          </div>
-        `,
-      })
+            `,
+          },
+          { idempotencyKey: `password-reset:${resetRecord.id}` },
+        )
+        .catch((error) => {
+          logger.error("password_reset_email_failed", {
+            userId: user.id,
+            internal: String(error),
+          })
+        })
     } else {
-      // Development: log the link instead of sending email
-      console.log('[PASSWORD RESET] Reset link (no RESEND_API_KEY):', resetUrl)
+      logger.warn("password_reset_email_skipped", {
+        userId: user.id,
+        reason: "RESEND_API_KEY missing",
+      })
     }
 
-    return NextResponse.json({
-      message: 'If an account exists for this email, a reset link has been sent.',
-    })
-  } catch {
+    return NextResponse.json({ message: GENERIC_MESSAGE })
+  } catch (error) {
+    logger.error("password_reset_request_failed", { internal: String(error) })
     return NextResponse.json(
-      { error: 'Failed to process reset request' },
-      { status: 500 }
+      { error: "Failed to process reset request" },
+      { status: 500 },
     )
   }
 }
