@@ -23,6 +23,9 @@ Each endpoint is safe to call again after scheduler timeouts:
 Alert when a job returns a non-2xx response, has not succeeded within twice its expected cadence, or
 reports failed/review-required work. Payment attempts with a reconciliation failure code and refunds
 in `NEEDS_ATTENTION` require manual comparison with the Paystack dashboard before state is changed.
+The public `/api/health` endpoint reports the aggregate job state. The admin-only
+`/api/v1/admin/status` endpoint reports exact failed outbox events, stale locks, expired
+reservations, overdue payments, and refunds needing attention.
 
 After deployment, verify each job once with a staging secret and confirm its structured success log.
 Do not enable the production schedule until the Paystack test-mode purchase and missed-webhook

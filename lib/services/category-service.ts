@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { Prisma, ProductCategory } from "@prisma/client"
 import { z } from "zod"
+import { invalidateCatalogueCache } from "@/lib/cache/catalogue"
 
 export const categoryInputSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -20,26 +21,26 @@ export async function getCategoriesWithCounts(): Promise<AdminCategory[]> {
     orderBy: { name: "asc" },
   })
 
-  const results: AdminCategory[] = []
-
-  for (const category of categories) {
-    let productCount = 0
-    if (category.enumKey) {
-      productCount = await prisma.product.count({
-        where: { category: category.enumKey },
-      })
-    }
-
-    results.push({ ...category, productCount })
-  }
-
-  return results
+  const counts = await prisma.product.groupBy({
+    by: ["category"],
+    where: { deletedAt: null },
+    _count: { _all: true },
+  })
+  const countByCategory = new Map(
+    counts.map((row) => [row.category, row._count._all]),
+  )
+  return categories.map((category) => ({
+    ...category,
+    productCount: category.enumKey
+      ? (countByCategory.get(category.enumKey) ?? 0)
+      : 0,
+  }))
 }
 
 export async function createCategory(input: CategoryInput) {
   const data = categoryInputSchema.parse(input)
 
-  return prisma.category.create({
+  const category = await prisma.category.create({
     data: {
       name: data.name,
       slug: data.slug,
@@ -47,12 +48,14 @@ export async function createCategory(input: CategoryInput) {
       enumKey: data.enumKey ?? null,
     },
   })
+  invalidateCatalogueCache()
+  return category
 }
 
 export async function updateCategory(id: string, input: CategoryInput) {
   const data = categoryInputSchema.parse(input)
 
-  return prisma.category.update({
+  const category = await prisma.category.update({
     where: { id },
     data: {
       name: data.name,
@@ -61,6 +64,8 @@ export async function updateCategory(id: string, input: CategoryInput) {
       enumKey: data.enumKey ?? null,
     },
   })
+  invalidateCatalogueCache()
+  return category
 }
 
 export class CategoryInUseError extends Error {
@@ -92,4 +97,5 @@ export async function deleteCategory(id: string) {
   await prisma.category.delete({
     where: { id },
   })
+  invalidateCatalogueCache()
 }

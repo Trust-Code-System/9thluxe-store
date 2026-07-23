@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { AppError } from '@/lib/http/errors'
 import { writeAudit } from '@/lib/audit'
 import type { ApprovalStatus } from '@prisma/client'
+import { invalidateCatalogueCache } from '@/lib/cache/catalogue'
 
 export type ApprovalAction =
   | 'refund'
@@ -43,6 +44,7 @@ const EXECUTORS: Partial<Record<ApprovalAction, Executor>> = {
     const productId = String(payload.productId ?? '')
     if (!productId) throw new AppError('VALIDATION_ERROR', { message: 'publish requires payload.productId' })
     await prisma.product.update({ where: { id: productId }, data: { publishStatus: 'PUBLISHED' } })
+    invalidateCatalogueCache()
   },
   stock_adjust: async (payload) => {
     const productId = String(payload.productId ?? '')
@@ -55,6 +57,7 @@ const EXECUTORS: Partial<Record<ApprovalAction, Executor>> = {
     const priceNGN = Number(payload.priceNGN ?? -1)
     if (!productId || !Number.isInteger(priceNGN) || priceNGN < 0) throw new AppError('VALIDATION_ERROR', { message: 'price_change requires productId + non-negative integer priceNGN' })
     await prisma.product.update({ where: { id: productId }, data: { priceNGN } })
+    invalidateCatalogueCache()
   },
 }
 

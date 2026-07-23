@@ -9,6 +9,7 @@ import { getCommerce } from '@/integrations/registry'
 import { writeAudit } from '@/lib/audit'
 import { logger } from '@/lib/observability/logger'
 import type { CommerceProduct } from '@/integrations/commerce/types'
+import { invalidateCatalogueCache } from '@/lib/cache/catalogue'
 
 export interface SyncIssue {
   slug: string
@@ -50,6 +51,9 @@ export async function syncCatalog(opts: { apply?: boolean; limit?: number } = {}
 
   if (apply) {
     await writeAudit({ actorRole: 'ADMIN', action: 'catalogue.sync', targetType: 'Catalogue', metadata: { ...report, issues: report.issues.length } })
+    if (report.created > 0 || report.updated > 0) {
+      invalidateCatalogueCache()
+    }
   }
   logger.info('catalogue_sync', { ...report, issues: report.issues.length })
   return report

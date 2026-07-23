@@ -10,43 +10,15 @@ import { BrandStorySection } from "@/components/home/brand-story-section"
 
 import { ConciergeInvitation } from "@/components/home/concierge-invitation"
 
-import { prisma } from "@/lib/prisma"
+import { getCachedHomepageProducts } from "@/lib/cache/catalogue"
 
 export const dynamic = "force-dynamic"
 
 export default async function HomePage() {
   // Fetch featured products from database (best-effort; allow the page to render even if DB isn't ready).
-  let dbProducts: Awaited<ReturnType<typeof prisma.product.findMany>> = []
+  let dbProducts: Awaited<ReturnType<typeof getCachedHomepageProducts>> = []
   try {
-    dbProducts = await prisma.product.findMany({
-      where: {
-        deletedAt: null, // Exclude soft-deleted products
-        publishStatus: "PUBLISHED",
-        OR: [
-          { isBestseller: true },
-          { isNew: true },
-          { isLimited: true },
-          { isFeatured: true },
-        ],
-      },
-      orderBy: [
-        { isFeatured: "desc" },
-        { isBestseller: "desc" },
-        { ratingAvg: "desc" },
-        { createdAt: "desc" },
-      ],
-      take: 8,
-    })
-
-    // No flagged products yet, fall back to the latest additions so the
-    // homepage edit never renders empty.
-    if (dbProducts.length === 0) {
-      dbProducts = await prisma.product.findMany({
-        where: { deletedAt: null, publishStatus: "PUBLISHED" },
-        orderBy: [{ ratingAvg: "desc" }, { createdAt: "desc" }],
-        take: 8,
-      })
-    }
+    dbProducts = await getCachedHomepageProducts()
   } catch (err) {
     console.error("HomePage: failed to load featured products", err)
     dbProducts = []

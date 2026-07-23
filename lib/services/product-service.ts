@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { invalidateCatalogueCache } from "@/lib/cache/catalogue"
 import { Prisma, ProductCategory } from "@prisma/client"
 import { z } from "zod"
 
@@ -181,7 +182,7 @@ export async function getCartProducts(productIds: string[]) {
 }
 
 export async function createProduct(input: ProductInput) {
-  return prisma.product.create({
+  const product = await prisma.product.create({
     data: {
       name: input.name,
       slug: input.slug,
@@ -203,10 +204,12 @@ export async function createProduct(input: ProductInput) {
       fragranceFamily: input.fragranceFamily,
     },
   })
+  invalidateCatalogueCache()
+  return product
 }
 
 export async function updateProduct(id: string, input: ProductInput) {
-  return prisma.product.update({
+  const product = await prisma.product.update({
     where: { id },
     data: {
       name: input.name,
@@ -229,6 +232,8 @@ export async function updateProduct(id: string, input: ProductInput) {
       fragranceFamily: input.fragranceFamily,
     },
   })
+  invalidateCatalogueCache()
+  return product
 }
 
 export class ProductInUseError extends Error {
@@ -275,6 +280,7 @@ export async function deleteProduct(id: string): Promise<void> {
       where: { id },
       data: { deletedAt: new Date() },
     })
+    invalidateCatalogueCache()
     throw new ProductInUseError(
       `Cannot delete "${product.name}": it is referenced by ${orderItemsCount} order item(s). The product has been soft-deleted (hidden from listings).`
     )
@@ -284,6 +290,7 @@ export async function deleteProduct(id: string): Promise<void> {
   await prisma.product.delete({
     where: { id },
   })
+  invalidateCatalogueCache()
 }
 
 export async function getProductStats() {

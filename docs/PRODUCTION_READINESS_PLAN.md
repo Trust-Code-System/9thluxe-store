@@ -92,14 +92,28 @@ Completed in the first hardening milestone:
   versions; the production dependency audit now reports zero vulnerabilities;
 - payment-matching, checkout-idempotency, publication, origin, and shipping-policy regression tests
   were added;
-- Prisma schema validation, TypeScript, lint, 365 unit/integration tests, and the production build
+- unbounded account and admin reads are paginated, catalogue/category count N+1 queries are
+  aggregated, and cart input is bounded;
+- remaining cart, address, and messaging-preference mutations now have origin checks and
+  distributed rate limits;
+- public health reports database, Redis, environment, and background-job readiness without exposing
+  backlog details; the protected admin status endpoint includes actionable backlog counts;
+- homepage product-card metadata and the shop brand facet use a conservative tagged data cache with
+  mutation invalidation; inventory and transactional decisions remain database-live;
+- read-only query and bounded HTTP load checks are documented and available as `npm run
+  test:queries` and `npm run test:load`;
+- Prisma schema validation, TypeScript, lint, 379 unit/integration tests, and the production build
   pass on this branch; all 15 staging migrations are applied with zero schema drift.
 
 Still required before launch:
 
 - browser/Paystack integration tests and production staging certification;
+- production Redis credentials followed by a successful `/api/health` readiness check;
 - deployment-time scheduler registration for reservation expiry, outbox delivery, and payment
   reconciliation (the authenticated routes support both Vercel Cron `GET` and external `POST`);
+- managed Postgres backup/PITR confirmation and a staging restore drill;
+- external error monitoring is intentionally deferred by the owner; structured logging remains in
+  place, but this is still an accepted operational gap;
 - owner-supplied provider credentials, business details, brand assets, and approved policies.
 
 ## Audit findings
@@ -129,12 +143,12 @@ This is the original audit list. Items completed on `codex/production-readiness`
    decrement.
 2. **Resolved on branch:** public catalogue queries did not consistently require
    `publishStatus = PUBLISHED`.
-3. **Partially resolved on branch:** critical commerce/authentication and exposed public-form
-   mutations validate request origin; the remaining authenticated and admin mutation endpoints
-   still require a complete consistency pass.
-4. **Partially resolved on branch:** signup, password reset, order creation, payment initialization,
-   and credential login now use the rate-limiter abstraction; production still requires the
-   configured Redis backend for cross-instance durability.
+3. **Resolved on branch:** critical commerce/authentication, exposed public-form, cart, address, and
+   messaging-preference mutations validate request origin.
+4. **Resolved in code, deployment pending:** signup, password reset, order creation, payment
+   initialization, credential login, cart, address, and preference mutations use the rate-limiter
+   abstraction; production still requires the configured Redis backend for cross-instance
+   durability.
 5. **Resolved on branch:** contact-form values are HTML escaped before email rendering.
 6. Required production configuration does not fail fast at startup.
 7. Missing favicon, PWA icons, and Open Graph image cause broken metadata assets.

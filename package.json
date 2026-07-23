@@ -20,6 +20,8 @@
     "test:a11y": "playwright test tests/e2e/accessibility.spec.ts --project=desktop-chromium",
     "test:theme": "playwright test tests/e2e/theme.spec.ts --project=desktop-chromium",
     "test:browser": "playwright test",
+    "test:queries": "node scripts/check-query-performance.mjs",
+    "test:load": "node scripts/smoke-load.mjs",
     "test:watch": "vitest",
     "seed": "prisma db seed"
   },

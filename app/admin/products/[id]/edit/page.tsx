@@ -13,6 +13,7 @@ import {
   ensureScentTemplateColumn,
   isTemplateId,
 } from '@/lib/fragrance/template-store'
+import { invalidateCatalogueCache } from '@/lib/cache/catalogue'
 
 /** Empty / sentinel string -> null, for optional text columns. */
 function nn(v: FormDataEntryValue | null): string | null {
@@ -102,6 +103,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         ...(publishStatus ? { publishStatus } : {}),
       },
     })
+    invalidateCatalogueCache()
 
     // Persist the chosen visual template (resilient: additive column, applied on demand). Empty
     // value clears the override so the storefront uses the recommended template.

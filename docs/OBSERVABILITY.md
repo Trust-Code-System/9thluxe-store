@@ -11,9 +11,10 @@ internal error detail (server-side only).
 `x-request-id` header. Provider calls (Shopify) accept a correlation id.
 
 ## Health / readiness
-`app/api/health` exists. `lib/env.integrationStatus()` + `registry.providerStatus()` expose which
-integrations/providers are active (safe for an admin panel): database, auth, paystack, resend,
-shopify, ai provider + key presence, whatsapp, sms.
+`/api/health` checks database, Redis, required environment, and background-job readiness without
+exposing backlog counts. `/api/v1/admin/status` is admin-only and adds the exact failed/stale job
+counts needed for remediation. `lib/env.integrationStatus()` + `registry.providerStatus()` expose
+which integrations/providers are active without exposing secret values.
 
 ## Jobs / webhooks / retries
 - `JobRun` (status, attempts, lastError, timestamps) for background work + failed-job retention.
@@ -27,8 +28,11 @@ webhook reconciliation gaps, AI schema-failure/fallback/circuit-open counts + to
 counts.
 
 ## Cache invalidation
-Catalogue reads are DB-live in the local provider (no stale availability). If a cache is added later,
-invalidate on `products/update` + `inventory_levels/update` webhooks.
+Homepage product-card metadata is cached for at most 60 seconds and the shop brand facet for at most
+10 minutes. Both use the `catalogue-metadata` tag and are invalidated by product, category,
+collection, approval, and catalogue-sync mutations. Stock is deliberately excluded from these
+caches; checkout, inventory reservations, product availability, and payment decisions remain
+database-live.
 
 ## Backups & recovery
 - **DB backup:** rely on the managed Postgres provider's PITR/automated backups (Neon/Supabase).

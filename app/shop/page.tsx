@@ -5,6 +5,7 @@ import { ProductCard } from '@/components/ui/product-card'
 import { mapPrismaProductToCard } from '@/lib/queries/products'
 import { ShopFiltersForm } from '@/components/shop/shop-filters-form'
 import type { Product } from '@prisma/client'
+import { getCachedPublishedBrands } from '@/lib/cache/catalogue'
 
 const CATEGORY_MAP: Record<string, Product['category']> = {
   perfumes: 'PERFUMES',
@@ -119,14 +120,10 @@ export default async function ShopPage({ searchParams }: { searchParams?: Promis
         orderBy: orderBy,
         take: 24,
       }),
-      prisma.product.findMany({
-        where: { deletedAt: null, publishStatus: 'PUBLISHED' },
-        distinct: ['brand'],
-        select: { brand: true },
-      }),
+      getCachedPublishedBrands(),
     ])
     products = productsResult
-    brands = brandRows.map((row) => row.brand).filter(Boolean) as string[]
+    brands = brandRows
   } catch (err) {
     console.error('Shop page data fetch failed:', err)
     fetchError = err instanceof Error ? err : new Error(String(err))
