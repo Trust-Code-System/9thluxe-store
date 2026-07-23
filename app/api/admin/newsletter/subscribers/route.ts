@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireAdmin } from "@/lib/admin"
+import { getAuthorizedUser } from "@/lib/authz"
 
 export const runtime = "nodejs"
 
 // GET - List all subscribers
 export async function GET(request: NextRequest) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("marketing:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get("search") || ""
@@ -57,7 +58,8 @@ export async function GET(request: NextRequest) {
 // DELETE - Unsubscribe (soft delete)
 export async function DELETE(request: NextRequest) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("marketing:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const { email } = await request.json()
 

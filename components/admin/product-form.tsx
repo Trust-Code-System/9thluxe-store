@@ -42,6 +42,12 @@ export interface ProductFormInitialValues {
   images?: string[]
   collectionId?: string | null
   fragranceFamily?: string | null
+  sku?: string | null; barcode?: string | null; launchYear?: number | null; perfumer?: string | null; countryOfOrigin?: string | null
+  concentration?: string | null; longevity?: string | null; sillage?: string | null; intensity?: string | null; sprayGuidance?: string | null
+  climate?: string | null; season?: string | null; timeOfDay?: string | null; occasion?: string | null
+  weightGrams?: number | null; shippingClass?: string | null; reorderPoint?: number | null; dropDate?: string | null
+  seoTitle?: string | null; seoDescription?: string | null; publishStatus?: "DRAFT" | "PUBLISHED" | "ARCHIVED"
+  beginnerFriendly?: boolean; returnEligible?: boolean; isPreorder?: boolean; isWaitlist?: boolean
 }
 
 interface ProductFormProps {
@@ -374,6 +380,19 @@ export function ProductForm({ initialValues, categories, collections, brands = [
               Upload up to 4 images. The first image will be used as the thumbnail on the storefront.
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border shadow-sm">
+        <CardContent className="space-y-6 pt-6">
+          <h2 className="font-serif text-xl">Catalogue, performance, commerce and SEO</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[['sku','SKU'],['barcode','Barcode'],['launchYear','Launch year'],['perfumer','Perfumer'],['countryOfOrigin','Country of origin'],['concentration','Concentration'],['longevity','Longevity'],['sillage','Sillage'],['intensity','Intensity'],['climate','Climate'],['season','Season'],['timeOfDay','Time of day'],['occasion','Occasion'],['weightGrams','Weight (grams)'],['shippingClass','Shipping class'],['reorderPoint','Reorder point'],['dropDate','Drop date']].map(([key,label]) => <div className="space-y-2" key={key}><Label htmlFor={key}>{label}</Label><Input id={key} name={key} type={key === 'launchYear' || key === 'weightGrams' || key === 'reorderPoint' ? 'number' : key === 'dropDate' ? 'datetime-local' : 'text'} defaultValue={String(initialValues?.[key as keyof ProductFormInitialValues] ?? '')} /></div>)}
+          </div>
+          <div className="space-y-2"><Label htmlFor="sprayGuidance">Spray guidance</Label><Textarea id="sprayGuidance" name="sprayGuidance" defaultValue={initialValues?.sprayGuidance ?? ''} /></div>
+          <div className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label htmlFor="seoTitle">SEO title</Label><Input id="seoTitle" name="seoTitle" maxLength={70} defaultValue={initialValues?.seoTitle ?? ''} /></div><div className="space-y-2"><Label htmlFor="seoDescription">SEO description</Label><Textarea id="seoDescription" name="seoDescription" maxLength={180} defaultValue={initialValues?.seoDescription ?? ''} /></div></div>
+          <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">{[['beginnerFriendly','Beginner friendly'],['returnEligible','Return eligible'],['isPreorder','Preorder'],['isWaitlist','Waitlist']].map(([key,label]) => <label className="flex items-center gap-2" key={key}><input type="checkbox" name={key} defaultChecked={key === 'returnEligible' ? initialValues?.returnEligible !== false : Boolean(initialValues?.[key as keyof ProductFormInitialValues])} />{label}</label>)}</div>
+          <div className="space-y-2"><Label htmlFor="publishStatus">Publish status</Label><select id="publishStatus" name="publishStatus" defaultValue={initialValues?.publishStatus ?? 'DRAFT'} className="input"><option value="DRAFT">Draft</option><option value="PUBLISHED">Published</option><option value="ARCHIVED">Archived</option></select></div>
         </CardContent>
       </Card>
 

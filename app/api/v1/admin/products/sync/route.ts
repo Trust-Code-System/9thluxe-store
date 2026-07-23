@@ -4,6 +4,7 @@
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { syncCatalog } from '@/lib/catalogue/sync'
 
 export const runtime = 'nodejs'
@@ -14,6 +15,7 @@ const bodySchema = z.object({ apply: z.boolean().optional() }).optional()
 export const POST = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'products:manage')) raise('FORBIDDEN')
   let apply = false
   try {
     const body = bodySchema.parse(await req.json().catch(() => ({})))

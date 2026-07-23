@@ -2,6 +2,7 @@
 import { Resend } from "resend"
 import { escapeHtml } from "@/lib/security/html"
 import { logger } from "@/lib/observability/logger"
+import { resolveEmailTemplate } from "@/lib/email-templates/service"
 
 type OrderLike = {
   id: string
@@ -114,12 +115,13 @@ export async function sendReceipt(order: OrderLike, idempotencyKey?: string) {
     </html>
   `
 
+  const resolved = await resolveEmailTemplate("order_receipt", { customerName: order.user.name || "Customer", orderRef, total: `₦${order.totalNGN.toLocaleString()}` }, `Order Confirmation - Order #${orderRef}`, html)
   try {
     const result = await resend.emails.send({
       from: process.env.NEWSLETTER_FROM_EMAIL || "Fádé Essence <onboarding@resend.dev>",
       to: order.user.email,
-      subject: `Order Confirmation - Order #${orderRef}`,
-      html,
+      subject: resolved.subject,
+      html: resolved.html,
     }, idempotencyKey ? { idempotencyKey } : undefined)
     if (result.error) {
       throw new Error(`Resend rejected receipt delivery: ${result.error.name}`)

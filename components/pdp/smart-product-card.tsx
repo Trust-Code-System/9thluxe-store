@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Heart, GitCompareArrows, Plus, Check } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -28,6 +29,7 @@ const AVAILABILITY_LABEL: Record<PdpCard["availability"], string> = {
  * or omitted.
  */
 export function SmartProductCard({ card, className }: { card: PdpCard; className?: string }) {
+  const router = useRouter()
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const inWishlist = useWishlistStore((s) => s.isInWishlist(card.id))
   const toggleCompare = useCompareStore((s) => s.toggle)
@@ -58,12 +60,28 @@ export function SmartProductCard({ card, className }: { card: PdpCard; className
 
   const handleCompare = (e: React.MouseEvent) => {
     e.preventDefault()
+    const wasIn = inCompare
     const ok = toggleCompare(card)
     if (!ok) {
       toast.error(`Compare holds up to ${MAX_COMPARE} fragrances`, {
         description: "Remove one to add another.",
       })
       return
+    }
+    if (wasIn) {
+      toast(`Removed ${card.name} from compare`)
+      return
+    }
+    const count = useCompareStore.getState().items.length
+    if (count < 2) {
+      toast.success("Added to compare", {
+        description: "Add one more fragrance to see them side by side.",
+      })
+    } else {
+      toast.success(`Comparing ${count} fragrances`, {
+        description: "Ready when you are.",
+        action: { label: "View", onClick: () => router.push("/compare") },
+      })
     }
     trackPdp("comparison_started", { productId: card.id })
   }

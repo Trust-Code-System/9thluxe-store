@@ -135,7 +135,6 @@ export function PaymentForm({
     setIsProcessing(true);
 
     try {
-      // 1) Create order (PENDING)
       const createRes = await fetch("/api/checkout/create-order", {
         method: "POST",
         headers: {
@@ -153,12 +152,10 @@ export function PaymentForm({
       if (!orderId) throw new Error("No order ID returned");
 
       if (paymentMethod === "BANK_TRANSFER") {
-        // Show bank details instead of redirecting to Paystack
         setBankTransferOrder({ orderId });
         return;
       }
 
-      // 2) Card: Initialize Paystack
       const payRes = await fetch("/api/paystack/initialize", {
         method: "POST",
         headers: {
@@ -262,10 +259,9 @@ export function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" data-payment-form>
-      {/* Payment Method Toggle */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Payment Method</CardTitle>
+          <CardTitle className="text-lg">Payment</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {/* Card Payment */}
@@ -287,7 +283,7 @@ export function PaymentForm({
             />
             <CreditCard className="h-5 w-5 text-primary shrink-0" />
             <div>
-              <p className="font-medium text-sm">Card / Online Payment</p>
+              <p className="text-sm font-medium">Pay with Paystack</p>
               <p className="text-xs text-muted-foreground">
                 {paymentsEnabled
                   ? "Pay securely via Paystack (card, USSD, bank)"
@@ -324,13 +320,11 @@ export function PaymentForm({
         </CardContent>
       </Card>
 
-      {/* Security badge */}
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Lock className="h-3.5 w-3.5" />
-        <span>Your order details are encrypted and secured.</span>
+        <span>Your payment is encrypted and processed by Paystack.</span>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex gap-3">
         <Button
           type="button"
@@ -339,7 +333,7 @@ export function PaymentForm({
           className="flex-1 bg-transparent"
           disabled={isProcessing}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
         <Button
@@ -352,17 +346,12 @@ export function PaymentForm({
         >
           {isProcessing ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Processing...
-            </>
-          ) : paymentMethod === "BANK_TRANSFER" ? (
-            <>
-              <Building2 className="h-4 w-4 mr-2" />
-              Place Order: Get Account Details
             </>
           ) : (
             <>
-              <Lock className="h-4 w-4 mr-2" />
+              <Lock className="mr-2 h-4 w-4" />
               Pay with Paystack
             </>
           )}

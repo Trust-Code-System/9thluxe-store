@@ -52,6 +52,12 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     images,
     collectionId: product.collectionId,
     fragranceFamily: product.fragranceFamily,
+    sku: product.sku, barcode: product.barcode, launchYear: product.launchYear, perfumer: product.perfumer, countryOfOrigin: product.countryOfOrigin,
+    concentration: product.concentration, longevity: product.longevity, sillage: product.sillage, intensity: product.intensity, sprayGuidance: product.sprayGuidance,
+    climate: product.climate, season: product.season, timeOfDay: product.timeOfDay, occasion: product.occasion,
+    weightGrams: product.weightGrams, shippingClass: product.shippingClass, reorderPoint: product.reorderPoint, dropDate: product.dropDate ? product.dropDate.toISOString().slice(0,16) : null,
+    seoTitle: product.seoTitle, seoDescription: product.seoDescription, publishStatus: product.publishStatus,
+    beginnerFriendly: Boolean(product.beginnerFriendly), returnEligible: product.returnEligible, isPreorder: product.isPreorder, isWaitlist: product.isWaitlist,
   }
 
   async function handleUpdate(formData: FormData) {

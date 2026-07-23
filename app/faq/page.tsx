@@ -1,11 +1,17 @@
 import type { Metadata } from "next"
 import { MainLayout } from "@/components/layout/main-layout"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { ManagedPage } from "@/components/pages/managed-page"
+import { getManagedPageMetadata, getPublishedPage } from "@/lib/pages/queries"
 
-export const metadata: Metadata = {
+export const dynamic = "force-dynamic"
+
+const fallbackMetadata: Metadata = {
   title: "FAQ | Fádé Essence",
   description: "Frequently asked questions about ordering, delivery, payments, and returns at Fádé Essence.",
 }
+
+export function generateMetadata() { return getManagedPageMetadata("faq", fallbackMetadata) }
 
 const faqs = [
   {
@@ -50,7 +56,9 @@ const faqs = [
   },
 ]
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const managed = await getPublishedPage("faq")
+  if (managed) return <ManagedPage page={managed} />
   return (
     <MainLayout>
       <section data-surface="night" className="grain relative bg-background py-14 text-foreground lg:py-20">

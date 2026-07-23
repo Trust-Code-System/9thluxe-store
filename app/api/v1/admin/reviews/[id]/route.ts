@@ -4,6 +4,7 @@
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { prisma } from '@/lib/prisma'
 import { writeAudit } from '@/lib/audit'
 
@@ -14,6 +15,7 @@ const bodySchema = z.object({ decision: z.enum(['approve', 'reject']), reason: z
 export const POST = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'content:manage')) raise('FORBIDDEN')
 
   const parts = req.nextUrl.pathname.split('/').filter(Boolean)
   const id = parts[parts.length - 1]

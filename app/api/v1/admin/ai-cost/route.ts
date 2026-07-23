@@ -3,6 +3,7 @@
 // note on durable persistence). Owner-only.
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { aiUsageSnapshot, PROMPT_VERSIONS } from '@/integrations/ai/cost'
 
 export const runtime = 'nodejs'
@@ -11,6 +12,7 @@ export const dynamic = 'force-dynamic'
 export const GET = route(async () => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'dashboard:view')) raise('FORBIDDEN')
   const snapshot = aiUsageSnapshot()
   return { data: { usage: snapshot.records, totals: snapshot.totals, promptVersions: PROMPT_VERSIONS, scope: 'process' } }
 })

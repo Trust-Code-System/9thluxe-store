@@ -1,0 +1,4 @@
+import { prisma } from "@/lib/prisma"
+import { CampaignManager } from "@/components/admin/campaign-manager"
+export const dynamic = "force-dynamic"
+export default async function CampaignsPage() { let campaigns: any[] = [], coupons: any[] = [], products: { id: string; name: string }[] = []; try { [campaigns, coupons, products] = await Promise.all([prisma.campaign.findMany({ orderBy: { createdAt: "desc" } }), prisma.coupon.findMany({ orderBy: { createdAt: "desc" } }), prisma.product.findMany({ where: { deletedAt: null }, select: { id: true, name: true }, orderBy: { name: "asc" } })]) } catch {} return <div className="space-y-6"><div><h1 className="font-serif text-2xl font-semibold">Campaigns and discounts</h1><p className="text-muted-foreground">Schedule storefront launches and manage promo codes.</p></div><CampaignManager campaigns={campaigns} coupons={coupons} products={products} /></div> }

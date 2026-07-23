@@ -32,7 +32,7 @@ dev server, on the seed catalogue (`nocturne-eau-de-parfum`, `aurelius-noir-eau-
 - **Q&A** — honest "coming soon / not enabled in this environment" state with categories + search shell. ✅
 - **Authenticity** — Retailer-inspected status + seal/batch/report guidance (only true claims). ✅
 - **Delivery/returns FAQ** — 9 accordion items from the single policy source. ✅
-- **Brand & perfumer** — brand block + "All Fàdè" link (perfumer hidden — none set). ✅
+- **Brand & perfumer** — brand block + "All Fádé" link (perfumer hidden — none set). ✅
 - **Compare** — floating tray shows count; `/compare` page renders side-by-side with real values (EDP, oriental, real notes) and dims identical rows; nulls show "—". ✅
 
 ## Correctly hidden (no fake data)

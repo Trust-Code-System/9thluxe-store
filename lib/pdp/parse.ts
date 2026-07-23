@@ -12,7 +12,7 @@ import type {
 
 export const PROVENANCE_LABEL: Record<Provenance, string> = {
   BRAND: "Brand-provided",
-  EDITORIAL: "Fàdè editorial",
+  EDITORIAL: "Fádé editorial",
   CUSTOMER_AGGREGATE: "Verified customers",
 }
 

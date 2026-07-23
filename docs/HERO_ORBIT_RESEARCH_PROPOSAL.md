@@ -49,7 +49,7 @@ public gender labelling.
 - **Merchant approval required**: YES - slide + cutout approval (content is otherwise real).
 
 ### Slide 3 - Nocturne Eau de Parfum 100ml (`nocturne-eau-de-parfum`) - proposed ACTIVE/front default
-- **Why selected**: the house (Fàdè) signature oriental; oud/amber/vanilla closes the sequence with
+- **Why selected**: the house (Fádé) signature oriental; oud/amber/vanilla closes the sequence with
   the woody-amber chapter. Strongest note coverage (4 approved ingredients).
 - **Internal lean**: unisex.
 - **Scent family (approved data)**: ORIENTAL. Notes: bergamot / oud / amber, vanilla.

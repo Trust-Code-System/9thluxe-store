@@ -2,6 +2,7 @@
 // GET /api/v1/admin/audit?targetType=&targetId=&action= -> ADMIN-only audit-log search.
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { prisma } from '@/lib/prisma'
 
 export const runtime = 'nodejs'
@@ -10,6 +11,7 @@ export const dynamic = 'force-dynamic'
 export const GET = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'audit:view')) raise('FORBIDDEN')
 
   const sp = req.nextUrl.searchParams
   const where: Record<string, unknown> = {}

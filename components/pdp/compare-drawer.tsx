@@ -4,7 +4,6 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { GitCompareArrows, X, ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { useCompareStore, MAX_COMPARE } from "@/lib/stores/compare-store"
 import { trackPdp } from "@/lib/analytics/pdp-events"
 
@@ -18,9 +17,20 @@ export function CompareDrawer() {
   const clear = useCompareStore((s) => s.clear)
   const [mounted, setMounted] = React.useState(false)
   const [open, setOpen] = React.useState(false)
+  const prevCount = React.useRef(0)
 
   React.useEffect(() => setMounted(true), [])
+
+  // Expand the tray the moment a fragrance is added, so users see what compare is and what to do
+  // next instead of hunting for a small pill in the corner.
+  React.useEffect(() => {
+    if (items.length > prevCount.current) setOpen(true)
+    prevCount.current = items.length
+  }, [items.length])
+
   if (!mounted || items.length === 0) return null
+
+  const canCompare = items.length >= 2
 
   return (
     <div className="fixed bottom-24 right-4 z-[var(--z-sticky)] lg:bottom-6">
@@ -57,17 +67,27 @@ export function CompareDrawer() {
               </li>
             ))}
           </ul>
-          <Link
-            href="/compare"
-            onClick={() => trackPdp("comparison_completed", { count: items.length })}
-            className={cn(
-              "mt-3 flex items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground",
-              items.length < 2 && "pointer-events-none opacity-50",
-            )}
-            aria-disabled={items.length < 2}
-          >
-            Compare {items.length < 2 ? "(add one more)" : "now"} <ArrowRight className="h-4 w-4" />
-          </Link>
+          {canCompare ? (
+            <Link
+              href="/compare"
+              onClick={() => trackPdp("comparison_completed", { count: items.length })}
+              className="mt-3 flex items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+            >
+              Compare now <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : (
+            <div className="mt-3 space-y-2">
+              <p className="text-xs text-muted-foreground">
+                Add one more fragrance to compare them side by side.
+              </p>
+              <Link
+                href="/shop"
+                className="flex items-center justify-center gap-1.5 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-secondary/60"
+              >
+                Browse fragrances <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         <button

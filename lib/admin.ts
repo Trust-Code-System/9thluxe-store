@@ -23,13 +23,13 @@ export async function getAdminUser() {
   if (!email) return null
   let user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, email: true, name: true, role: true },
+    select: { id: true, email: true, name: true, role: true, adminRole: true },
   })
   if (user && user.role !== "ADMIN" && isBootstrapAdminEmail(email)) {
     user = await prisma.user.update({
       where: { email },
       data: { role: "ADMIN" },
-      select: { id: true, email: true, name: true, role: true },
+      select: { id: true, email: true, name: true, role: true, adminRole: true },
     })
   }
   return user && user.role === "ADMIN" ? user : null
@@ -51,6 +51,7 @@ export async function requireAdmin() {
       email: true,
       name: true,
       role: true,
+      adminRole: true,
     },
   })
 
@@ -63,6 +64,7 @@ export async function requireAdmin() {
         email: true,
         name: true,
         role: true,
+        adminRole: true,
       },
     })
   }

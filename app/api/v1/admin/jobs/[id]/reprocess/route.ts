@@ -2,6 +2,7 @@
 // POST /api/v1/admin/jobs/:id/reprocess -> ADMIN-only re-queue of a FAILED job.
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { reprocessJob } from '@/lib/ops/reprocess'
 
 export const runtime = 'nodejs'
@@ -9,6 +10,7 @@ export const runtime = 'nodejs'
 export const POST = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'settings:manage')) raise('FORBIDDEN')
   const parts = req.nextUrl.pathname.split('/').filter(Boolean)
   // .../jobs/<id>/reprocess -> id is second-to-last
   const id = parts[parts.length - 2]

@@ -8,11 +8,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { RETURNS_WINDOW_DAYS } from "@/lib/pdp/policy";
+import { ManagedPage } from "@/components/pages/managed-page";
+import { getManagedPageMetadata, getPublishedPage } from "@/lib/pages/queries";
 
-export const metadata: Metadata = {
+export const dynamic = "force-dynamic";
+
+const fallbackMetadata: Metadata = {
   title: "FAQ | Fádé",
   description: "Frequently asked questions about shopping at Fádé.",
 };
+
+export function generateMetadata() { return getManagedPageMetadata("help/faq", fallbackMetadata); }
 
 const faqs = [
   {
@@ -66,7 +72,9 @@ const faqs = [
   },
 ];
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const managed = await getPublishedPage("help/faq");
+  if (managed) return <ManagedPage page={managed} />;
   return (
     <MainLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">

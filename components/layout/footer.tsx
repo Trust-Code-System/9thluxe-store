@@ -8,34 +8,49 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { SocialLinks } from "@/components/footer/SocialLinks";
+import { useSiteChrome } from "./site-chrome-context";
 
-const shopLinks = [
+type FooterLink = { name: string; href: string };
+
+const defaultShopLinks: FooterLink[] = [
   { name: "All perfumes", href: "/shop" },
   { name: "Collections", href: "/collections" },
   { name: "Limited drops", href: "/drops" },
   { name: "New arrivals", href: "/shop?sort=newest" },
 ];
 
-const discoverLinks = [
+const defaultDiscoverLinks: FooterLink[] = [
   { name: "Find your fragrance", href: "/find-your-fragrance" },
   { name: "Scent discovery", href: "/discovery" },
   { name: "Concierge", href: "/concierge" },
   { name: "The Journal", href: "/journal" },
 ];
 
-const helpLinks = [
+const defaultHelpLinks: FooterLink[] = [
   { name: "FAQ", href: "/help/faq" },
   { name: "Contact us", href: "/help/contact" },
   { name: "Returns & exchanges", href: "/help/returns" },
   { name: "Shipping", href: "/help/shipping" },
 ];
 
-const companyLinks = [
+const defaultCompanyLinks: FooterLink[] = [
   { name: "About Fádé", href: "/about" },
   { name: "Privacy policy", href: "/privacy" },
   { name: "Terms of service", href: "/terms" },
   { name: "My account", href: "/account" },
 ];
+
+export interface FooterProps {
+  newsletterHeading?: string;
+  newsletterSubtext?: string;
+  paymentNote?: string;
+  copyrightText?: string;
+  social?: import("@/components/footer/SocialLinks").SocialLinksProps;
+  shopLinks?: FooterLink[];
+  discoverLinks?: FooterLink[];
+  helpLinks?: FooterLink[];
+  companyLinks?: FooterLink[];
+}
 
 function LinkColumn({
   title,
@@ -65,9 +80,43 @@ function LinkColumn({
   );
 }
 
-export function Footer() {
+const asStr = (v: string | boolean | undefined) =>
+  typeof v === "string" ? v : undefined;
+const toLinks = (items: { label: string; href: string }[] | undefined): FooterLink[] | undefined =>
+  items && items.length ? items.map((i) => ({ name: i.label, href: i.href })) : undefined;
+
+export function Footer(props: FooterProps = {}) {
   const [email, setEmail] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const chrome = useSiteChrome();
+  const s = chrome?.settings ?? {};
+  const nav = chrome?.nav ?? {};
+
+  const newsletterHeading =
+    props.newsletterHeading ?? asStr(s.newsletterHeading) ?? "Leave a trail.";
+  const newsletterSubtext =
+    props.newsletterSubtext ??
+    asStr(s.newsletterSubtext) ??
+    "New arrivals, limited drops and notes from the atelier. Sent occasionally, written carefully.";
+  const paymentNote =
+    props.paymentNote ?? asStr(s.footerPaymentNote) ?? "Secure payment via Paystack";
+  const copyrightText =
+    props.copyrightText ?? asStr(s.copyrightText) ?? "Fádé Essence · Lagos, Nigeria";
+  const social =
+    props.social ?? {
+      instagramUrl: asStr(s.instagramUrl),
+      xUrl: asStr(s.xUrl),
+      whatsappUrl: asStr(s.whatsappUrl),
+      tiktokUrl: asStr(s.tiktokUrl),
+      facebookUrl: asStr(s.facebookUrl),
+    };
+  const shopLinks = props.shopLinks ?? toLinks(nav.FOOTER_SHOP) ?? defaultShopLinks;
+  const discoverLinks =
+    props.discoverLinks ?? toLinks(nav.FOOTER_DISCOVER) ?? defaultDiscoverLinks;
+  const helpLinks = props.helpLinks ?? toLinks(nav.FOOTER_HELP) ?? defaultHelpLinks;
+  const companyLinks =
+    props.companyLinks ?? toLinks(nav.FOOTER_COMPANY) ?? defaultCompanyLinks;
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,11 +172,10 @@ export function Footer() {
           <div>
             <p className="eyebrow mb-4">The Sillage letter</p>
             <h2 className="font-serif text-3xl font-light md:text-4xl">
-              Leave a trail<span className="text-accent">.</span>
+              {newsletterHeading}
             </h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-              New arrivals, limited drops and notes from the atelier. Sent
-              occasionally, written carefully.
+              {newsletterSubtext}
             </p>
           </div>
           <form
@@ -169,13 +217,15 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col gap-6 border-t border-border/70 pt-8 md:flex-row md:items-center md:justify-between">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-            © {new Date().getFullYear()} Fádé Essence · Lagos, Nigeria
+            © {new Date().getFullYear()} {copyrightText}
           </p>
           <div className="flex items-center gap-6">
-            <p className="hidden font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground sm:block">
-              Secure payment via Paystack
-            </p>
-            <SocialLinks />
+            {paymentNote && (
+              <p className="hidden font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground sm:block">
+                {paymentNote}
+              </p>
+            )}
+            <SocialLinks {...(social ?? {})} />
           </div>
         </div>
       </div>

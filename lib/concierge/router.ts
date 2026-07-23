@@ -37,7 +37,7 @@ function pickIntent(text: string): ConciergeIntent {
   if (/(gift|present for)/i.test(text)) return "GIFT_GUIDANCE"
   if (includesAny(text, NOTE_TERMS) && /(what|how|smell|add|combined|together)/i.test(text)) return "NOTE_EXPLANATION"
   if (/(ingredient|raw material|natural|synthetic|molecule)/i.test(text)) return "INGREDIENT_RESEARCH"
-  if (/(which fádé|which fade|show me|show only|recommend|what perfume|find me|currently available)/i.test(text)) return "CATALOGUE_RECOMMENDATION"
+  if (/(which fádé|which fàdé|which fàdè|which fade|show me|show only|recommend|what perfume|find me|currently available)/i.test(text)) return "CATALOGUE_RECOMMENDATION"
   if (/(recommend|what perfume|best perfume)/i.test(text)) return "GLOBAL_RECOMMENDATION"
   if (/(perfume|fragrance|scent|edt|edp|parfum|maceration|top notes|heart notes|base notes)/i.test(text)) return "GENERAL_PERFUME_KNOWLEDGE"
   return "OUT_OF_SCOPE"
@@ -52,7 +52,7 @@ export function routeConciergeIntent(message: string, state?: ConciergeConversat
   if (followUp && state?.lastIntent && primaryIntent === "OUT_OF_SCOPE") primaryIntent = state.lastIntent
   const notes = NOTE_TERMS.filter((term) => new RegExp(`\\b${term}s?\\b`, "i").test(text))
   const budget = text.match(/(?:₦|ngn|n)?\s*([0-9][0-9,]{3,})/i)?.[1]
-  const explicitFade = /fádé|fade|catalogue|in stock|available|show me|which product/i.test(text)
+  const explicitFade = /fádé|fàdé|fàdè|fade|catalogue|in stock|available|show me|which product/i.test(text)
   const requiresLiveStock = ["AVAILABILITY_CHECK", "CATALOGUE_RECOMMENDATION"].includes(primaryIntent) || /in stock|available now/i.test(text)
   const requiresCatalogue = explicitFade || requiresLiveStock || ["PRICE_CHECK", "PRODUCT_LOOKUP"].includes(primaryIntent) || Boolean(followUp && state?.activeProductIds.length)
   const currentResearch = ["REVIEW_RESEARCH", "PERFUME_HISTORY", "BRAND_OR_PERFUMER_RESEARCH"].includes(primaryIntent) || /current|latest|recent|reformulat|who created/i.test(text)

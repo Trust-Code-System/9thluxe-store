@@ -3,15 +3,21 @@ import { requireAdmin } from '@/lib/admin'
 import { User, Mail, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { UserRoleSelect } from '@/components/admin/user-role-select'
 
 export const dynamic = 'force-dynamic'
+
+function effectiveRole(role: string, adminRole: string | null): string {
+  if (role !== 'ADMIN') return 'none'
+  return adminRole ?? 'SUPER_ADMIN'
+}
 
 export default async function AdminUsersPage({
   searchParams,
 }: {
   searchParams?: Promise<{ page?: string }>
 }) {
-  await requireAdmin()
+  const me = await requireAdmin()
 
   const params = await searchParams
   const requestedPage = Number.parseInt(params?.page ?? '1', 10)
@@ -28,6 +34,8 @@ export default async function AdminUsersPage({
         id: true,
         name: true,
         email: true,
+        role: true,
+        adminRole: true,
         createdAt: true,
         _count: {
           select: {
@@ -66,6 +74,7 @@ export default async function AdminUsersPage({
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Email</th>
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Orders</th>
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Joined</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Admin role</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -97,6 +106,13 @@ export default async function AdminUsersPage({
                         {new Date(user.createdAt).toLocaleDateString()}
                       </div>
                     </td>
+                    <td className="px-4 py-3">
+                      <UserRoleSelect
+                        userId={user.id}
+                        current={effectiveRole(user.role, user.adminRole)}
+                        self={user.id === me.id}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -126,4 +142,3 @@ export default async function AdminUsersPage({
     </div>
   )
 }
-

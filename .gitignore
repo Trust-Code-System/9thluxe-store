@@ -45,3 +45,6 @@ prisma/dev.db-journal
 .claude
 .cursor
 .gstack/
+
+# Runtime-uploaded media (local storage adapter)
+public/uploads/

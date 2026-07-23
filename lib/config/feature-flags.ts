@@ -12,6 +12,8 @@ export type FeatureFlag =
   | 'whatsapp_marketing' // promotional WhatsApp: requires consent + creds
   | 'agentic_feed' // expose machine-readable product feed for AI shopping channels
   | 'hero_orbit' // homepage orbital perfume carousel: default OFF until the merchant approves it
+  | 'hero_cinematic' // one-time landing and spray hero: default OFF pending showcase asset approval
+  | 'hero_fusion' // approved fusion fragrance sequence: default OFF pending fragrance and asset approval
 
 const DEFAULTS: Record<FeatureFlag, boolean> = {
   shopify_commerce: false,
@@ -23,6 +25,8 @@ const DEFAULTS: Record<FeatureFlag, boolean> = {
   whatsapp_marketing: false,
   agentic_feed: false,
   hero_orbit: false,
+  hero_cinematic: false,
+  hero_fusion: false,
 }
 
 function enabledSet(): Set<string> {
@@ -44,4 +48,22 @@ export function allFlags(): Record<FeatureFlag, boolean> {
   return Object.fromEntries(
     (Object.keys(DEFAULTS) as FeatureFlag[]).map((f) => [f, isFeatureEnabled(f)]),
   ) as Record<FeatureFlag, boolean>
+}
+
+/** Every known flag key, in declaration order. */
+export function flagKeys(): FeatureFlag[] {
+  return Object.keys(DEFAULTS) as FeatureFlag[]
+}
+
+/** The built-in default (ignoring env overrides) for a flag. */
+export function flagDefault(flag: FeatureFlag): boolean {
+  return DEFAULTS[flag]
+}
+
+/** Where a flag's effective value comes from: an env override or the built-in default. */
+export function flagSource(flag: FeatureFlag): 'enabled-by-env' | 'disabled-by-env' | 'default' {
+  const set = enabledSet()
+  if (set.has(flag)) return 'enabled-by-env'
+  if (set.has(`!${flag}`)) return 'disabled-by-env'
+  return 'default'
 }

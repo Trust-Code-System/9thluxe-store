@@ -36,6 +36,8 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
       name: (formData.get("name") as string) ?? "",
       slug: (formData.get("slug") as string) ?? "",
       description: (formData.get("description") as string) || undefined,
+      seoTitle: (formData.get("seoTitle") as string) || undefined,
+      seoDescription: (formData.get("seoDescription") as string) || undefined,
     })
 
     redirect("/admin/collections?success=created")
@@ -51,6 +53,8 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
       name: (formData.get("name") as string) ?? "",
       slug: (formData.get("slug") as string) ?? "",
       description: (formData.get("description") as string) || undefined,
+      seoTitle: (formData.get("seoTitle") as string) || undefined,
+      seoDescription: (formData.get("seoDescription") as string) || undefined,
     })
 
     redirect("/admin/collections?success=updated")
@@ -121,6 +125,8 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
                     placeholder="Short description shown in the UI."
                   />
                 </div>
+                <div className="space-y-2"><Label htmlFor="seoTitle">SEO title</Label><Input id="seoTitle" name="seoTitle" maxLength={70} /></div>
+                <div className="space-y-2"><Label htmlFor="seoDescription">SEO description</Label><Input id="seoDescription" name="seoDescription" maxLength={180} /></div>
                 <Button type="submit" size="sm">
                   Create collection
                 </Button>
@@ -162,6 +168,8 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
                     <Label htmlFor="new-description">Description</Label>
                     <Input id="new-description" name="description" placeholder="Updated description" />
                   </div>
+                  <div className="space-y-2"><Label htmlFor="new-seo-title">SEO title</Label><Input id="new-seo-title" name="seoTitle" maxLength={70} /></div>
+                  <div className="space-y-2"><Label htmlFor="new-seo-description">SEO description</Label><Input id="new-seo-description" name="seoDescription" maxLength={180} /></div>
                   <Button type="submit" size="sm">
                     Save changes
                   </Button>

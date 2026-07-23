@@ -1,4 +1,5 @@
 import { Resend } from "resend"
+import { resolveEmailTemplate } from "@/lib/email-templates/service"
 
 const BRAND_COLOR = "#1a1a1a"
 const ACCENT_COLOR = "#c9a96e"
@@ -78,12 +79,13 @@ export async function sendPriceDropAlert(params: PriceDropAlertParams) {
   </body>
 </html>`
 
+  const resolved = await resolveEmailTemplate("price_drop", { customerName: customerName || "Customer", productName, oldPrice: `₦${oldPriceNGN.toLocaleString()}`, newPrice: `₦${newPriceNGN.toLocaleString()}`, productUrl }, `Price Drop: ${productName} is now ₦${newPriceNGN.toLocaleString()} (save ${savingsPct}%)`, html)
   try {
     await resend.emails.send({
       from: process.env.NEWSLETTER_FROM_EMAIL || "Fádé Essence <onboarding@resend.dev>",
       to,
-      subject: `Price Drop: ${productName} is now ₦${newPriceNGN.toLocaleString()} (save ${savingsPct}%)`,
-      html,
+      subject: resolved.subject,
+      html: resolved.html,
     })
     console.log("[EMAIL] Price drop alert sent:", to, productName)
   } catch (error) {

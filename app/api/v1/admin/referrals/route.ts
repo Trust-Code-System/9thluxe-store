@@ -5,6 +5,7 @@
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { prisma } from '@/lib/prisma'
 import { requestReferralReward, reverseReferral } from '@/lib/referrals/service'
 
@@ -16,6 +17,7 @@ const STATUSES = ['PENDING', 'QUALIFIED', 'REWARDED', 'REVERSED']
 export const GET = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'marketing:manage')) raise('FORBIDDEN')
   const statusParam = req.nextUrl.searchParams.get('status')?.toUpperCase()
   const where = statusParam && STATUSES.includes(statusParam) ? { status: statusParam } : {}
   const referrals = await prisma.referral.findMany({ where, orderBy: { createdAt: 'desc' }, take: 100 })
@@ -30,6 +32,7 @@ const bodySchema = z.object({
 export const POST = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'marketing:manage')) raise('FORBIDDEN')
   const { referralId, op } = bodySchema.parse(await req.json())
   const data: { approval: unknown; referral: unknown } = { approval: null, referral: null }
   if (op === 'request_reward') {

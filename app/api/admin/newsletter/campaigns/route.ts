@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireAdmin } from "@/lib/admin"
+import { getAuthorizedUser } from "@/lib/authz"
 
 export const runtime = "nodejs"
 
 // GET - List all campaigns
 export async function GET(_request: NextRequest) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("marketing:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const campaigns = await prisma.newsletterCampaign.findMany({
       orderBy: { createdAt: "desc" },
@@ -32,7 +33,8 @@ export async function GET(_request: NextRequest) {
 // POST - Create new campaign
 export async function POST(request: NextRequest) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("marketing:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const { subject, html, text, status = "DRAFT" } = await request.json()
 
@@ -71,7 +73,8 @@ export async function POST(request: NextRequest) {
 // PATCH - Update campaign
 export async function PATCH(request: NextRequest) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("marketing:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const { id, subject, html, text, status } = await request.json()
 

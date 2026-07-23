@@ -1,15 +1,24 @@
-import { journalArticles, articleContent } from "@/lib/journal-articles"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, ArrowUpRight } from "lucide-react"
+import type { Metadata } from "next"
+
 import { prisma } from "@/lib/prisma"
+import {
+  getPublicStory,
+  getPublishedStoryCards,
+  getAllStorySlugs,
+} from "@/lib/stories/queries"
 import { MainLayout } from "@/components/layout/main-layout"
 import { ProductCard } from "@/components/ui/product-card"
 import { mapPrismaProductToCard } from "@/lib/queries/products"
-import type { Metadata } from "next"
+import { StoryBlocks } from "@/components/journal/story-blocks"
 
-export function generateStaticParams() {
-  return journalArticles.map((a) => ({ slug: a.slug }))
+export const dynamic = "force-dynamic"
+
+export async function generateStaticParams() {
+  const slugs = await getAllStorySlugs()
+  return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({
@@ -18,11 +27,14 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const article = journalArticles.find((a) => a.slug === slug)
-  if (!article) return {}
+  const story = await getPublicStory(slug)
+  if (!story) return {}
   return {
-    title: `${article.title} | The Journal | Fádé`,
-    description: article.excerpt,
+    title: `${story.seoTitle ?? story.title} | The Journal | Fádé`,
+    description: story.seoDescription ?? story.excerpt,
+    openGraph: story.socialImageUrl
+      ? { images: [{ url: story.socialImageUrl }] }
+      : undefined,
   }
 }
 
@@ -32,18 +44,26 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const article = journalArticles.find((a) => a.slug === slug)
-  if (!article) notFound()
+  const story = await getPublicStory(slug)
+  if (!story) notFound()
 
-  const paragraphs = articleContent[slug] ?? []
-  const others = journalArticles.filter((a) => a.slug !== slug).slice(0, 3)
+  // Related products: prefer explicit relations, then any product blocks.
+  const productSlugs = Array.from(
+    new Set([
+      ...story.relatedProductSlugs,
+      ...story.blocks
+        .filter((b) => b.type === "product")
+        .map((b) => String((b.data as { productSlug?: string }).productSlug ?? ""))
+        .filter(Boolean),
+    ])
+  )
 
   let relatedProducts: Awaited<ReturnType<typeof prisma.product.findMany>> = []
-  if (article.relatedProductSlugs?.length) {
+  if (productSlugs.length) {
     try {
       relatedProducts = await prisma.product.findMany({
         where: {
-          slug: { in: article.relatedProductSlugs },
+          slug: { in: productSlugs },
           deletedAt: null,
           publishStatus: "PUBLISHED",
         },
@@ -53,6 +73,10 @@ export default async function ArticlePage({
     }
   }
 
+  const others = (await getPublishedStoryCards())
+    .filter((s) => s.slug !== slug)
+    .slice(0, 3)
+
   return (
     <MainLayout>
       <article
@@ -60,7 +84,6 @@ export default async function ArticlePage({
         className="grain relative bg-background py-14 text-foreground lg:py-20"
       >
         <div className="container relative z-10 mx-auto max-w-[760px] px-4 sm:px-6">
-          {/* Back link */}
           <Link
             href="/journal"
             className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-accent"
@@ -69,15 +92,18 @@ export default async function ArticlePage({
             The Journal
           </Link>
 
-          {/* Header */}
           <header className="mt-10">
             <div className="flex flex-wrap items-center gap-4 font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-              <span className="text-accent">{article.category}</span>
-              <span aria-hidden>·</span>
-              <span>{article.readTime}</span>
+              <span className="text-accent">{story.category}</span>
+              {story.readTime && (
+                <>
+                  <span aria-hidden>·</span>
+                  <span>{story.readTime}</span>
+                </>
+              )}
               <span aria-hidden>·</span>
               <span>
-                {new Date(article.date).toLocaleDateString("en-NG", {
+                {new Date(story.date).toLocaleDateString("en-NG", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -85,28 +111,19 @@ export default async function ArticlePage({
               </span>
             </div>
             <h1 className="mt-6 text-balance font-serif text-4xl font-light leading-[1.08] tracking-[-0.01em] md:text-5xl">
-              {article.title}
+              {story.title}
             </h1>
-            <p className="mt-6 font-serif text-lg italic leading-relaxed text-muted-foreground md:text-xl">
-              {article.excerpt}
-            </p>
+            {(story.subtitle || story.excerpt) && (
+              <p className="mt-6 font-serif text-lg italic leading-relaxed text-muted-foreground md:text-xl">
+                {story.subtitle || story.excerpt}
+              </p>
+            )}
           </header>
 
           <div className="rule-fade my-10" aria-hidden />
 
-          {/* Body */}
-          <div className="space-y-7">
-            {paragraphs.map((para, i) => (
-              <p
-                key={i}
-                className="text-base leading-[1.85] text-foreground/85 first:first-letter:float-left first:first-letter:mr-3 first:first-letter:font-serif first:first-letter:text-6xl first:first-letter:leading-[0.85] first:first-letter:text-accent"
-              >
-                {para}
-              </p>
-            ))}
-          </div>
+          <StoryBlocks blocks={story.blocks} />
 
-          {/* Related Products */}
           {relatedProducts.length > 0 && (
             <div className="mt-16 border-t border-border pt-12">
               <p className="eyebrow mb-8">Referenced in this story</p>
@@ -118,33 +135,35 @@ export default async function ArticlePage({
             </div>
           )}
 
-          {/* More Articles */}
-          <div className="mt-16 border-t border-border pt-12">
-            <p className="eyebrow mb-6">More from the Journal</p>
-            <div className="border-t border-border">
-              {others.map((a) => (
-                <Link
-                  key={a.slug}
-                  href={`/journal/${a.slug}`}
-                  className="group grid grid-cols-[1fr_auto] items-baseline gap-x-6 border-b border-border py-5 transition-colors hover:bg-secondary/40"
-                >
-                  <div className="min-w-0">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                      {a.category} · {a.readTime}
-                    </p>
-                    <p className="mt-1.5 line-clamp-2 font-serif text-lg font-light leading-snug transition-colors group-hover:text-accent">
-                      {a.title}
-                    </p>
-                  </div>
-                  <ArrowUpRight
-                    className="h-4 w-4 self-center text-muted-foreground/50 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
-                    strokeWidth={1.5}
-                    aria-hidden
-                  />
-                </Link>
-              ))}
+          {others.length > 0 && (
+            <div className="mt-16 border-t border-border pt-12">
+              <p className="eyebrow mb-6">More from the Journal</p>
+              <div className="border-t border-border">
+                {others.map((a) => (
+                  <Link
+                    key={a.slug}
+                    href={`/journal/${a.slug}`}
+                    className="group grid grid-cols-[1fr_auto] items-baseline gap-x-6 border-b border-border py-5 transition-colors hover:bg-secondary/40"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                        {a.category}
+                        {a.readTime ? ` · ${a.readTime}` : ""}
+                      </p>
+                      <p className="mt-1.5 line-clamp-2 font-serif text-lg font-light leading-snug transition-colors group-hover:text-accent">
+                        {a.title}
+                      </p>
+                    </div>
+                    <ArrowUpRight
+                      className="h-4 w-4 self-center text-muted-foreground/50 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
+                      strokeWidth={1.5}
+                      aria-hidden
+                    />
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </article>
     </MainLayout>

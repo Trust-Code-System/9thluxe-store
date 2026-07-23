@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireAdmin } from "@/lib/admin"
+import { getAuthorizedUser } from "@/lib/authz"
 import { ProductCategory } from "@prisma/client"
 
 export const runtime = "nodejs"
@@ -8,7 +8,8 @@ export const runtime = "nodejs"
 // GET - List all categories
 export async function GET() {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("products:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const categories = await prisma.category.findMany({
       orderBy: { name: "asc" },
@@ -39,7 +40,8 @@ export async function GET() {
 // POST - Create category
 export async function POST(request: NextRequest) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("products:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const { name, slug, description, enumKey } = await request.json()
 

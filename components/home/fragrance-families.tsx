@@ -44,11 +44,17 @@ const FAMILIES = [
   },
 ]
 
+interface FragranceFamiliesProps {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+}
+
 /**
  * The Index of Scents: fragrance families as an editorial ledger,
  * not a grid of cards.
  */
-export function FragranceFamilies() {
+export function FragranceFamilies({ eyebrow, title, subtitle }: FragranceFamiliesProps = {}) {
   return (
     <section
       data-surface="night"
@@ -57,13 +63,19 @@ export function FragranceFamilies() {
       <div className="container relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <header className="mb-12 lg:mb-16">
-            <p className="eyebrow mb-4">Index of scents</p>
+            <p className="eyebrow mb-4">{eyebrow || "Index of scents"}</p>
             <h2 className="max-w-xl text-balance">
-              Every perfume belongs to a <em className="text-accent">family</em>.
+              {title ? (
+                title
+              ) : (
+                <>
+                  Every perfume belongs to a <em className="text-accent">family</em>.
+                </>
+              )}
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground md:text-base">
-              Six characters, six moods. Start from the one that feels like
-              you, or the one you have never dared to wear.
+              {subtitle ||
+                "Six characters, six moods. Start from the one that feels like you, or the one you have never dared to wear."}
             </p>
           </header>
         </Reveal>

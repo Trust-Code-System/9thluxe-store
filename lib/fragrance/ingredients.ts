@@ -32,7 +32,7 @@ interface IngredientSeed {
  */
 function ing(seed: IngredientSeed): Ingredient {
   const alt =
-    seed.alt ?? `A stylised illustration of ${seed.displayName.toLowerCase()}, in Fàdè house art direction.`
+    seed.alt ?? `A stylised illustration of ${seed.displayName.toLowerCase()}, in Fádé house art direction.`
   return {
     id: `ingredient_${seed.canonicalName.replace(/[^a-z0-9]+/g, "_")}`,
     canonicalName: seed.canonicalName,

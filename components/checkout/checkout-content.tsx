@@ -61,6 +61,14 @@ export function CheckoutContent({
 
   const [currentStep, setCurrentStep] = React.useState(1);
 
+  // Checkout steps swap in place (no URL change), so the shared ScrollToTop never fires between
+  // them. Without this you land wherever the previous step's button was (usually the bottom of the
+  // page) and have to scroll up to see the next step. Return to the top on every step change.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentStep]);
+
   const couponCode = useCartStore((state) => state.couponCode);
 
   const couponId = useCartStore((state) => state.couponId);
@@ -169,7 +177,6 @@ export function CheckoutContent({
   ]);
 
   // Redirect to cart only once the server cart has hydrated and is truly empty.
-
   React.useEffect(() => {
     if (hasHydrated && items.length === 0) {
       router.replace("/cart");
@@ -276,8 +283,6 @@ export function CheckoutContent({
               removeCoupon={removeCoupon}
               giftWrapFee={giftWrapFee}
               onPaymentClick={() => {
-                // Trigger form submission in payment form
-
                 const form = document.querySelector(
                   "form[data-payment-form]",
                 ) as HTMLFormElement;

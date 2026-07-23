@@ -2,6 +2,7 @@
 // GET /api/v1/admin/jobs?status=FAILED -> ADMIN-only job-run list (failed-job retention view).
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { prisma } from '@/lib/prisma'
 import type { JobStatus } from '@prisma/client'
 
@@ -13,6 +14,7 @@ const VALID: JobStatus[] = ['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED']
 export const GET = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'settings:manage')) raise('FORBIDDEN')
   const statusParam = req.nextUrl.searchParams.get('status')?.toUpperCase()
   const where = statusParam && (VALID as string[]).includes(statusParam) ? { status: statusParam as JobStatus } : {}
   const jobs = await prisma.jobRun.findMany({ where, orderBy: { createdAt: 'desc' }, take: 100 })

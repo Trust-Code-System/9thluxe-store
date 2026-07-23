@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { Fraunces, Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import { CartHydrator } from "@/components/cart/cart-hydrator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { NavigationProgress } from "@/components/loading/navigation-progress";
 import { Suspense } from "react";
+import { SiteChromeProvider } from "@/components/layout/site-chrome-context";
+import { getSiteSettings } from "@/lib/settings/service";
+import { getNavigation } from "@/lib/navigation/service";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -48,76 +51,80 @@ function resolveSiteUrl() {
 
 const siteUrl = resolveSiteUrl();
 
-export const metadata: Metadata = {
-  metadataBase: siteUrl,
-  title: {
-    default: "Fádé Essence | Luxury Perfumes",
-    template: "%s | Fádé Essence",
-  },
-  description:
+const str = (v: unknown, fallback: string): string =>
+  typeof v === "string" && v.trim() ? v : fallback;
+
+// SEO defaults are admin-editable (Site settings). Falls back to the built-in copy if unset or
+// if the settings store is unavailable.
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings().catch(() => ({}) as Record<string, unknown>);
+
+  const siteName = str(settings.siteName, "Fádé Essence");
+  const defaultTitle = str(settings.seoDefaultTitle, "Fádé Essence | Luxury Perfumes");
+  const description = str(
+    settings.seoDefaultDescription,
     "Discover premium luxury perfumes at Fádé Essence. Curated collection of timeless fragrances and sophistication.",
-  keywords: [
-    "luxury perfumes",
-    "fragrances",
-    "Fádé",
-    "premium perfume",
-    "Nigeria",
-  ],
-  manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Fádé",
-  },
-  formatDetection: { telephone: false },
-  authors: [{ name: "Fádé Essence" }],
-  creator: "Fádé Essence",
-  publisher: "Fádé Essence",
-  openGraph: {
-    type: "website",
-    locale: "en_NG",
-    url: siteUrl.toString(),
-    siteName: "Fádé Essence",
-    title: "Fádé Essence | Luxury Perfumes",
-    description: "Discover premium luxury perfumes at Fádé Essence.",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Fádé Essence",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Fádé Essence | Luxury Perfumes",
-    description: "Discover premium luxury perfumes at Fádé Essence.",
-    images: ["/og-image.jpg"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+  );
+  const ogImage = str(settings.seoOgImage, "/og-image.jpg");
+
+  return {
+    metadataBase: siteUrl,
+    title: { default: defaultTitle, template: `%s | ${siteName}` },
+    description,
+    keywords: ["luxury perfumes", "fragrances", "Fádé", "premium perfume", "Nigeria"],
+    icons: {
+      icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+      apple: [{ url: "/apple-icon" }],
+    },
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: "Fádé",
+    },
+    formatDetection: { telephone: false },
+    authors: [{ name: siteName }],
+    creator: siteName,
+    publisher: siteName,
+    openGraph: {
+      type: "website",
+      locale: "en_NG",
+      url: siteUrl.toString(),
+      siteName,
+      title: defaultTitle,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: siteName }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: defaultTitle,
+      description,
+      images: [ogImage],
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-  verification: {
-    // Add your verification codes here when available
-    // google: "your-google-verification-code",
-    // yandex: "your-yandex-verification-code",
-  },
-};
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [settings, nav] = await Promise.all([
+    getSiteSettings().catch(() => ({})),
+    getNavigation().catch(() => ({}) as Awaited<ReturnType<typeof getNavigation>>),
+  ]);
+
   return (
     <html
       lang="en"
@@ -129,14 +136,16 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         <ThemeProvider>
-          <Suspense fallback={null}>
-            <NavigationProgress />
-            <ScrollToTop />
-          </Suspense>
-          <CartHydrator />
-          {children}
-          <Toaster position="top-center" />
-          <Analytics />
+          <SiteChromeProvider value={{ settings, nav }}>
+            <Suspense fallback={null}>
+              <NavigationProgress />
+              <ScrollToTop />
+            </Suspense>
+            <CartHydrator />
+            {children}
+            <Toaster position="top-center" />
+            <Analytics />
+          </SiteChromeProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireAdmin } from "@/lib/admin"
+import { getAuthorizedUser } from "@/lib/authz"
 
 export const runtime = "nodejs"
 
@@ -10,7 +10,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("marketing:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
     const { id } = await params
 
     await prisma.newsletterCampaign.delete({
@@ -33,7 +34,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("marketing:manage")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
     const { id } = await params
 
     const campaign = await prisma.newsletterCampaign.findUnique({

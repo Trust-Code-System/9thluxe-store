@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireAdmin } from "@/lib/admin"
+import { getAuthorizedUser } from "@/lib/authz"
 
 export const runtime = "nodejs"
 
 // GET - List notifications
 export async function GET(request: NextRequest) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("dashboard:view")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const searchParams = request.nextUrl.searchParams
     const unreadOnly = searchParams.get("unreadOnly") === "true"
@@ -41,7 +42,8 @@ export async function GET(request: NextRequest) {
 // PATCH - Mark notifications as read
 export async function PATCH(request: NextRequest) {
   try {
-    await requireAdmin()
+    const authz = await getAuthorizedUser("dashboard:view")
+    if (!authz.ok) return NextResponse.json({ error: authz.status === 403 ? "Forbidden" : "Unauthorized" }, { status: authz.status })
 
     const { notificationIds, markAllAsRead } = await request.json()
 

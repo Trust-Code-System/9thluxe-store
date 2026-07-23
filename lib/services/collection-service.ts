@@ -7,6 +7,8 @@ export const collectionInputSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().optional().nullable(),
+  seoTitle: z.string().max(70).optional().nullable(),
+  seoDescription: z.string().max(180).optional().nullable(),
 })
 
 export type CollectionInput = z.infer<typeof collectionInputSchema>
@@ -34,6 +36,8 @@ export async function createCollection(input: CollectionInput) {
       name: data.name,
       slug: data.slug,
       description: data.description,
+      seoTitle: data.seoTitle,
+      seoDescription: data.seoDescription,
     },
   })
   invalidateCatalogueCache()
@@ -49,6 +53,8 @@ export async function updateCollection(id: string, input: CollectionInput) {
       name: data.name,
       slug: data.slug,
       description: data.description,
+      seoTitle: data.seoTitle,
+      seoDescription: data.seoDescription,
     },
   })
   invalidateCatalogueCache()

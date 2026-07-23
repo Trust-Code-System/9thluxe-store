@@ -4,6 +4,7 @@
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { prisma } from '@/lib/prisma'
 import { createApproval } from '@/lib/approvals/service'
 import type { ApprovalStatus } from '@prisma/client'
@@ -16,6 +17,7 @@ const VALID: ApprovalStatus[] = ['PENDING', 'APPROVED', 'REJECTED', 'EXECUTED']
 export const GET = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'orders:manage')) raise('FORBIDDEN')
   const statusParam = (req.nextUrl.searchParams.get('status') || 'PENDING').toUpperCase()
   const status = (VALID as string[]).includes(statusParam) ? (statusParam as ApprovalStatus) : 'PENDING'
   const approvals = await prisma.approvalRequest.findMany({ where: { status }, orderBy: { createdAt: 'desc' }, take: 100 })
@@ -34,6 +36,7 @@ const createSchema = z.object({
 export const POST = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'orders:manage')) raise('FORBIDDEN')
   const body = createSchema.parse(await req.json())
   const approval = await createApproval({ ...body, createdBy: admin!.id })
   return { data: { approval }, status: 201 }

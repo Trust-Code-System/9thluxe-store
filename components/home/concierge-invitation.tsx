@@ -6,7 +6,23 @@ import { ArrowRight, MessageCircle } from "lucide-react";
 import { LogoMark } from "@/components/logo";
 import { Reveal } from "@/components/motion";
 
-export function ConciergeInvitation() {
+interface ConciergeInvitationProps {
+  heading?: string;
+  subtext?: string;
+  primaryCtaLabel?: string;
+  primaryCtaHref?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaHref?: string;
+}
+
+export function ConciergeInvitation({
+  heading,
+  subtext,
+  primaryCtaLabel,
+  primaryCtaHref,
+  secondaryCtaLabel,
+  secondaryCtaHref,
+}: ConciergeInvitationProps = {}) {
   return (
     <section
       data-surface="night"
@@ -20,32 +36,37 @@ export function ConciergeInvitation() {
         </Reveal>
         <Reveal delay={0.08}>
           <h2 className="mt-8 text-balance">
-            Describe a <em className="text-accent">memory</em>.
-            <br />
-            We&apos;ll find the scent.
+            {heading ? (
+              heading
+            ) : (
+              <>
+                Describe a <em className="text-accent">memory</em>.
+                <br />
+                We&apos;ll find the scent.
+              </>
+            )}
           </h2>
         </Reveal>
         <Reveal delay={0.16}>
           <p className="mx-auto mt-5 max-w-md leading-relaxed text-muted-foreground">
-            A mood, an evening, someone you remember. The Scent Concierge
-            listens and recommends real, in-stock fragrances from our house. no
-            guesswork.
+            {subtext ||
+              "A mood, an evening, someone you remember. The Scent Concierge listens and recommends real, in-stock fragrances from our house. no guesswork."}
           </p>
         </Reveal>
         <Reveal delay={0.24}>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
-              href="/concierge"
+              href={primaryCtaHref || "/concierge"}
               className="inline-flex h-13 items-center justify-center gap-2.5 bg-primary px-8 font-mono text-[12px] uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90"
             >
               <MessageCircle className="h-4 w-4" />
-              Talk to the Concierge
+              {primaryCtaLabel || "Talk to the Concierge"}
             </Link>
             <Link
-              href="/find-your-fragrance"
+              href={secondaryCtaHref || "/find-your-fragrance"}
               className="group inline-flex h-13 items-center justify-center gap-2 border border-border px-8 font-mono text-[12px] uppercase tracking-[0.2em] text-foreground transition-colors hover:border-accent hover:text-accent"
             >
-              Take the scent quiz
+              {secondaryCtaLabel || "Take the scent quiz"}
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>

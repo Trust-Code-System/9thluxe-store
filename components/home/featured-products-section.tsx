@@ -6,6 +6,12 @@ import { Stagger, StaggerItem } from "@/components/motion";
 
 interface FeaturedProductsSectionProps {
   products: Product[];
+  /** Optional copy overrides from the homepage CMS; blank/undefined keeps the defaults. */
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  viewAllLabel?: string;
+  viewAllHref?: string;
 }
 
 /**
@@ -14,6 +20,11 @@ interface FeaturedProductsSectionProps {
  */
 export function FeaturedProductsSection({
   products,
+  eyebrow,
+  title,
+  subtitle,
+  viewAllLabel,
+  viewAllHref,
 }: FeaturedProductsSectionProps) {
   if (products.length === 0) return null;
 
@@ -27,11 +38,14 @@ export function FeaturedProductsSection({
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="The edit"
-          title="Currently coveted"
-          subtitle="Hand-picked from the collection: the bottles our clients keep returning to."
-          viewAllHref="/shop"
-          viewAllLabel="View all perfumes"
+          eyebrow={eyebrow || "The edit"}
+          title={title || "Currently coveted"}
+          subtitle={
+            subtitle ||
+            "Hand-picked from the collection: the bottles our clients keep returning to."
+          }
+          viewAllHref={viewAllHref || "/shop"}
+          viewAllLabel={viewAllLabel || "View all perfumes"}
         />
 
         <Stagger className="grid gap-x-6 gap-y-12 lg:grid-cols-2">

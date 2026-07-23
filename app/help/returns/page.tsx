@@ -5,13 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Package, Clock, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import { RETURNS_WINDOW_DAYS } from "@/lib/pdp/policy";
+import { ManagedPage } from "@/components/pages/managed-page";
+import { getManagedPageMetadata, getPublishedPage } from "@/lib/pages/queries";
 
-export const metadata: Metadata = {
+export const dynamic = "force-dynamic";
+
+const fallbackMetadata: Metadata = {
   title: "Returns & Exchanges | Fádé",
   description: "Learn about our return and exchange policy.",
 };
 
-export default function ReturnsPage() {
+export function generateMetadata() { return getManagedPageMetadata("help/returns", fallbackMetadata); }
+
+export default async function ReturnsPage() {
+  const managed = await getPublishedPage("help/returns");
+  if (managed) return <ManagedPage page={managed} />;
   return (
     <MainLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">

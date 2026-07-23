@@ -159,15 +159,34 @@ export function PurchasePanel({ data, policyShipping, policyReturns }: PurchaseP
       hasSample: data.hasSample,
       availability: data.stock > 0 ? "in_stock" : "out_of_stock",
     }
+    const wasIn = inCompare
     const ok = toggleCompare(card)
-    if (!ok) toast.error(`Compare holds up to ${MAX_COMPARE} fragrances`)
-    else trackPdp("comparison_started", { productId: data.id })
+    if (!ok) {
+      toast.error(`Compare holds up to ${MAX_COMPARE} fragrances`)
+      return
+    }
+    if (wasIn) {
+      toast(`Removed ${data.name} from compare`)
+      return
+    }
+    const count = useCompareStore.getState().items.length
+    if (count < 2) {
+      toast.success("Added to compare", {
+        description: "Add one more fragrance to see them side by side.",
+      })
+    } else {
+      toast.success(`Comparing ${count} fragrances`, {
+        description: "Ready when you are.",
+        action: { label: "View", onClick: () => router.push("/compare") },
+      })
+    }
+    trackPdp("comparison_started", { productId: data.id })
   }
 
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? window.location.href : ""
     try {
-      if (navigator.share) await navigator.share({ title: data.name, text: `${data.name} on Fàdè`, url })
+      if (navigator.share) await navigator.share({ title: data.name, text: `${data.name} on Fádé`, url })
       else {
         await navigator.clipboard.writeText(url)
         toast.success("Link copied")

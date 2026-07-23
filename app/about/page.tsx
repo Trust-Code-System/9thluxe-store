@@ -3,12 +3,18 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
 import { MainLayout } from "@/components/layout/main-layout"
+import { ManagedPage } from "@/components/pages/managed-page"
+import { getManagedPageMetadata, getPublishedPage } from "@/lib/pages/queries"
 
-export const metadata: Metadata = {
+export const dynamic = "force-dynamic"
+
+const fallbackMetadata: Metadata = {
   title: "About Fádé",
   description:
     "Fádé is a Lagos house for rare and coveted perfumes, curated with care, described honestly, delivered nationwide.",
 }
+
+export function generateMetadata() { return getManagedPageMetadata("about", fallbackMetadata) }
 
 const PRINCIPLES = [
   {
@@ -29,7 +35,9 @@ const PRINCIPLES = [
   },
 ]
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const managed = await getPublishedPage("about")
+  if (managed) return <ManagedPage page={managed} />
   return (
     <MainLayout>
       {/* Manifesto hero */}

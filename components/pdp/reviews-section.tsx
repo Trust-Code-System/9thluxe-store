@@ -264,7 +264,7 @@ export function ReviewsSection({
                 <div className="mb-2 flex items-start justify-between gap-3">
                   <div>
                     <p className="flex items-center gap-1.5 text-sm font-medium">
-                      {r.displayName || "Fàdè customer"}
+                      {r.displayName || "Fádé customer"}
                       {r.verifiedPurchase && (
                         <span className="inline-flex items-center gap-0.5 text-[11px] text-moss">
                           <BadgeCheck className="h-3.5 w-3.5" /> Verified

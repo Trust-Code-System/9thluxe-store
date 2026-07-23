@@ -4,6 +4,7 @@
 // The AI summary must derive only from the metrics JSON; it never executes any action.
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { getAi } from '@/integrations/registry'
 import { buildDailyBrief } from '@/lib/copilot/daily-brief'
 
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic'
 export const GET = route(async () => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'dashboard:view')) raise('FORBIDDEN')
 
   const brief = await buildDailyBrief()
 

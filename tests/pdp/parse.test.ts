@@ -125,7 +125,7 @@ describe("buildScentStory", () => {
 describe("PROVENANCE_LABEL", () => {
   it("maps every provenance to a human label", () => {
     expect(PROVENANCE_LABEL.BRAND).toBe("Brand-provided")
-    expect(PROVENANCE_LABEL.EDITORIAL).toBe("Fàdè editorial")
+    expect(PROVENANCE_LABEL.EDITORIAL).toBe("Fádé editorial")
     expect(PROVENANCE_LABEL.CUSTOMER_AGGREGATE).toBe("Verified customers")
   })
 })

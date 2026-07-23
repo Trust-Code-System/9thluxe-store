@@ -7,6 +7,8 @@ import { ProductCard } from "@/components/ui/product-card"
 import { ProductGrid } from "@/components/ui/product-grid"
 import { CountdownTimer } from "@/components/drops/countdown-timer"
 import { NotifyButton } from "@/components/drops/notify-button"
+import { getActiveCampaign } from "@/lib/campaigns/service"
+import Link from "next/link"
 
 export const metadata = {
   title: "Limited Drops | Fádé",
@@ -18,6 +20,7 @@ export const dynamic = "force-dynamic"
 
 export default async function DropsPage() {
   const now = new Date()
+  const campaign = await getActiveCampaign(now)
 
   const upcomingDrops: Awaited<ReturnType<typeof prisma.product.findMany>> = []
   const liveDrops: Awaited<ReturnType<typeof prisma.product.findMany>> = []
@@ -50,6 +53,17 @@ export default async function DropsPage() {
 
   return (
     <MainLayout>
+      {campaign && (
+        <section className="relative overflow-hidden border-b border-border bg-secondary">
+          {campaign.desktopImage && <Image src={campaign.desktopImage} alt="" fill className="object-cover opacity-25" priority />}
+          <div className="container relative z-10 mx-auto max-w-[1200px] px-4 py-10 sm:px-6 lg:px-8">
+            <p className="eyebrow">Current campaign</p>
+            <h2 className="mt-3 font-serif text-3xl font-light">{campaign.title}</h2>
+            {campaign.description && <p className="mt-2 max-w-xl text-muted-foreground">{campaign.description}</p>}
+            {campaign.ctaLabel && campaign.ctaHref && <Link href={campaign.ctaHref} className="mt-5 inline-flex border border-accent px-5 py-2 text-sm text-accent">{campaign.ctaLabel}</Link>}
+          </div>
+        </section>
+      )}
       {/* Night hero */}
       <section data-surface="night" className="veil grain relative bg-background text-foreground">
         <div className="container relative z-10 mx-auto max-w-[1200px] px-4 pb-14 pt-16 text-center sm:px-6 lg:px-8 lg:pb-20 lg:pt-24">

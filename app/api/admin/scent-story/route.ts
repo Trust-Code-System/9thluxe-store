@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { getAdminUser } from "@/lib/admin"
+import { hasCapability, resolveRole } from "@/lib/authz-core"
 import { enrichComposition } from "@/lib/fragrance/enrich"
 import { matchIngredients } from "@/lib/fragrance/normalize"
 
@@ -54,6 +55,9 @@ export async function POST(request: NextRequest) {
     const admin = await getAdminUser()
     if (!admin) {
       return NextResponse.json({ error: "Admin access required" }, { status: 401 })
+    }
+    if (!hasCapability(resolveRole(admin), "products:manage")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const parsed = BodySchema.safeParse(await request.json())

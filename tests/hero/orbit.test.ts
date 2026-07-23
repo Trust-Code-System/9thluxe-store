@@ -29,7 +29,7 @@ function product(overrides: Partial<OrbitProductInput> = {}): OrbitProductInput 
     id: "p1",
     name: "Nocturne Eau de Parfum 100ml",
     slug: "nocturne-eau-de-parfum",
-    brand: "Fàdè",
+    brand: "Fádé",
     images: ["/nocturne-eau-de-parfum.jpg"],
     notesTop: "bergamot",
     notesHeart: "oud",

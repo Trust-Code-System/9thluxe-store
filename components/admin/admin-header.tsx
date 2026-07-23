@@ -28,6 +28,7 @@ interface AdminHeaderProps {
     id: string
     name: string | null
     email: string
+    roleLabel?: string | null
   }
 }
 
@@ -471,6 +472,11 @@ export function AdminHeader({ user }: AdminHeaderProps) {
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium">{displayName}</p>
                   <p className="text-xs text-muted-foreground">{displayEmail}</p>
+                  {user?.roleLabel && (
+                    <span className="mt-1 w-fit rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                      {user.roleLabel}
+                    </span>
+                  )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />

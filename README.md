@@ -1,568 +1,127 @@
-# Fádé Essence - Luxury E-Commerce Platform
+# 9thluxe Store / Fàdè Essence
 
-A modern, full-featured e-commerce platform built with Next.js 16, TypeScript, and Prisma. Fádé Essence specializes in luxury perfumes, offering a premium shopping experience with comprehensive admin management capabilities.
+An editorial perfume-commerce platform combining a customer storefront, operational administration, checkout, catalogue management, and a provider-abstracted perfume concierge.
 
-## 🎯 Project Overview
+> **Status:** Active development. The public deployment is available at [9thluxe-store.vercel.app](https://9thluxe-store.vercel.app), but production readiness still depends on deployment-specific payment, email, database, storage, and AI-provider configuration.
 
-Fádé Essence is a complete e-commerce solution featuring:
-- **Customer-facing storefront** with product browsing, cart management, and checkout
-- **Admin dashboard** for product, order, and inventory management
-- **User authentication** with NextAuth.js v5
-- **Payment integration** with Paystack
-- **Email notifications** via Resend
-- **Inventory management** with low stock alerts
-- **Order tracking** and status management
-- **Newsletter campaigns** with rich text editor
-- **Perfume Intelligence concierge** with multi-turn guidance, grounded catalogue recommendations, optional cited web research, and saved conversations
-- **SEO optimization** with dynamic sitemaps and metadata
+![Editorial perfume collection](./public/luxury-perfume-bottles.png)
 
-## ✨ Key Features
+## Product scope
 
-### 🛍️ Customer Features
+### Storefront
 
-#### Shopping Experience
-- **Product Catalog**: Browse luxury perfumes
-- **Product Search**: Real-time search across products
-- **Product Filtering**: Filter by category, brand, price, and tags (New, Bestseller, Limited)
-- **Product Details**: Comprehensive product pages with galleries, specifications, and reviews
-- **Related Products**: Smart product recommendations
-- **Brand Collections**: Dedicated pages for each brand
-- **Featured Collections**: Curated collections (Featured, New Arrivals, Bestsellers, Limited Edition)
+- Perfume catalogue, search, filters, brands, collections, and product detail pages.
+- Persistent cart, discount handling, delivery options, checkout, and Paystack integration.
+- Customer accounts with orders, addresses, reviews, wishlist, and preferences.
+- Responsive editorial presentation, theme support, metadata, sitemap, and structured navigation.
 
-#### Cart & Checkout
-- **Shopping Cart**: Persistent cart using Zustand with localStorage
-- **Cart Management**: Add, update quantities, remove items with stock validation
-- **Coupon Codes**: Apply discount codes (e.g., FADE10 for 10% off)
-- **Checkout Flow**: Multi-step checkout with shipping and payment
-- **Address Management**: Save and manage shipping addresses
-- **Delivery Options**: Multiple delivery methods
-- **Payment Integration**: Secure payment processing via Paystack
+### Administration
 
-#### User Account
-- **User Registration**: Sign up with email and password
-- **User Authentication**: Secure login with NextAuth.js
-- **Account Dashboard**: View order history, wishlist, and addresses
-- **Order Tracking**: Track order status (Pending → Paid → Shipped → Delivered)
-- **Order Reviews**: Review and rate purchased products
-- **Wishlist**: Save favorite products for later
-- **Profile Settings**: Update name, email, and notification preferences
-- **Address Book**: Manage multiple shipping addresses
+- Product, brand, collection, category, inventory, and order workflows.
+- Payment verification, order-state management, exports, and operational notifications.
+- Newsletter campaign and subscriber management through Resend-backed delivery.
+- Concierge observability for provider status, latency, errors, limits, and feedback.
 
-#### Additional Features
-- **Product Reviews**: Read and write product reviews with ratings
-- **Newsletter Subscription**: Subscribe to marketing emails
-- **Help Center**: FAQ, contact, shipping info, and returns policy
-- **Social Media Integration**: Links to Instagram, X (Twitter), WhatsApp, TikTok, and Facebook
-- **Responsive Design**: Fully responsive across all devices
-- **Dark Mode**: Theme toggle for light/dark mode
-- **Perfume Intelligence Concierge**: Ask perfume-knowledge, comparison, layering, climate, occasion, and catalogue questions in a responsive multi-turn workspace
+### Perfume concierge
 
-### 👨‍💼 Admin Features
+The concierge supports multi-turn perfume discovery, comparisons, layering, climate and occasion guidance, and catalogue-grounded recommendations. Generation providers are selected through a server-side abstraction; optional web research remains separately configured.
 
-#### Product Management
-- **Product CRUD**: Create, read, update, and delete products
-- **Bulk Operations**: Manage multiple products efficiently
-- **Image Upload**: Upload up to 4 product images with client-side compression
-- **Product Categories**: Organize products by category (Perfumes)
-- **Product Tags**: Mark products as New, Bestseller, Limited, or Featured
-- **Brand Management**: Add and manage product brands
-- **Collections**: Group products into collections
-- **Product Search**: Search products by name or brand
-- **Soft Deletion**: Products with orders are soft-deleted to preserve order history
+## Architecture
 
-#### Order Management
-- **Order Dashboard**: View all orders with filtering and search
-- **Order Details**: Comprehensive order information with customer details
-- **Order Status Updates**: Update order status (Pending → Paid → Shipped → Delivered)
-- **Order Notifications**: Automatic notifications when orders are paid
-- **Order Export**: Export orders to CSV
-- **Payment Verification**: Verify Paystack payments and update order status
-
-#### Inventory Management
-- **Stock Tracking**: Track product stock levels
-- **Low Stock Alerts**: Automatic alerts for products with stock ≤ 10 units
-- **Stock Validation**: Prevent adding out-of-stock items to cart
-- **Inventory Dashboard**: Centralized view of all inventory status
-
-#### Category & Collection Management
-- **Category CRUD**: Create, edit, and delete product categories
-- **Auto-Slug Generation**: Automatic URL-friendly slug generation
-- **Category Linking**: Link categories to product types
-- **Collection Management**: Create and manage product collections
-
-#### Newsletter Management
-- **Campaign Creation**: Create newsletter campaigns with rich text editor
-- **HTML Editor**: WYSIWYG editor with image upload support
-- **Campaign Management**: Edit, duplicate, delete, and send campaigns
-- **Subscriber Management**: View, search, and manage newsletter subscribers
-- **Subscriber Stats**: Track subscriber count and growth
-
-#### Notifications
-- **Admin Notifications**: Real-time notifications for new orders
-- **Notification Center**: View and manage all admin notifications
-- **Unread Badge**: Visual indicator for unread notifications
-
-#### Global Search
-- **Unified Search**: Search across products, orders, and customers
-- **Debounced Search**: Optimized search with debouncing
-- **Search Results**: Grouped results by type with quick links
-
-#### Analytics & Reporting
-- **Dashboard Stats**: Overview of products, orders, and revenue
-- **Product Statistics**: Total products, active products, low stock items
-- **Order Analytics**: Order status breakdown and trends
-- **Concierge Observability**: Review provider status, spend, latency, error/cache rates, intents, limits, and feedback
-
-### 🔐 Security Features
-
-- **Authentication**: Secure user authentication with NextAuth.js
-- **Route Protection**: Protected admin and account routes
-- **Input Validation**: Zod schema validation for all forms
-- **XSS Prevention**: Input sanitization
-- **Rate Limiting**: API rate limiting to prevent abuse
-- **CSRF Protection**: Built-in Next.js CSRF protection
-- **Secure Cookies**: HTTP-only cookies for sensitive data
-- **Password Hashing**: bcrypt password hashing
-
-### 📧 Email Features
-
-- **Order Confirmations**: Automatic email receipts after payment
-- **Order Status Updates**: Email notifications for order status changes
-- **Newsletter Campaigns**: Send marketing emails to subscribers
-- **Email Templates**: Beautiful HTML email templates
-- **Resend Integration**: Professional email delivery via Resend
-
-### 🔍 SEO & Performance
-
-- **Dynamic Sitemap**: Auto-generated sitemap.xml
-- **Robots.txt**: Search engine optimization
-- **Meta Tags**: Comprehensive Open Graph and Twitter Card support
-- **Structured Data**: Ready for JSON-LD structured data
-- **Image Optimization**: Next.js Image optimization
-- **Code Splitting**: Automatic code splitting for optimal performance
-- **Analytics**: Vercel Analytics integration
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **Next.js 16**: React framework with App Router
-- **React 19**: UI library
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first CSS framework
-- **Radix UI**: Accessible component primitives
-- **Zustand**: Lightweight state management
-- **React Icons**: Icon library (Font Awesome 6)
-- **Sonner**: Toast notifications
-- **React Hook Form**: Form management
-- **Zod**: Schema validation
-
-### Backend
-- **Next.js API Routes**: Serverless API endpoints
-- **Next.js Server Actions**: Server-side form handling
-- **Prisma**: Type-safe database ORM
-- **PostgreSQL**: Relational database via Prisma
-- **NextAuth.js v5**: Authentication and session management
-- **bcryptjs**: Password hashing
-
-### Services & Integrations
-- **Paystack**: Payment processing
-- **Resend**: Email delivery service
-- **Vercel Analytics**: Web analytics
-- **OpenAI, Anthropic, Google Gemini, or xAI**: Configurable Concierge V2 generation and hosted research providers
-
-### Development Tools
-- **ESLint**: Code linting
-- **TypeScript**: Static type checking
-- **Prisma Studio**: Database GUI
-
-## 📁 Project Structure
-
-```
-9thluxe-store-starter/
-├── app/                          # Next.js App Router pages
-│   ├── (routes)/                 # Public routes
-│   │   ├── page.tsx             # Homepage
-│   │   ├── shop/                # Shop page
-│   │   ├── product/[slug]/      # Product detail pages
-│   │   ├── collections/         # Collections pages
-│   │   ├── category/[slug]/     # Category pages
-│   │   ├── cart/                # Shopping cart
-│   │   ├── checkout/            # Checkout flow
-│   │   ├── about/               # About page
-│   │   └── help/                # Help center
-│   ├── account/                  # User account pages
-│   │   ├── page.tsx             # Account overview
-│   │   ├── orders/              # Order history
-│   │   ├── addresses/           # Address management
-│   │   ├── wishlist/            # Wishlist
-│   │   └── settings/            # Account settings
-│   ├── admin/                    # Admin dashboard
-│   │   ├── page.tsx             # Admin dashboard
-│   │   ├── products/            # Product management
-│   │   ├── orders/              # Order management
-│   │   ├── categories/          # Category management
-│   │   ├── collections/         # Collection management
-│   │   ├── inventory/           # Inventory management
-│   │   └── newsletter/          # Newsletter management
-│   ├── auth/                     # Authentication pages
-│   │   ├── signin/              # Sign in
-│   │   ├── signup/              # Sign up
-│   │   └── signout/             # Sign out
-│   └── api/                      # API routes
-│       ├── auth/                # NextAuth routes
-│       ├── admin/               # Admin API endpoints
-│       ├── cart/                # Cart API
-│       ├── checkout/            # Checkout API
-│       ├── paystack/            # Paystack webhook
-│       ├── newsletter/          # Newsletter API
-│       └── contact/             # Contact form API
-├── components/                   # React components
-│   ├── ui/                      # Reusable UI components
-│   ├── admin/                   # Admin-specific components
-│   ├── cart/                    # Cart components
-│   ├── checkout/                # Checkout components
-│   ├── product/                 # Product components
-│   ├── collections/             # Collection components
-│   ├── layout/                  # Layout components
-│   └── auth/                    # Auth components
-├── lib/                          # Utility libraries
-│   ├── stores/                  # Zustand stores
-│   ├── services/                # Business logic services
-│   ├── middleware/              # Middleware functions
-│   ├── auth.ts                  # NextAuth configuration
-│   ├── prisma.ts                # Prisma client
-│   └── utils.ts                 # Utility functions
-├── emails/                       # Email templates
-│   ├── sendReceipt.ts           # Order receipt email
-│   └── sendOrderStatusUpdate.ts # Order status email
-├── prisma/                       # Database
-│   ├── schema.prisma            # Prisma schema
-│   └── migrations/             # Database migrations
-└── public/                       # Static assets
+```text
+app/            Next.js routes, server actions, and API handlers
+components/     Storefront, admin, product, cart, and shared UI
+lib/            Auth, validation, services, stores, and integrations
+prisma/         PostgreSQL schema, migrations, and seed tooling
+emails/         Transactional and campaign email templates
+tests/          Unit, integration, browser, theme, and accessibility checks
+e2e/            Additional end-to-end workspace
+docs/           Product and implementation documentation
 ```
 
-## 🚀 Getting Started
+The application uses the Next.js App Router for the storefront, account area, admin platform, and API surface. Prisma owns relational persistence, NextAuth handles sessions, Zod validates boundaries, and Zustand coordinates selected client state.
+
+## Stack
+
+| Layer | Technology |
+| --- | --- |
+| Application | Next.js 16, React 19, TypeScript |
+| Interface | Tailwind CSS, Radix UI, Motion, Zustand, React Hook Form |
+| Data | PostgreSQL, Prisma |
+| Identity | NextAuth.js v5, bcrypt |
+| Commerce | Paystack, server-side checkout and order workflows |
+| Messaging | Resend |
+| AI | Configurable OpenAI, Anthropic, Google, or xAI providers |
+| Quality | ESLint, TypeScript, Vitest, Playwright, axe-core |
+
+## Local setup
 
 ### Prerequisites
 
-- **Node.js** 18+ and npm
-- **Git** for version control
-- **PostgreSQL** database (local or hosted)
+- Node.js compatible with Next.js 16
+- npm
+- PostgreSQL
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd 9thluxe-store-starter
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   Create a `.env` file in the root directory:
-   ```env
-    # Database
-    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DB?pgbouncer=true&connection_limit=1"
-
-    # NextAuth
-    NEXTAUTH_SECRET="your-secret-key-here"
-    NEXTAUTH_URL="http://localhost:3000"
-
-   # Site Configuration
-   APP_URL="http://localhost:3000"
-   NEXT_PUBLIC_SITE_URL="http://localhost:3000"
-
-   # Paystack (disabled until explicitly enabled)
-   PAYMENTS_ENABLED="false"
-   PAYSTACK_PUBLIC_KEY="your-paystack-public-key"
-   PAYSTACK_SECRET_KEY="your-paystack-secret-key"
-
-   # Resend (for emails)
-   RESEND_API_KEY="your-resend-api-key"
-   NEWSLETTER_FROM_EMAIL="noreply@yourdomain.com"
-
-   ```
-
-4. **Set up the database**
-   ```bash
-    npx prisma generate
-    npx prisma migrate dev
-   ```
-
-5. **Create an admin user**
-   You can create an admin user directly in the database or through Prisma Studio:
-   ```bash
-   npx prisma studio
-   ```
-   - Navigate to the `User` model
-   - Create a new user with `role: "ADMIN"`
-   - Set a password hash (use bcrypt to hash your password)
-
-6. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-
-7. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 🔑 Environment Variables
-
-### Required Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DATABASE_URL` | Postgres connection string | `postgresql://...` |
-| `NEXTAUTH_SECRET` | NextAuth secret key | Generate with `openssl rand -base64 32` |
-| `NEXTAUTH_URL` | Base URL of your application | `http://localhost:3000` |
-| `APP_URL` | Trusted application origin and callback base | `http://localhost:3000` |
-
-### Optional Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `PAYMENTS_ENABLED` | Explicit payment collection switch; defaults to `false` | `false` |
-| `PAYSTACK_PUBLIC_KEY` | Paystack public key | `pk_test_...` |
-| `PAYSTACK_SECRET_KEY` | Paystack secret key | `sk_test_...` |
-| `RESEND_API_KEY` | Resend API key | `re_...` |
-| `NEWSLETTER_FROM_EMAIL` | Email sender address | `noreply@yourdomain.com` |
-| `NEXT_PUBLIC_SITE_URL` | Public site URL | `https://yourdomain.com` |
-| `AI_PROVIDER` | Concierge provider (`mock` is for development/test) | `openai` |
-| `AI_PROVIDER_PRIORITY` | Ordered Concierge V2 provider fallback list | `openai,anthropic,gemini,xai` |
-| `FEATURE_FLAGS` | Comma-separated feature switches; add `concierge_v2` to enable V2 | `concierge_v2` |
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Durable authenticated per-minute limits in production | Upstash credentials |
-| `CONCIERGE_*` | Guest/auth limits, tool/search caps, token cap, spend gates, and catalogue-only mode | See `.env.example` |
-
-## 📊 Database Schema
-
-### Main Models
-
-- **User**: User accounts (customers and admins)
-- **Product**: Product catalog with images, pricing, and inventory
-- **Category**: Product categories
-- **Collection**: Product collections
-- **Order**: Customer orders
-- **OrderItem**: Order line items
-- **Coupon**: Discount coupons
-- **Review**: Product reviews and ratings
-- **Wishlist**: User wishlists
-- **Address**: User shipping addresses
-- **NewsletterSubscriber**: Newsletter subscribers
-- **NewsletterCampaign**: Newsletter campaigns
-- **Notification**: Admin notifications
-
-### Key Features
-
-- **Soft Deletion**: Products are soft-deleted (not permanently removed) when they have associated orders
-- **Audit Trails**: Created/updated timestamps on all models
-- **Relationships**: Proper foreign key relationships between models
-
-## 🔌 API Endpoints
-
-### Public APIs
-
-- `GET /api/products` - List products
-- `GET /api/search?q=query` - Search products
-- `POST /api/newsletter/subscribe` - Subscribe to newsletter
-- `POST /api/contact` - Submit contact form
-- `POST /api/v2/concierge/chat` - Stream a grounded Concierge V2 turn
-- `GET /api/v2/concierge/allowance` - Read the current guest/authenticated allowance
-- `GET|POST /api/v2/concierge/conversations` - List or create owned conversations
-- `GET|PATCH|DELETE /api/v2/concierge/conversations/[id]` - Read, rename, or archive an owned conversation
-- `POST /api/v2/concierge/messages/[id]/feedback` - Record assistant-response feedback
-
-### Authenticated APIs
-
-- `GET /api/account/settings` - Get user settings
-- `PATCH /api/account/settings` - Update user settings
-- `GET /api/cart/summary` - Get cart summary
-
-### Admin APIs
-
-- `GET /api/admin/products` - List products (admin)
-- `POST /api/admin/products` - Create product
-- `GET /api/admin/products/[id]` - Get product
-- `PATCH /api/admin/products/[id]` - Update product
-- `DELETE /api/admin/products/[id]` - Delete product
-- `GET /api/admin/orders` - List orders
-- `GET /api/admin/search?q=query` - Global search
-- `GET /api/admin/notifications` - Get notifications
-- `PATCH /api/admin/notifications` - Mark notifications as read
-- `GET /api/admin/newsletter/campaigns` - List campaigns
-- `POST /api/admin/newsletter/campaigns` - Create campaign
-- `GET /api/admin/newsletter/subscribers` - List subscribers
-
-### Payment APIs
-
-- `POST /api/paystack/initialize` - Initialize Paystack payment
-- `POST /api/paystack/webhook` - Paystack webhook handler
-
-## 🎨 UI Components
-
-The project uses a comprehensive set of reusable UI components built with Radix UI:
-
-- **Button**: Various button styles and sizes
-- **Input**: Text inputs with validation
-- **Select**: Dropdown selects
-- **Card**: Content cards
-- **Dialog**: Modal dialogs
-- **Popover**: Popover menus
-- **Dropdown Menu**: Context menus
-- **Tabs**: Tab navigation
-- **Accordion**: Collapsible content
-- **Badge**: Status badges
-- **Toast**: Notification toasts
-- **Skeleton**: Loading skeletons
-- **Avatar**: User avatars
-- **Table**: Data tables
-
-## 🧪 Testing
-
-Run the automated local gates with:
+### Install
 
 ```bash
-npm run typecheck
-npm run lint
-npm test
-npm run build
-npx playwright test tests/e2e/concierge-v2.spec.ts
+npm ci
+cp .env.example .env
+npx prisma generate
+npx prisma migrate deploy
+npm run dev
 ```
 
-### Manual Testing Checklist
+Open `http://localhost:3000`.
 
-- [ ] User registration and login
-- [ ] Product browsing and search
-- [ ] Add to cart and checkout flow
-- [ ] Payment processing (test mode)
-- [ ] Order status updates
-- [ ] Admin product management
-- [ ] Admin order management
-- [ ] Newsletter subscription
-- [ ] Email notifications
-- [ ] Mobile responsiveness
+Use [`.env.example`](./.env.example) as the complete variable-name reference. Never commit real database URLs, authentication secrets, provider keys, payment keys, or service-role credentials.
 
-## 🚢 Deployment
+## Commands
 
-### Vercel (Recommended)
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start local development |
+| `npm run build` | Create a production build |
+| `npm run lint` | Run copy and ESLint checks |
+| `npm run typecheck` | Run TypeScript without emitting files |
+| `npm test` | Run the Vitest suite |
+| `npm run test:e2e` | Run storefront browser tests |
+| `npm run test:a11y` | Run automated accessibility checks |
+| `npm run test:theme` | Verify supported themes |
+| `npm run seed` | Seed the configured development database |
 
-1. **Push to GitHub**
-   ```bash
-   git push origin main
-   ```
+## Deployment
 
-2. **Import to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Framework preset: **Next.js** (auto-detected)
-   - Deploy
+Before deploying:
 
-3. **Configure environment variables (Project → Settings → Environment Variables)**
-   - `DATABASE_URL` (Postgres) â€” required
-   - `NEXTAUTH_SECRET` â€” required
-   - `NEXTAUTH_URL` â€” required (set to your Vercel domain, e.g. `https://your-app.vercel.app`)
-   - `ADMIN_EMAILS` â€” recommended (comma-separated admin emails, e.g. `fadeessencee@gmail.com`)
-   - `APP_URL` and `NEXT_PUBLIC_SITE_URL` â€” required production origins
-   - `PAYMENTS_ENABLED=false` â€” safe portfolio/staging mode without provider calls
-   - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY` â€” required only when payments are enabled
-   - `RESEND_API_KEY` â€” required for email
+1. provision PostgreSQL and apply reviewed migrations;
+2. configure the canonical application URL and authentication secrets;
+3. configure Paystack webhooks against the production domain;
+4. verify Resend sender identity and templates;
+5. configure only the required AI providers;
+6. run lint, typecheck, unit, browser, accessibility, and build checks;
+7. test checkout, admin authorization, inventory, email, and webhook replay behavior.
 
-4. **Database Setup**
-   - Create a Postgres database (Vercel Postgres, Neon, Supabase, etc.)
-   - Apply migrations: `npx prisma migrate deploy`
+## Security and privacy
 
-5. **Post-deploy production checks**
-   - Open `https://<your-domain>/api/health`
-   - Confirm response has `"ok": true`
-   - If status is `503`, check `missingCritical` and update Vercel environment variables
-   - Add this URL to an uptime monitor (UptimeRobot, Better Stack, or similar)
+- Keep payment verification, service-role access, and AI-provider credentials server-side.
+- Treat webhook authentication and idempotency as deployment gates.
+- Do not copy production customer or order data into development environments.
+- Review role checks for every admin mutation and export.
+- Rate-limit authentication, checkout, contact, newsletter, and concierge endpoints.
+- Sanitize generated or editor-authored HTML before rendering.
 
-### Other Platforms
+If a credential has ever been committed, removing it from the current tree is not sufficient—rotate it at the provider and review repository history.
 
-The application can be deployed to any platform supporting Next.js:
-- **Netlify**: Use Next.js plugin
-- **Railway**: Automatic deployment
-- **AWS**: Use Amplify or EC2
-- **DigitalOcean**: App Platform
+## Documentation
 
-## 📝 Development
+- [`docs/`](./docs/) — product and implementation records
+- [`e2e/README.md`](./e2e/README.md) — end-to-end workspace guidance
+- [`NEWSLETTER_INTEGRATION.md`](./NEWSLETTER_INTEGRATION.md) — newsletter integration notes
+- [`REGENERATE_PRISMA.md`](./REGENERATE_PRISMA.md) — Prisma generation guidance
 
-### Concierge V2 documentation
+## Ownership and licence
 
-- [Architecture](docs/CONCIERGE_V2_ARCHITECTURE.md)
-- [Provider matrix](docs/CONCIERGE_V2_PROVIDER_MATRIX.md)
-- [Entitlements and limits](docs/CONCIERGE_V2_RATE_LIMITS.md)
-- [Security boundaries](docs/CONCIERGE_V2_SECURITY.md)
-- [Evaluation and preview test script](docs/CONCIERGE_V2_EVALUATION.md)
-- [Deployment handoff and rollback](docs/CONCIERGE_V2_HANDOFF.md)
-- [Live checklist](docs/CONCIERGE_V2_TODO.md)
+This is a collaborative product repository. Commit and pull-request history should be used when describing individual contributions.
 
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-
-### Database Commands
-
-- `npx prisma generate` - Generate Prisma Client
-- `npx prisma db push` - Push schema changes
-- `npx prisma studio` - Open Prisma Studio
-- `npx prisma migrate dev` - Create migration
-- `npx prisma migrate deploy` - Apply migrations (prod)
-
-### Code Style
-
-- **TypeScript**: Strict mode enabled
-- **ESLint**: Configured for Next.js
-- **Prettier**: Code formatting (if configured)
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Prisma Client not found**
-   ```bash
-   npx prisma generate
-   ```
-
-2. **Database connection errors**
-   - Verify `DATABASE_URL` is set (must be `postgresql://...`)
-   - Run `npx prisma migrate deploy` (prod) or `npx prisma migrate dev` (dev)
-
-3. **Build errors**
-   - Clear `.next` folder
-   - Run `npm run build` again
-
-4. **Authentication issues**
-   - Check `NEXTAUTH_SECRET` is set
-   - Verify `NEXTAUTH_URL` matches your domain
-
-## 📄 License
-
-This project is proprietary software. All rights reserved.
-
-## 👥 Support
-
-For support, contact:
-- **Email**: fadeessencee@gmail.com
-- **Phone**: +234 8160591348
-- **Business Hours**: Monday - Saturday, 8:00 AM - 8:00 PM
-
-## 🙏 Acknowledgments
-
-- **Next.js** team for the amazing framework
-- **Vercel** for hosting and analytics
-- **Radix UI** for accessible components
-- **Prisma** for the excellent ORM
-- **Paystack** for payment processing
-- **Resend** for email delivery
-
----
-
-**Built with ❤️ for Fádé Essence**
-
+No open-source licence is currently granted. Public visibility does not by itself permit reuse, modification, or redistribution.

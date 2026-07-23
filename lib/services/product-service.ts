@@ -24,6 +24,12 @@ export const productInputSchema = z.object({
   images: z.array(z.string()).optional().default([]),
   collectionId: z.string().optional().nullable(),
   fragranceFamily: z.string().optional().nullable(),
+  sku: z.string().optional().nullable(), barcode: z.string().optional().nullable(), launchYear: z.number().int().optional().nullable(), perfumer: z.string().optional().nullable(), countryOfOrigin: z.string().optional().nullable(),
+  concentration: z.string().optional().nullable(), longevity: z.string().optional().nullable(), sillage: z.string().optional().nullable(), intensity: z.string().optional().nullable(), sprayGuidance: z.string().optional().nullable(),
+  climate: z.string().optional().nullable(), season: z.string().optional().nullable(), timeOfDay: z.string().optional().nullable(), occasion: z.string().optional().nullable(),
+  weightGrams: z.number().int().optional().nullable(), shippingClass: z.string().optional().nullable(), reorderPoint: z.number().int().optional().nullable(), dropDate: z.string().optional().nullable(),
+  seoTitle: z.string().max(70).optional().nullable(), seoDescription: z.string().max(180).optional().nullable(), publishStatus: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).optional().default("DRAFT"),
+  beginnerFriendly: z.boolean().optional().default(false), returnEligible: z.boolean().optional().default(true), isPreorder: z.boolean().optional().default(false), isWaitlist: z.boolean().optional().default(false),
 })
 
 export type ProductInput = z.infer<typeof productInputSchema>
@@ -79,6 +85,12 @@ export function parseProductFormData(formData: FormData): ProductInput {
     images,
     collectionId: ((formData.get("collectionId") as string) || "").trim() || null,
     fragranceFamily: ((formData.get("fragranceFamily") as string) || "").trim() || null,
+    sku: ((formData.get("sku") as string) || "").trim() || null, barcode: ((formData.get("barcode") as string) || "").trim() || null, launchYear: toOptionalNumber(formData.get("launchYear")), perfumer: ((formData.get("perfumer") as string) || "").trim() || null, countryOfOrigin: ((formData.get("countryOfOrigin") as string) || "").trim() || null,
+    concentration: ((formData.get("concentration") as string) || "").trim() || null, longevity: ((formData.get("longevity") as string) || "").trim() || null, sillage: ((formData.get("sillage") as string) || "").trim() || null, intensity: ((formData.get("intensity") as string) || "").trim() || null, sprayGuidance: ((formData.get("sprayGuidance") as string) || "").trim() || null,
+    climate: ((formData.get("climate") as string) || "").trim() || null, season: ((formData.get("season") as string) || "").trim() || null, timeOfDay: ((formData.get("timeOfDay") as string) || "").trim() || null, occasion: ((formData.get("occasion") as string) || "").trim() || null,
+    weightGrams: toOptionalNumber(formData.get("weightGrams")), shippingClass: ((formData.get("shippingClass") as string) || "").trim() || null, reorderPoint: toOptionalNumber(formData.get("reorderPoint")), dropDate: ((formData.get("dropDate") as string) || "").trim() || null,
+    seoTitle: ((formData.get("seoTitle") as string) || "").trim() || null, seoDescription: ((formData.get("seoDescription") as string) || "").trim() || null, publishStatus: ((formData.get("publishStatus") as string) || "DRAFT") as "DRAFT" | "PUBLISHED" | "ARCHIVED",
+    beginnerFriendly: Boolean(formData.get("beginnerFriendly")), returnEligible: Boolean(formData.get("returnEligible")), isPreorder: Boolean(formData.get("isPreorder")), isWaitlist: Boolean(formData.get("isWaitlist")),
   }
 
   return productInputSchema.parse(result)
@@ -202,6 +214,7 @@ export async function createProduct(input: ProductInput) {
       images: input.images,
       collectionId: input.collectionId,
       fragranceFamily: input.fragranceFamily,
+      sku: input.sku, barcode: input.barcode, launchYear: input.launchYear, perfumer: input.perfumer, countryOfOrigin: input.countryOfOrigin, concentration: input.concentration, longevity: input.longevity, sillage: input.sillage, intensity: input.intensity, sprayGuidance: input.sprayGuidance, climate: input.climate, season: input.season, timeOfDay: input.timeOfDay, occasion: input.occasion, weightGrams: input.weightGrams, shippingClass: input.shippingClass, reorderPoint: input.reorderPoint, dropDate: input.dropDate ? new Date(input.dropDate) : null, seoTitle: input.seoTitle, seoDescription: input.seoDescription, publishStatus: input.publishStatus, beginnerFriendly: input.beginnerFriendly, returnEligible: input.returnEligible, isPreorder: input.isPreorder, isWaitlist: input.isWaitlist,
     },
   })
   invalidateCatalogueCache()
@@ -230,6 +243,7 @@ export async function updateProduct(id: string, input: ProductInput) {
       images: input.images,
       collectionId: input.collectionId,
       fragranceFamily: input.fragranceFamily,
+      sku: input.sku, barcode: input.barcode, launchYear: input.launchYear, perfumer: input.perfumer, countryOfOrigin: input.countryOfOrigin, concentration: input.concentration, longevity: input.longevity, sillage: input.sillage, intensity: input.intensity, sprayGuidance: input.sprayGuidance, climate: input.climate, season: input.season, timeOfDay: input.timeOfDay, occasion: input.occasion, weightGrams: input.weightGrams, shippingClass: input.shippingClass, reorderPoint: input.reorderPoint, dropDate: input.dropDate ? new Date(input.dropDate) : null, seoTitle: input.seoTitle, seoDescription: input.seoDescription, publishStatus: input.publishStatus, beginnerFriendly: input.beginnerFriendly, returnEligible: input.returnEligible, isPreorder: input.isPreorder, isWaitlist: input.isWaitlist,
     },
   })
   invalidateCatalogueCache()

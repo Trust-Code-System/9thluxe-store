@@ -19,7 +19,7 @@ export const brandSlugMap: Record<string, string> = {
 export function slugifyBrand(name: string): string {
   return name
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // strip accents (Fàdè → Fade)
+    .replace(/[\u0300-\u036f]/g, "") // strip accents (Fádé → Fade)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")

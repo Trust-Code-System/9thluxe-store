@@ -1,8 +1,10 @@
 import Link from "next/link"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 
-import { journalArticles } from "@/lib/journal-articles"
+import { getPublishedStoryCards } from "@/lib/stories/queries"
 import { MainLayout } from "@/components/layout/main-layout"
+
+export const dynamic = "force-dynamic"
 
 export const metadata = {
   title: "The Journal | Fádé",
@@ -18,8 +20,32 @@ function formatDate(date: string) {
   })
 }
 
-export default function JournalPage() {
-  const [featured, ...rest] = journalArticles
+export default async function JournalPage() {
+  const cards = await getPublishedStoryCards()
+  const [featured, ...rest] = cards
+
+  if (!featured) {
+    return (
+      <MainLayout>
+        <section
+          data-surface="night"
+          className="grain relative bg-background py-16 text-foreground lg:py-24"
+        >
+          <div className="container relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <header className="mb-8">
+              <span className="eyebrow">The Journal</span>
+              <h1 className="mt-4 font-serif text-4xl font-light tracking-[-0.01em] md:text-6xl">
+                Notes &amp; <em className="text-accent">stories</em>
+              </h1>
+            </header>
+            <p className="max-w-md leading-relaxed text-muted-foreground">
+              New stories are coming soon.
+            </p>
+          </div>
+        </section>
+      </MainLayout>
+    )
+  }
 
   return (
     <MainLayout>

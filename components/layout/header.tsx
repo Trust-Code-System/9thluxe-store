@@ -19,20 +19,21 @@ import {
 import { SearchDialog } from "@/components/search/search-dialog";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useSiteChrome } from "./site-chrome-context";
 
-const primaryNav = [
+type NavEntry = { name: string; href: string };
+
+const defaultPrimaryNav: NavEntry[] = [
   { name: "Shop", href: "/shop" },
   { name: "Collections", href: "/collections" },
   { name: "Discover", href: "/find-your-fragrance" },
 ];
 
-const secondaryNav = [
+const defaultSecondaryNav: NavEntry[] = [
   { name: "Drops", href: "/drops" },
   { name: "Journal", href: "/journal" },
   { name: "Concierge", href: "/concierge" },
 ];
-
-const allNav = [...primaryNav, ...secondaryNav];
 
 function NavLink({
   item,
@@ -57,11 +58,32 @@ function NavLink({
   );
 }
 
-export function Header() {
+function toEntries(items: { label: string; href: string }[] | undefined): NavEntry[] | undefined {
+  if (!items || items.length === 0) return undefined;
+  return items.map((i) => ({ name: i.label, href: i.href }));
+}
+
+export function Header({
+  primaryNav: primaryNavProp,
+  secondaryNav: secondaryNavProp,
+}: {
+  primaryNav?: NavEntry[];
+  secondaryNav?: NavEntry[];
+} = {}) {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [hasMounted, setHasMounted] = React.useState(false);
-  const cartItemCount = useCartStore((state) => state.items.length);
+  const cartItemCount = useCartStore((state) => state.getUniqueItemsCount());
+  const chrome = useSiteChrome();
+
+  const primaryNav =
+    primaryNavProp ?? toEntries(chrome?.nav?.HEADER_PRIMARY) ?? defaultPrimaryNav;
+  const secondaryNav =
+    secondaryNavProp ?? toEntries(chrome?.nav?.HEADER_SECONDARY) ?? defaultSecondaryNav;
+  const allNav = React.useMemo(
+    () => [...primaryNav, ...secondaryNav],
+    [primaryNav, secondaryNav],
+  );
 
   React.useEffect(() => {
     setHasMounted(true);

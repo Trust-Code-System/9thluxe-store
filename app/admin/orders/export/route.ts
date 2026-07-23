@@ -1,13 +1,16 @@
 // app/admin/orders/export/route.ts
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requireAdmin } from '@/lib/admin'
+import { getAuthorizedUser } from '@/lib/authz'
 import { OrderStatus } from '@prisma/client'
 
 export const runtime = 'nodejs'
 
 export async function GET(req: Request) {
-  await requireAdmin()
+  const authz = await getAuthorizedUser('orders:view')
+  if (!authz.ok) {
+    return new Response(authz.status === 403 ? 'Forbidden' : 'Unauthorized', { status: authz.status })
+  }
   const url = new URL(req.url)
   const q = (url.searchParams.get('q') || '').trim()
   const status = (url.searchParams.get('status') || '') as OrderStatus | ''

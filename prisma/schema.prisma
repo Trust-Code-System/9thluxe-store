@@ -59,17 +59,22 @@ enum InventoryMovementReason {
 }
 
 model User {
-  id               String   @id @default(cuid())
+  id               String     @id @default(cuid())
   name             String?
-  email            String   @unique
+  email            String     @unique
   passwordHash     String
-  role             Role     @default(USER)
-  marketingEmails  Boolean  @default(true)
-  smsNotifications Boolean  @default(false)
-  orderUpdates     Boolean  @default(true)
-  wishlistAlerts   Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  role             Role       @default(USER)
+  adminRole        AdminRole? // scopes admin capabilities; NULL + role=ADMIN ⇒ SUPER_ADMIN
+  marketingEmails  Boolean    @default(true)
+  smsNotifications Boolean    @default(false)
+  orderUpdates     Boolean    @default(true)
+  wishlistAlerts   Boolean    @default(false)
+  customerTags     String?
+  customerNotes    String?
+  customerSegment  String?
+  customerStatus   String     @default("ACTIVE")
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
   // Loyalty & referral
   loyaltyTier        String  @default("STANDARD") // STANDARD | OBSIDIAN | GOLD | PLATINUM
@@ -111,22 +116,24 @@ model Category {
 }
 
 model Product {
-  id          String          @id @default(cuid())
-  name        String
-  slug        String          @unique
-  description String
-  images      Json // store image array as JSON
-  priceNGN    Int
-  oldPriceNGN Int?
-  currency    String          @default("NGN")
-  category    ProductCategory
-  brand       String?
-  productType String? // perfume
-  notesTop    String?
-  notesHeart  String?
-  notesBase   String?
-  longevity   String?
-  occasion    String?
+  id             String          @id @default(cuid())
+  name           String
+  slug           String          @unique
+  description    String
+  seoTitle       String?
+  seoDescription String?
+  images         Json // store image array as JSON
+  priceNGN       Int
+  oldPriceNGN    Int?
+  currency       String          @default("NGN")
+  category       ProductCategory
+  brand          String?
+  productType    String? // perfume
+  notesTop       String?
+  notesHeart     String?
+  notesBase      String?
+  longevity      String?
+  occasion       String?
 
   // --- Perfume identity ---
   shopifyId       String?       @unique
@@ -198,6 +205,10 @@ model Product {
   backInStockSubs       BackInStockSubscription[]
   inventoryReservations InventoryReservation[]
   inventoryMovements    InventoryMovement[]
+  storyLinks            StoryProduct[]
+  campaignLinks         CampaignProduct[]
+  relatedFrom           ProductRelation[]         @relation("RelatedFrom")
+  relatedTo             ProductRelation[]         @relation("RelatedTo")
 
   @@index([name])
   @@index([category])
@@ -258,7 +269,8 @@ model Coupon {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  orders Order[]
+  orders    Order[]
+  campaigns Campaign[]
 }
 
 enum NewsletterStatus {
@@ -479,12 +491,14 @@ model OrderItem {
 }
 
 model Collection {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  description    String?
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   products Product[]
 }
@@ -555,6 +569,18 @@ enum Role {
   ADMIN
 }
 
+// Granular admin role (admin-control initiative). Layered over Role: a user must be ADMIN to reach
+// the panel; adminRole then scopes what they can do. NULL on an existing ADMIN = SUPER_ADMIN
+// (backwards compatible — no current admin loses access). See lib/authz.ts for capability mapping.
+enum AdminRole {
+  SUPER_ADMIN
+  CONTENT_MANAGER
+  PRODUCT_MANAGER
+  ORDER_MANAGER
+  MARKETING_MANAGER
+  ANALYST
+}
+
 // ------------------------------------------------------------------
 // Backend upgrade: perfume commerce + intelligence domains
 // ------------------------------------------------------------------
@@ -563,6 +589,13 @@ enum PublishStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+enum FormSubmissionStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  SPAM
 }
 
 enum AuthenticityStatus {
@@ -1025,4 +1058,280 @@ model PerfumeKnowledgeEntry {
   updatedAt      DateTime       @updatedAt
 
   @@index([category, approvalStatus])
+}
+
+// ------------------------------------------------------------------
+// Editorial / storytelling CMS (admin-control initiative — Journal)
+// Replaces the hard-coded lib/journal-articles.ts array.
+// ------------------------------------------------------------------
+
+model Story {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  title    String
+  subtitle String?
+  excerpt  String?
+  category String? // e.g. "Fragrance Guide", "How To", "Seasonal"
+  readTime String? // e.g. "5 min read"
+  author   String?
+  tags     String? // comma-separated
+
+  coverImageUrl  String?
+  mobileCoverUrl String?
+  socialImageUrl String?
+
+  seoTitle       String?
+  seoDescription String?
+
+  status   PublishStatus @default(DRAFT)
+  featured Boolean       @default(false)
+  position Int           @default(0) // manual ordering (lower = earlier)
+
+  publishedAt  DateTime?
+  scheduledFor DateTime? // scheduled publish time
+  unpublishAt  DateTime? // scheduled unpublish time
+
+  createdBy String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft-delete / trash
+
+  blocks          StoryBlock[]
+  relatedProducts StoryProduct[]
+
+  @@index([status, publishedAt])
+  @@index([featured, position])
+  @@index([deletedAt])
+}
+
+model StoryBlock {
+  id       String @id @default(cuid())
+  storyId  String
+  story    Story  @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  type     String // heading | paragraph | quote | image | divider | product | button
+  position Int    @default(0)
+  data     Json // typed per block type; text is stored as plain text (sanitised on write)
+
+  @@index([storyId, position])
+}
+
+model StoryProduct {
+  id        String  @id @default(cuid())
+  storyId   String
+  productId String
+  position  Int     @default(0)
+  story     Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, productId])
+  @@index([storyId, position])
+}
+
+// Managed static/editorial pages. Legal pages intentionally remain source-controlled.
+model Page {
+  id             String        @id @default(cuid())
+  slug           String        @unique // route without a leading slash, e.g. "about" or "help/shipping"
+  title          String
+  eyebrow        String?
+  excerpt        String?
+  seoTitle       String?
+  seoDescription String?
+  status         PublishStatus @default(DRAFT)
+  publishedAt    DateTime?
+  scheduledFor   DateTime?
+  unpublishAt    DateTime?
+  createdBy      String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+  blocks         PageBlock[]
+
+  @@index([status, publishedAt])
+  @@index([deletedAt])
+}
+
+model PageBlock {
+  id       String @id @default(cuid())
+  pageId   String
+  page     Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type     String
+  position Int    @default(0)
+  data     Json
+
+  @@index([pageId, position])
+}
+
+// Durable inbox for public forms. The initial source is the contact form; source stays explicit
+// so product enquiries and other forms can join without another table.
+model FormSubmission {
+  id         String               @id @default(cuid())
+  source     String               @default("contact")
+  name       String?
+  email      String
+  subject    String?
+  message    String
+  status     FormSubmissionStatus @default(NEW)
+  notes      String?
+  metadata   Json?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  resolvedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([source, createdAt])
+  @@index([email, createdAt])
+}
+
+// ------------------------------------------------------------------
+// Global site settings + navigation (admin-control initiative)
+// SiteSetting is a typed key/value store: the set of allowed keys and their
+// shapes are defined in lib/settings/schema.ts, NOT open-ended.
+// ------------------------------------------------------------------
+
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+}
+
+enum NavLocation {
+  HEADER_PRIMARY
+  HEADER_SECONDARY
+  FOOTER_SHOP
+  FOOTER_DISCOVER
+  FOOTER_HELP
+  FOOTER_COMPANY
+}
+
+model NavigationItem {
+  id        String      @id @default(cuid())
+  location  NavLocation
+  label     String
+  href      String
+  newTab    Boolean     @default(false)
+  visible   Boolean     @default(true)
+  position  Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([location, position])
+}
+
+// Homepage section layout (admin-control initiative). Fixed catalogue of known section types
+// (see lib/homepage/registry.ts); one row per type controls order, visibility, and copy overrides.
+model HomepageSection {
+  id        String   @id @default(cuid())
+  type      String   @unique
+  position  Int      @default(0)
+  visible   Boolean  @default(true)
+  config    Json     @default("{}") // copy overrides only; empty = use built-in defaults
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+
+  @@index([position])
+}
+
+// Central media library (admin-control initiative). Catalogues uploaded + registered media URLs
+// with alt/caption/dimensions so assets can be reused, searched, and protected from deletion while
+// still referenced. The URL is the identity (matches how the app stores media elsewhere).
+model MediaAsset {
+  id        String    @id @default(cuid())
+  url       String    @unique
+  kind      String    @default("image") // image | video
+  filename  String?
+  alt       String?
+  caption   String?
+  mimeType  String?
+  sizeBytes Int?
+  width     Int?
+  height    Int?
+  source    String    @default("upload") // upload | url
+  createdBy String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([kind])
+  @@index([deletedAt])
+}
+
+model Campaign {
+  id           String            @id @default(cuid())
+  slug         String            @unique
+  title        String
+  description  String?
+  desktopImage String?
+  mobileImage  String?
+  ctaLabel     String?
+  ctaHref      String?
+  status       PublishStatus     @default(DRAFT)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  couponId     String?
+  coupon       Coupon?           @relation(fields: [couponId], references: [id])
+  createdBy    String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  products     CampaignProduct[]
+
+  @@index([status, startsAt, endsAt])
+}
+
+model CampaignProduct {
+  campaignId String
+  productId  String
+  position   Int      @default(0)
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([campaignId, productId])
+  @@index([campaignId, position])
+}
+
+model Redirect {
+  id          String   @id @default(cuid())
+  source      String   @unique
+  destination String
+  permanent   Boolean  @default(true)
+  active      Boolean  @default(true)
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContentRevision {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  version    Int
+  snapshot   Json
+  createdBy  String?
+  createdAt  DateTime @default(now())
+
+  @@unique([entityType, entityId, version])
+  @@index([entityType, entityId, createdAt])
+}
+
+model ProductRelation {
+  sourceId String
+  targetId String
+  position Int     @default(0)
+  source   Product @relation("RelatedFrom", fields: [sourceId], references: [id], onDelete: Cascade)
+  target   Product @relation("RelatedTo", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@id([sourceId, targetId])
+  @@index([sourceId, position])
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  subject   String
+  bodyText  String
+  enabled   Boolean  @default(false)
+  updatedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

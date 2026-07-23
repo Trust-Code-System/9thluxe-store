@@ -1,5 +1,6 @@
 import { Resend } from "resend"
 import { OrderStatus } from "@prisma/client"
+import { resolveEmailTemplate } from "@/lib/email-templates/service"
 
 type OrderLike = {
   id: string
@@ -211,14 +212,15 @@ export async function sendOrderStatusUpdate(order: OrderLike, newStatus: OrderSt
   }
   const resend = new Resend(resendKey)
 
-  const { subject, html } = statusContent[newStatus](order, orderRef)
+  const fallback = statusContent[newStatus](order, orderRef)
+  const resolved = await resolveEmailTemplate(`order_status_${newStatus}`, { customerName: order.user.name || "Customer", orderRef, total: `₦${order.totalNGN.toLocaleString()}` }, fallback.subject, fallback.html)
 
   try {
     const result = await resend.emails.send({
       from: process.env.NEWSLETTER_FROM_EMAIL || "Fádé Essence <onboarding@resend.dev>",
       to: order.user.email,
-      subject,
-      html,
+      subject: resolved.subject,
+      html: resolved.html,
     })
     if (result.error) {
       throw new Error(`Resend rejected status delivery: ${result.error.name}`)

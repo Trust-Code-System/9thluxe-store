@@ -54,7 +54,7 @@ interface ProductPageProps {
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params
   const data = await loadPdpData(slug)
-  if (!data) return { title: "Product Not Found | Fàdè" }
+  if (!data) return { title: "Product Not Found | Fádé" }
   const firstImage = data.media.find((m) => m.kind === "image")?.url
   return {
     title: data.seo.title,

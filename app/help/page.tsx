@@ -3,11 +3,17 @@ import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 
 import { MainLayout } from "@/components/layout/main-layout"
+import { ManagedPage } from "@/components/pages/managed-page"
+import { getManagedPageMetadata, getPublishedPage } from "@/lib/pages/queries"
 
-export const metadata: Metadata = {
+export const dynamic = "force-dynamic"
+
+const fallbackMetadata: Metadata = {
   title: "Help Center | Fádé",
   description: "Get help with your orders, shipping, and returns.",
 }
+
+export function generateMetadata() { return getManagedPageMetadata("help", fallbackMetadata) }
 
 const helpTopics = [
   {
@@ -42,7 +48,9 @@ const helpTopics = [
   },
 ]
 
-export default function HelpPage() {
+export default async function HelpPage() {
+  const managed = await getPublishedPage("help")
+  if (managed) return <ManagedPage page={managed} />
   return (
     <MainLayout>
       <section

@@ -4,13 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Truck, Clock, Package, MapPin } from "lucide-react";
 import { getCommerceConfig } from "@/lib/config/commerce";
 import { formatPrice } from "@/lib/format";
+import { ManagedPage } from "@/components/pages/managed-page";
+import { getManagedPageMetadata, getPublishedPage } from "@/lib/pages/queries";
 
-export const metadata: Metadata = {
+export const dynamic = "force-dynamic";
+
+const fallbackMetadata: Metadata = {
   title: "Shipping Information | Fádé",
   description: "Learn about our shipping options and delivery times.",
 };
 
-export default function ShippingPage() {
+export function generateMetadata() { return getManagedPageMetadata("help/shipping", fallbackMetadata); }
+
+export default async function ShippingPage() {
+  const managed = await getPublishedPage("help/shipping");
+  if (managed) return <ManagedPage page={managed} />;
   const { shipping } = getCommerceConfig();
 
   return (

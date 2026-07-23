@@ -4,6 +4,7 @@
 // lib/config/feature-flags.ts). Owner/admin-only.
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { prisma } from '@/lib/prisma'
 import { allFlags } from '@/lib/config/feature-flags'
 
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic'
 export const GET = route(async () => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'settings:manage')) raise('FORBIDDEN')
   const persisted = await prisma.featureFlag.findMany({ select: { key: true, enabled: true, description: true } }).catch(() => [])
   return { data: { effective: allFlags(), persisted, source: 'FEATURE_FLAGS env var' } }
 })

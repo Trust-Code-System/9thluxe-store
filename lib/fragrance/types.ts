@@ -32,7 +32,7 @@ export type ApprovalStatus = "draft" | "pending_review" | "approved" | "rejected
 /** Provenance for any subjective / inferred product field. Mirrors the PDP Provenance vocabulary. */
 export type FieldSource =
   | "brand" // supplied by the manufacturer / brand
-  | "editorial" // written / curated by the Fàdè team
+  | "editorial" // written / curated by the Fádé team
   | "customer_aggregate" // aggregated from verified customer reviews
   | "inferred" // derived by the deterministic enrichment pipeline
   | "ai_model" // produced by an external AI model (credential-gated, optional)

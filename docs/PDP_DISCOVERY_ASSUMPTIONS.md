@@ -37,7 +37,7 @@ listed in `PDP_BACKEND_REQUIREMENTS.md`.
    `intensity` are *editorial / aggregated opinion*, and `authenticityStatus` distinguishes
    `RETAILER_INSPECTED` from `MANUFACTURER_VERIFIED`.
    - **Assumption:** every subjective value is labelled with its source
-     (`Brand-provided` · `Fàdè editorial` · `Verified customers`) using a small provenance chip, and
+     (`Brand-provided` · `Fádé editorial` · `Verified customers`) using a small provenance chip, and
      never presented as a laboratory fact.
 
 ## Endpoint reality

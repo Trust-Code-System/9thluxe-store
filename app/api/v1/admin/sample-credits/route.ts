@@ -4,6 +4,7 @@
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { grantSampleCredit } from '@/lib/samples/service'
 
 export const runtime = 'nodejs'
@@ -19,6 +20,7 @@ const bodySchema = z.object({
 export const POST = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'marketing:manage')) raise('FORBIDDEN')
   const body = bodySchema.parse(await req.json())
   const credit = await grantSampleCredit(body, admin!.id)
   return { data: { credit: { id: credit.id, amountNGN: credit.amountNGN, remainingNGN: credit.remainingNGN, expiresAt: credit.expiresAt } }, status: 201 }

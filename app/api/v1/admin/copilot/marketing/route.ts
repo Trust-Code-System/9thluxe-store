@@ -4,6 +4,7 @@
 import { z } from 'zod'
 import { route, raise } from '@/lib/http/handler'
 import { getAdminUser } from '@/lib/admin'
+import { hasCapability, resolveRole } from '@/lib/authz-core'
 import { generateMarketingDraft } from '@/lib/copilot/marketing'
 
 export const runtime = 'nodejs'
@@ -23,6 +24,7 @@ const bodySchema = z.object({
 export const POST = route(async ({ req }) => {
   const admin = await getAdminUser()
   if (!admin) raise('FORBIDDEN')
+  if (!hasCapability(resolveRole(admin), 'marketing:manage')) raise('FORBIDDEN')
   const body = bodySchema.parse(await req.json())
   const draft = await generateMarketingDraft(body)
   return { data: { draft } }
