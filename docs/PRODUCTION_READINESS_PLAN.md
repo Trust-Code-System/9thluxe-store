@@ -66,6 +66,9 @@ Completed in the first hardening milestone:
 - signed refund lifecycle events now update the durable refund, order, payment, lifetime-spend, tier,
   and loyalty ledgers atomically; duplicate deliveries are harmless and the payment reconciliation
   job also polls non-terminal refunds when webhooks are missed;
+- payment collection is disabled by default and requires an explicit environment switch plus
+  provider credentials; checkout creation, Paystack initialization, the storefront payment control,
+  and administrative refunds all fail closed while it is disabled;
 - the protected outbox worker claims work safely, recovers stale locks, retries with exponential
   backoff, and retains exhausted events in a failed state;
 - receipt delivery uses provider idempotency, admin notifications use a database deduplication key,
@@ -89,13 +92,14 @@ Completed in the first hardening milestone:
   versions; the production dependency audit now reports zero vulnerabilities;
 - payment-matching, checkout-idempotency, publication, origin, and shipping-policy regression tests
   were added;
-- Prisma schema validation, TypeScript, lint, 356 unit/integration tests, and the production build
+- Prisma schema validation, TypeScript, lint, 365 unit/integration tests, and the production build
   pass on this branch; all 15 staging migrations are applied with zero schema drift.
 
 Still required before launch:
 
 - browser/Paystack integration tests and production staging certification;
-- scheduler configuration for reservation expiry, outbox delivery, and payment reconciliation;
+- deployment-time scheduler registration for reservation expiry, outbox delivery, and payment
+  reconciliation (the authenticated routes support both Vercel Cron `GET` and external `POST`);
 - owner-supplied provider credentials, business details, brand assets, and approved policies.
 
 ## Audit findings

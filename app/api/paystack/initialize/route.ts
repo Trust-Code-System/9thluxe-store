@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 
 import { getPayments } from "@/integrations/registry"
+import { isPaymentCollectionEnabled } from "@/integrations/payments/policy"
 import { auth } from "@/lib/auth"
 import { isValidIdempotencyKey } from "@/lib/checkout/idempotency"
 import { getCommerceConfig } from "@/lib/config/commerce"
@@ -61,6 +62,12 @@ export async function POST(req: Request) {
   try {
     if (!hasTrustedOrigin(req)) {
       return NextResponse.json({ error: "Request origin could not be verified" }, { status: 403 })
+    }
+    if (!isPaymentCollectionEnabled(env.PAYMENTS_ENABLED, env.PAYSTACK_SECRET_KEY)) {
+      return NextResponse.json(
+        { error: "Online payments are temporarily unavailable" },
+        { status: 503 },
+      )
     }
     const session = await auth()
     const email = session?.user?.email

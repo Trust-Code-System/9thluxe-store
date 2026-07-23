@@ -4,9 +4,11 @@
 signature-verified webhook. A browser returning to the success URL never marks payment.
 
 ## Provider abstraction
-`integrations/payments/types.ts` defines `PaymentProvider`. The registry picks:
+`integrations/payments/types.ts` defines `PaymentProvider`. Collection is fail-closed unless
+`PAYMENTS_ENABLED=true` and a secret key is configured. Behind that boundary, the registry picks:
 - `paystackProvider` when `PAYSTACK_SECRET_KEY` is set (test/sandbox key in this project).
-- `mockPaymentProvider` otherwise (deterministic, offline, used in dev/tests).
+- `mockPaymentProvider` otherwise (deterministic and available only to internal dev/test code;
+  public checkout remains disabled).
 
 ## Sequence
 1. **Create order (PENDING).** Server recomputes subtotal from DB prices, validates stock, and

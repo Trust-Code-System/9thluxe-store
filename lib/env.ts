@@ -21,6 +21,7 @@ const schema = z.object({
   NEXTAUTH_URL: z.string().url().optional(),
 
   // Payments (Paystack): sandbox/test only in this project
+  PAYMENTS_ENABLED: z.enum(['true', 'false']).transform((value) => value === 'true').default('false'),
   PAYSTACK_SECRET_KEY: z.string().optional(),
   PAYSTACK_PUBLIC_KEY: z.string().optional(),
 
@@ -130,6 +131,7 @@ export function integrationStatus() {
   return {
     database: Boolean(e.DATABASE_URL),
     auth: Boolean(e.AUTH_SECRET || e.NEXTAUTH_SECRET),
+    paymentsEnabled: e.PAYMENTS_ENABLED,
     paystack: Boolean(e.PAYSTACK_SECRET_KEY),
     resend: Boolean(e.RESEND_API_KEY),
     shopify: Boolean(e.SHOPIFY_STORE_DOMAIN && e.SHOPIFY_STOREFRONT_API_TOKEN),

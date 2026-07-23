@@ -9,7 +9,10 @@ import { shopifyCommerce } from './commerce/shopify'
 import type { PaymentProvider } from './payments/types'
 import { paystackProvider } from './payments/paystack'
 import { mockPaymentProvider } from './payments/mock'
-import { selectPaymentProviderMode } from './payments/policy'
+import {
+  isPaymentCollectionEnabled,
+  selectPaymentProviderMode,
+} from './payments/policy'
 import type { SearchProvider } from './search/types'
 import { postgresSearch } from './search/postgres'
 import { aiServices } from './ai'
@@ -39,7 +42,12 @@ export function getAi(): AiServices {
 export function providerStatus() {
   return {
     commerce: getCommerce().name,
-    payments: getPayments().name,
+    payments: isPaymentCollectionEnabled(
+      env.PAYMENTS_ENABLED,
+      env.PAYSTACK_SECRET_KEY,
+    )
+      ? getPayments().name
+      : 'disabled',
     search: getSearch().name,
     ai: env.AI_PROVIDER,
     conciergeAi: conciergeProviderStatus(),

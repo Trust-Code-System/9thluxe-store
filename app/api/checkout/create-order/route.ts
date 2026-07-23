@@ -12,6 +12,8 @@ import { consumeRateLimit } from "@/lib/middleware/limiter"
 import { validateCoupon } from "@/lib/pricing"
 import { hasTrustedOrigin } from "@/lib/security/origin"
 import { AppError } from "@/lib/http/errors"
+import { env } from "@/lib/env"
+import { isPaymentCollectionEnabled } from "@/integrations/payments/policy"
 import {
   aggregateInventoryLines,
   reservationExpiry,
@@ -103,6 +105,15 @@ export async function POST(req: NextRequest) {
       paymentMethod,
     } = parsed.data
 
+    if (
+      paymentMethod === "CARD" &&
+      !isPaymentCollectionEnabled(env.PAYMENTS_ENABLED, env.PAYSTACK_SECRET_KEY)
+    ) {
+      return NextResponse.json(
+        { error: "Online payments are temporarily unavailable" },
+        { status: 503 },
+      )
+    }
     if (paymentMethod === "BANK_TRANSFER" && !getBankTransferConfig()) {
       return NextResponse.json(
         { error: "Bank transfer is not currently available" },

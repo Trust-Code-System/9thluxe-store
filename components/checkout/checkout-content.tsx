@@ -40,6 +40,8 @@ interface CheckoutContentProps {
   giftWrapFee?: number;
 
   bankTransfer?: BankTransferConfig | null;
+
+  paymentsEnabled?: boolean;
 }
 
 export function CheckoutContent({
@@ -49,6 +51,7 @@ export function CheckoutContent({
   expressShippingFee = 35000,
   giftWrapFee = 2500,
   bankTransfer = null,
+  paymentsEnabled = false,
 }: CheckoutContentProps) {
   const router = useRouter();
 
@@ -253,6 +256,7 @@ export function CheckoutContent({
                 total={total}
                 orderPayload={orderPayload}
                 bankTransfer={bankTransfer}
+                paymentsEnabled={paymentsEnabled}
               />
             )}
           </div>

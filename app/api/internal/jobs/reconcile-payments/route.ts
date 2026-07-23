@@ -53,3 +53,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "job_failed" }, { status: 500 })
   }
 }
+
+// Vercel Cron invokes configured routes with GET. Keep POST for external schedulers and runbooks.
+export const GET = POST

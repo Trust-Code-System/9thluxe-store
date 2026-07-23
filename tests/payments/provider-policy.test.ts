@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest"
 
-import { selectPaymentProviderMode } from "@/integrations/payments/policy"
+import {
+  isPaymentCollectionEnabled,
+  selectPaymentProviderMode,
+} from "@/integrations/payments/policy"
 
 describe("payment provider environment policy", () => {
   it("uses the mock provider when no Paystack secret is configured", () => {
@@ -27,5 +30,11 @@ describe("payment provider environment policy", () => {
     expect(selectPaymentProviderMode("sk_live_example", "production")).toBe(
       "paystack",
     )
+  })
+
+  it("collects payments only after an explicit enable and a secret", () => {
+    expect(isPaymentCollectionEnabled(false, "sk_live_example")).toBe(false)
+    expect(isPaymentCollectionEnabled(true, undefined)).toBe(false)
+    expect(isPaymentCollectionEnabled(true, "sk_test_example")).toBe(true)
   })
 })

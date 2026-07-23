@@ -39,6 +39,7 @@ interface PaymentFormProps {
   total: number;
   orderPayload: OrderPayload;
   bankTransfer?: BankTransferConfig | null;
+  paymentsEnabled?: boolean;
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -71,6 +72,7 @@ export function PaymentForm({
   total,
   orderPayload,
   bankTransfer = null,
+  paymentsEnabled = false,
 }: PaymentFormProps) {
   const { formData } = useCheckoutStore();
   const checkoutIdempotencyKey = React.useRef(crypto.randomUUID());
@@ -272,7 +274,7 @@ export function PaymentForm({
               paymentMethod === "CARD"
                 ? "border-primary bg-primary/5"
                 : "border-border hover:border-border/80"
-            }`}
+              } ${!paymentsEnabled ? "cursor-not-allowed opacity-60" : ""}`}
           >
             <input
               type="radio"
@@ -280,13 +282,16 @@ export function PaymentForm({
               value="CARD"
               checked={paymentMethod === "CARD"}
               onChange={() => setPaymentMethod("CARD")}
+              disabled={!paymentsEnabled}
               className="h-4 w-4 accent-primary"
             />
             <CreditCard className="h-5 w-5 text-primary shrink-0" />
             <div>
               <p className="font-medium text-sm">Card / Online Payment</p>
               <p className="text-xs text-muted-foreground">
-                Pay securely via Paystack (card, USSD, bank)
+                {paymentsEnabled
+                  ? "Pay securely via Paystack (card, USSD, bank)"
+                  : "Online payment is temporarily disabled for this preview"}
               </p>
             </div>
           </label>
@@ -337,7 +342,14 @@ export function PaymentForm({
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <Button type="submit" className="flex-1" disabled={isProcessing}>
+        <Button
+          type="submit"
+          className="flex-1"
+          disabled={
+            isProcessing ||
+            (paymentMethod === "CARD" && !paymentsEnabled)
+          }
+        >
           {isProcessing ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

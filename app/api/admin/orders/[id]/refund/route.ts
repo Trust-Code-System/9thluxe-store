@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 
 import { getPayments } from "@/integrations/registry"
+import { isPaymentCollectionEnabled } from "@/integrations/payments/policy"
 import { getAdminUser } from "@/lib/admin"
 import { isValidIdempotencyKey } from "@/lib/checkout/idempotency"
 import { AppError } from "@/lib/http/errors"
@@ -9,6 +10,7 @@ import { consumeRateLimit } from "@/lib/middleware/limiter"
 import { logger } from "@/lib/observability/logger"
 import { requestFullRefund } from "@/lib/refunds/service"
 import { hasTrustedOrigin } from "@/lib/security/origin"
+import { env } from "@/lib/env"
 
 const bodySchema = z.object({
   reason: z.string().trim().min(3).max(500),
@@ -23,6 +25,12 @@ export async function POST(
       return NextResponse.json(
         { error: "Request origin could not be verified" },
         { status: 403 },
+      )
+    }
+    if (!isPaymentCollectionEnabled(env.PAYMENTS_ENABLED, env.PAYSTACK_SECRET_KEY)) {
+      return NextResponse.json(
+        { error: "Online payments are temporarily unavailable" },
+        { status: 503 },
       )
     }
     const admin = await getAdminUser()

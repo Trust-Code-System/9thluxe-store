@@ -1,7 +1,8 @@
 # Background jobs runbook
 
-The application exposes three authenticated job endpoints. A scheduler must call them with `POST`
-and the header `Authorization: Bearer <CRON_SECRET>`.
+The application exposes three authenticated job endpoints. A scheduler may call them with `GET` or
+`POST` and the header `Authorization: Bearer <CRON_SECRET>`. `GET` supports Vercel Cron; `POST`
+supports external schedulers and manual operational checks.
 
 | Job | Endpoint | Recommended cadence |
 | --- | --- | --- |
@@ -26,3 +27,8 @@ in `NEEDS_ATTENTION` require manual comparison with the Paystack dashboard befor
 After deployment, verify each job once with a staging secret and confirm its structured success log.
 Do not enable the production schedule until the Paystack test-mode purchase and missed-webhook
 reconciliation scenarios have passed.
+
+Vercel Hobby currently permits each cron only once per day, which is not frequent enough for these
+commerce jobs. On Hobby, use an external scheduler capable of the recommended cadence. On Vercel
+Pro or Enterprise, add the three paths to `vercel.json` at the cadence above. Vercel automatically
+sends `CRON_SECRET` as a bearer token and invokes cron paths with `GET`.

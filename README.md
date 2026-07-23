@@ -272,7 +272,12 @@ Fádé Essence is a complete e-commerce solution featuring:
     NEXTAUTH_SECRET="your-secret-key-here"
     NEXTAUTH_URL="http://localhost:3000"
 
-   # Paystack (for payments)
+   # Site Configuration
+   APP_URL="http://localhost:3000"
+   NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+
+   # Paystack (disabled until explicitly enabled)
+   PAYMENTS_ENABLED="false"
    PAYSTACK_PUBLIC_KEY="your-paystack-public-key"
    PAYSTACK_SECRET_KEY="your-paystack-secret-key"
 
@@ -280,8 +285,6 @@ Fádé Essence is a complete e-commerce solution featuring:
    RESEND_API_KEY="your-resend-api-key"
    NEWSLETTER_FROM_EMAIL="noreply@yourdomain.com"
 
-   # Site Configuration
-   NEXT_PUBLIC_SITE_URL="http://localhost:3000"
    ```
 
 4. **Set up the database**
@@ -316,11 +319,13 @@ Fádé Essence is a complete e-commerce solution featuring:
 | `DATABASE_URL` | Postgres connection string | `postgresql://...` |
 | `NEXTAUTH_SECRET` | NextAuth secret key | Generate with `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | Base URL of your application | `http://localhost:3000` |
+| `APP_URL` | Trusted application origin and callback base | `http://localhost:3000` |
 
 ### Optional Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
+| `PAYMENTS_ENABLED` | Explicit payment collection switch; defaults to `false` | `false` |
 | `PAYSTACK_PUBLIC_KEY` | Paystack public key | `pk_test_...` |
 | `PAYSTACK_SECRET_KEY` | Paystack secret key | `sk_test_...` |
 | `RESEND_API_KEY` | Resend API key | `re_...` |
@@ -460,8 +465,9 @@ npx playwright test tests/e2e/concierge-v2.spec.ts
    - `NEXTAUTH_SECRET` â€” required
    - `NEXTAUTH_URL` â€” required (set to your Vercel domain, e.g. `https://your-app.vercel.app`)
    - `ADMIN_EMAILS` â€” recommended (comma-separated admin emails, e.g. `fadeessencee@gmail.com`)
-   - `APP_URL` or `NEXT_PUBLIC_SITE_URL` â€” recommended (used for sitemap links)
-   - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY` â€” required for payments
+   - `APP_URL` and `NEXT_PUBLIC_SITE_URL` â€” required production origins
+   - `PAYMENTS_ENABLED=false` â€” safe portfolio/staging mode without provider calls
+   - `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY` â€” required only when payments are enabled
    - `RESEND_API_KEY` â€” required for email
 
 4. **Database Setup**
@@ -559,5 +565,4 @@ For support, contact:
 ---
 
 **Built with ❤️ for Fádé Essence**
-
 

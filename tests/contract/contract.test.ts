@@ -38,3 +38,26 @@ describe('contract: OpenAPI exposes the core storefront surface + envelope', () 
     },
   )
 })
+
+describe('contract: background jobs support authenticated schedulers', () => {
+  it.each([
+    'app/api/internal/jobs/process-outbox/route.ts',
+    'app/api/internal/jobs/release-reservations/route.ts',
+    'app/api/internal/jobs/reconcile-payments/route.ts',
+  ])('supports Vercel GET and external-scheduler POST in %s', (path) => {
+    const route = read(path)
+    expect(route).toContain('hasValidBearerSecret')
+    expect(route).toContain('export async function POST')
+    expect(route).toContain('export const GET = POST')
+  })
+})
+
+describe('contract: payment collection fails closed', () => {
+  it.each([
+    'app/api/checkout/create-order/route.ts',
+    'app/api/paystack/initialize/route.ts',
+    'app/api/admin/orders/[id]/refund/route.ts',
+  ])('guards provider mutations in %s', (path) => {
+    expect(read(path)).toContain('isPaymentCollectionEnabled')
+  })
+})

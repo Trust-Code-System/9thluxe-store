@@ -1,5 +1,12 @@
 export type PaymentProviderMode = "mock" | "paystack"
 
+export function isPaymentCollectionEnabled(
+  enabled: boolean,
+  secretKey: string | undefined,
+): boolean {
+  return enabled && Boolean(secretKey)
+}
+
 /**
  * Never let a local/test process contact Paystack with a live secret.
  * Test keys remain usable in production-mode staging builds.

@@ -2,7 +2,6 @@ const STRICT_CRITICAL_ENV_KEYS = ["DATABASE_URL", "NEXTAUTH_URL"] as const
 
 const PRODUCTION_CRITICAL_ENV_KEYS = [
   "APP_URL",
-  "PAYSTACK_SECRET_KEY",
   "RESEND_API_KEY",
   "NEWSLETTER_FROM_EMAIL",
   "UPSTASH_REDIS_REST_URL",
@@ -32,6 +31,11 @@ export function getEnvDiagnostics() {
     missingCritical.push(
       ...PRODUCTION_CRITICAL_ENV_KEYS.filter((key) => !hasValue(process.env[key])),
     )
+    if (process.env.PAYMENTS_ENABLED === "true") {
+      for (const key of ["PAYSTACK_SECRET_KEY", "PAYSTACK_PUBLIC_KEY"]) {
+        if (!hasValue(process.env[key])) missingCritical.push(key)
+      }
+    }
   }
 
   const hasAuthSecret = hasValue(process.env.AUTH_SECRET) || hasValue(process.env.NEXTAUTH_SECRET)
